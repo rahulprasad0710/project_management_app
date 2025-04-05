@@ -24,7 +24,7 @@ export async function connectToDatabase() {
         console.log("Connected to database :-", dbConnect.options.database);
     } catch (err: unknown) {
         console.error(err);
-        process.exit(1);
+        // process.exit(1);
     }
 }
 
