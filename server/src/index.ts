@@ -9,7 +9,7 @@ import routes from "./routes/index";
 
 dotenv.config();
 const app = express();
-const port = process.env.PORT || 3000;
+const port = Number(process.env.PORT) || 3000;
 
 connectToDatabase();
 
@@ -29,6 +29,6 @@ app.get("/", (req, res) => {
 
 app.use("/api", routes);
 
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
     console.log(`Server is running on port ${port}`);
 });
