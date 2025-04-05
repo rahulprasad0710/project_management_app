@@ -16,6 +16,9 @@ const dataSource = new DataSource({
     entities: entities,
     migrations: [],
     subscribers: [],
+    ssl: {
+        rejectUnauthorized: false,
+    },
 });
 
 export async function connectToDatabase() {
