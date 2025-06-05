@@ -1,4 +1,6 @@
+import { IProject, ITask, ITaskPayload, IUser } from "../types/user.types";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+
 import dotenv from "dotenv";
 
 export interface Response<T> {
@@ -8,8 +10,6 @@ export interface Response<T> {
 }
 
 dotenv.config();
-
-import { IUser, IProject, ITask, ITaskPayload } from "../types/user.types";
 
 // /* REDUX API */
 
@@ -32,7 +32,7 @@ export const api = createApi({
       }),
       invalidatesTags: ["Users"],
     }),
-    getProjects: build.query<IProject[], void>({
+    getProjects: build.query<Response<IProject[]>, void>({
       query: () => ({
         url: "projects",
         method: "GET",
@@ -107,4 +107,5 @@ export const {
   useCreateTasksMutation,
   useCreateProjectMutation,
   useLazyGetProjectsQuery,
+  useGetProjectsQuery,
 } = api;

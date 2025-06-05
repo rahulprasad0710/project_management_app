@@ -1,22 +1,24 @@
-import React, { useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { useCreateProjectMutation, useLazyGetProjectsQuery } from "@/store/api";
+import * as yup from "yup";
+
 import {
+  IAddProjectPayload,
+  IPriorityOptions,
+  IProject,
+  IProjectStatusOptions,
   Priority,
   ProjectStatus,
   priorityOptions,
-  IPriorityOptions,
-  IProjectStatusOptions,
-  IAddProjectPayload,
   projectStatusOptions,
 } from "@/types/user.types";
+import React, { useEffect, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { useCreateProjectMutation, useLazyGetProjectsQuery } from "@/store/api";
 
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { useParams } from "next/navigation";
-import { toast } from "react-toastify";
-import Spinner from "./Spinner";
 import MultiSelect from "./atoms/MultiSelect";
+import Spinner from "./Spinner";
+import { toast } from "react-toastify";
+import { useParams } from "next/navigation";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 // {
 //     "name": "project221",
@@ -49,10 +51,12 @@ interface IAssignedTo {
 
 type Props = {
   onClose: () => void;
+  selectedData: undefined | IProject;
+  setSelectedData: (data: IProject | undefined) => void;
 };
 
 const ProjectModal = (props: Props) => {
-  const { onClose } = props;
+  const { onClose, selectedData } = props;
   const { id } = useParams();
   const [createProjectMutation] = useCreateProjectMutation();
   const [fetchAllProject] = useLazyGetProjectsQuery();
@@ -80,11 +84,29 @@ const ProjectModal = (props: Props) => {
   const {
     register,
     handleSubmit,
+    setValue,
+    reset,
+    resetField,
     formState: { errors, isSubmitting },
   } = useForm<IFormInput>({
     defaultValues: defaultValues,
     resolver: yupResolver(schema),
   });
+
+  useEffect(() => {
+    if (selectedData) {
+      console.log("LOG: ~ useEffect ~ selectedData:", selectedData);
+      reset({
+        name: selectedData.name,
+        priority: selectedData.priority,
+        description: selectedData.description,
+        startDate: selectedData.startDate,
+        endDate: selectedData.endDate,
+        status: selectedData.status,
+        admin: Number(selectedData.admin),
+      });
+    }
+  }, [selectedData]);
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     console.log(data);

@@ -1,9 +1,10 @@
+import { Priority, ProjectStatus } from "../enums/Priority";
+
+import { IPagination } from "../types/express";
 import { Project } from "../db/entity/project";
+import { Task } from "../db/entity/task";
 import { User } from "../db/entity/User";
 import dataSource from "../db/data-source";
-import { Task } from "../db/entity/task";
-import { IPagination } from "../types/express";
-import { Priority, ProjectStatus } from "../enums/Priority";
 
 interface IProject {
     name: string;
@@ -45,9 +46,22 @@ export class ProjectService {
 
     async getAll(query: IPagination) {
         const { skip, take } = query;
-
+        console.log({
+            skip,
+            take,
+        });
         return await this.projectRepository.find({
-            select: ["id", "name", "startDate", "endDate"],
+            select: [
+                "id",
+                "name",
+                "startDate",
+                "endDate",
+                "status",
+                "priority",
+                "description",
+                "profilePicture",
+                "admin",
+            ],
             skip: skip,
             take: take,
         });

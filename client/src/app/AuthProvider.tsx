@@ -1,10 +1,11 @@
-import React from "react";
-import { Amplify } from "aws-amplify";
-import dotenv from "dotenv";
-dotenv.config();
-
-import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
+
+import { Amplify } from "aws-amplify";
+import { Authenticator } from "@aws-amplify/ui-react";
+import React from "react";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 Amplify.configure({
   Auth: {
@@ -77,7 +78,7 @@ const AuthProvider = (props: Props) => {
 
   const { children } = props;
   return (
-    <div className="py-6">
+    <div>
       <Authenticator
         services={services}
         variation="default"
@@ -86,7 +87,7 @@ const AuthProvider = (props: Props) => {
         {({ signOut, user }) => (
           <main>
             <div>
-              {JSON.stringify(user)}
+              {/* {JSON.stringify(user)} */}
               {user ? <div>{children}</div> : <div>Please Sign-in</div>}
             </div>
           </main>

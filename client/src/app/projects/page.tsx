@@ -1,20 +1,34 @@
 "use client";
 
 import React, { useState } from "react";
-import ProjectHeader from "../(components)/ProjectHeader";
-import ProjectCard from "../(components)/ProjectCard";
-import BoardView from "../(components)/BoardView";
-import TableView from "../(components)/TableView";
-import { useParams } from "next/navigation";
-import Header from "../(components)/Header";
-import { SquarePlus } from "lucide-react";
-import Modal from "../(components)/Modal";
-import ProjectModal from "../(components)/ProjectModal";
 
-type BOARD_TYPES = "BOARD" | "LIST" | "CALENDAR" | "TIMELINE";
+import BoardView from "../(components)/BoardView";
+import Header from "../(components)/Header";
+import Modal from "../(components)/Modal";
+import ProjectCard from "../(components)/ProjectCard";
+import ProjectHeader from "../(components)/ProjectHeader";
+import ProjectModal from "../(components)/ProjectModal";
+import ProjectTableView from "../(components)/ProjectTableView";
+import { SquarePlus } from "lucide-react";
+import TableView from "../(components)/TableView";
+import { useGetProjectsQuery } from "@/store/api";
+import { useParams } from "next/navigation";
+
+type BOARD_TYPES = "BOARD" | "LIST" | "CALENDAR" | "TIMELINE" | "TABLE";
 
 const ProjectPage = () => {
-  const [activeTab, setActiveTab] = useState<BOARD_TYPES>("BOARD");
+  const {
+    isFetching,
+    data: projectListResponse,
+    error,
+    isLoading,
+  } = useGetProjectsQuery();
+
+  console.log({
+    projectListResponse,
+  });
+
+  const [activeTab, setActiveTab] = useState<BOARD_TYPES>("TABLE");
   const [isModalNewProjectOpen, setIsModalNewProjectOpen] =
     useState<boolean>(false);
 
@@ -43,6 +57,10 @@ const ProjectPage = () => {
         />
       </div>
       <ProjectHeader activeTab={activeTab} setActiveTab={setActiveTab} />
+      {activeTab === "TABLE" && (
+        <ProjectTableView projectListResponse={projectListResponse} />
+      )}
+
       <Modal
         modalTitle="Add new project"
         isOpen={isModalNewProjectOpen}

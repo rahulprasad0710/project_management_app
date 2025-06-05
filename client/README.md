@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Creating a Jira-like project management app for non-developers—tailored for general company employees—means stripping out complex technical tooling and focusing on intuitive, productivity-oriented features. Here's a breakdown of core features you might include:
 
-## Getting Started
+🔹 1. Project Management
+Create Projects: Define a project with name, description, and department.
 
-First, run the development server:
+Project Dashboard: Visual summary of progress, tasks, deadlines.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Project Roles: Assign roles like Manager, Contributor, Viewer.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+🔹 2. Task & Workflow Management
+Task Boards: Kanban-style boards (To Do, In Progress, Done).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Task Details: Title, description, assignee, due date, priority, status.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Subtasks: Break large tasks into smaller ones.
 
-## Learn More
+Recurring Tasks: For repeated activities like reports or meetings.
 
-To learn more about Next.js, take a look at the following resources:
+🔹 3. Team Collaboration
+Comments: Threaded task discussions with @mentions.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Attachments: Upload files, images, PDFs.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Activity Log: Who did what, and when.
 
-## Deploy on Vercel
+🔹 4. Timeline & Deadlines
+Calendar View: Monthly/weekly overview of tasks.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Gantt Chart: Visual project timelines.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Reminders & Notifications: Email/in-app/push for due dates and updates.
+
+🔹 5. User & Team Management
+Team Creation: Group users into departments/teams.
+
+User Roles & Permissions: Control access levels.
+
+User Profiles: Contact info, roles, availability.
+
+🔹 6. Reports & Insights
+Progress Reports: % complete, overdue tasks, workload.
+
+Productivity Charts: Per user/team metrics.
+
+Export Reports: PDF/Excel for meetings or audits.
+
+🔹 7. Communication Tools
+Chat Integration: Optional chat channels per project/task.
+
+Meeting Scheduler: Sync with calendar (Google/Outlook).
+
+Announcements: Company-wide or project-specific posts.
+
+🔹 8. Customization
+Custom Fields: Add extra fields to tasks (e.g., "Client Name", "Budget").
+
+Tags & Labels: For easy filtering and categorization.
+
+Templates: Reuse task/project structures (e.g., onboarding).
+
+🔹 9. Access & Integrations
+Mobile App: Basic functionality for on-the-go.
+
+Integrations: Google Drive, Outlook, Slack (optional).
+
+Guest Access: Temporary accounts for clients or vendors.
+
+🔹 10. Admin & Security
+Audit Logs: Track user activity for compliance.
+
+Role-based Access Control: Fine-grained permissions.
+
+Data Backup: Auto-backup and restore options.

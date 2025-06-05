@@ -1,18 +1,19 @@
 "use client";
-import { setIsSidebarCollapsed } from "@/store";
-import { useAppDispatch, useAppSelector } from "@/store/StoreProvider";
+
 import {
-  AlignJustify,
   Briefcase,
   Home,
-  Icon,
   LockIcon,
   LucideIcon,
   Projector,
+  Users,
   X,
 } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/store/StoreProvider";
+
 import Image from "next/image";
 import Link from "next/link";
+import { setIsSidebarCollapsed } from "@/store";
 import { usePathname } from "next/navigation";
 
 interface SidebarLinkProps {
@@ -67,7 +68,7 @@ const Sidebar = () => {
   return (
     <div className={sidebarClassNames}>
       <div className="flex h-[100%] w-full flex-col justify-start">
-        <div className="z-50 flex min-h-[56px] w-64 items-center justify-between bg-white px-6">
+        <div className="z-50 flex h-16 min-h-[56px] w-64 items-center justify-between bg-white px-6">
           <div className="text-xl font-bold text-gray-800">LOGO</div>
           <button
             onClick={() => dispatch(setIsSidebarCollapsed(!isSidebarCollapsed))}
@@ -91,6 +92,7 @@ const Sidebar = () => {
           <SidebarLink href="/" icon={Home} title="Dashboard" />
           <SidebarLink href="/projects" icon={Projector} title="Project" />
           <SidebarLink href="/timeline" icon={Briefcase} title="Timeline" />
+          <SidebarLink href="/team-members" icon={Users} title="Team members" />
         </nav>
       </div>
     </div>
