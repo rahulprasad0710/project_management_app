@@ -1,6 +1,6 @@
-import { X } from "lucide-react";
 import React from "react";
 import ReactDOM from "react-dom";
+import { X } from "lucide-react";
 
 type Props = {
   children: React.ReactNode;
@@ -14,17 +14,27 @@ const Modal = (props: Props) => {
 
   if (!isOpen) return null;
   return ReactDOM.createPortal(
-    <div className="overflow-y fixed inset-0 z-50 flex h-full w-full items-center justify-center">
-      <div className="w-full max-w-2xl overflow-hidden rounded-md bg-white p-4 shadow-lg">
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-200 ${
+        isOpen ? "opacity-100" : "pointer-events-none opacity-0"
+      }`}
+    >
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black bg-opacity-30 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      {/* Modal Content */}
+      <div
+        className={`relative z-10 w-full max-w-2xl transform rounded-md bg-white p-4 shadow-lg transition-all duration-200 ${
+          isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"
+        }`}
+      >
         <div className="mb-4 flex items-center justify-between">
-          <div className="text-xl font-semibold text-gray-800">
-            {modalTitle}
-          </div>
-          <button
-            onClick={onClose}
-            className="hover: bg-gray-100 hover:bg-gray-200 hover:text-black"
-          >
-            <X className="h-5 w-5 font-semibold text-gray-800" />
+          <h2 className="text-xl font-semibold text-gray-800">{modalTitle}</h2>
+          <button onClick={onClose} className="rounded p-1 hover:bg-gray-200">
+            <X className="h-5 w-5 text-gray-800" />
           </button>
         </div>
         {children}

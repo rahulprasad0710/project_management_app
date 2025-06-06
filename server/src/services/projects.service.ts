@@ -4,6 +4,7 @@ import { IPagination } from "../types/express";
 import { Project } from "../db/entity/project";
 import { Task } from "../db/entity/task";
 import { User } from "../db/entity/User";
+import createPagination from "../utils/createPagination";
 import dataSource from "../db/data-source";
 
 interface IProject {
@@ -45,12 +46,12 @@ export class ProjectService {
     }
 
     async getAll(query: IPagination) {
-        const { skip, take } = query;
+        const { skip, take, isPaginationEnabled } = query;
         console.log({
             skip,
             take,
         });
-        return await this.projectRepository.find({
+        const result = await this.projectRepository.find({
             select: [
                 "id",
                 "name",
@@ -65,6 +66,16 @@ export class ProjectService {
             skip: skip,
             take: take,
         });
+        const totalCount = await this.projectRepository.count();
+        return {
+            result,
+            pagination: createPagination(
+                skip,
+                take,
+                totalCount,
+                isPaginationEnabled
+            ),
+        };
     }
 
     async update(id: number, project: IProject) {

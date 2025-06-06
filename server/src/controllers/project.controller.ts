@@ -1,7 +1,8 @@
+import { Request, Response } from "express";
+
+import { IPagination } from "../types/express";
 import ProjectService from "../services/projects.service";
 const projectService = new ProjectService();
-import { Request, Response } from "express";
-import { IPagination } from "../types/express";
 
 const create = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -34,6 +35,13 @@ const getAll = async (req: Request, res: Response) => {
     try {
         const { skip, take, keyword, isPaginationEnabled }: IPagination =
             req.pagination;
+
+        console.log({
+            skip,
+            take,
+            keyword,
+            isPaginationEnabled,
+        });
 
         const users = await projectService.getAll({
             skip,

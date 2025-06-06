@@ -3,13 +3,34 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 import dotenv from "dotenv";
 
+dotenv.config();
+
 export interface Response<T> {
   message: string;
   success: boolean;
   data: T;
 }
 
-dotenv.config();
+export interface ResponseWithPagination<T> {
+  message: string;
+  success: boolean;
+  data: {
+    result: T;
+    pagination: {
+      currentPage: number;
+      pageSize: number;
+      totalCount: number;
+      totalPages: number;
+    };
+  };
+}
+
+export interface Pagination {
+  page: number;
+  pageSize: number;
+  isPaginationEnabled: boolean;
+  keyword?: string;
+}
 
 // /* REDUX API */
 
@@ -32,11 +53,32 @@ export const api = createApi({
       }),
       invalidatesTags: ["Users"],
     }),
-    getProjects: build.query<Response<IProject[]>, void>({
-      query: () => ({
+    getProjects: build.query<ResponseWithPagination<IProject[]>, Pagination>({
+      query: ({
+        isPaginationEnabled = true,
+        page = 1,
+        pageSize = 10,
+        keyword,
+      }) => ({
         url: "projects",
         method: "GET",
+        params: {
+          isPaginationEnabled,
+          page,
+          pageSize,
+          keyword: keyword ? keyword : undefined,
+        },
       }),
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.data.result.map((project) => ({
+                type: "Projects" as const,
+                id: project.id,
+              })),
+              { type: "Projects" as const, id: "LIST" },
+            ]
+          : [{ type: "Projects" as const, id: "LIST" }],
     }),
     getProjectById: build.query<Response<IProject>, { projectId: number }>({
       query: ({ projectId }) => ({
@@ -50,7 +92,7 @@ export const api = createApi({
         method: "POST",
         body: payload,
       }),
-      invalidatesTags: ["Projects"],
+      invalidatesTags: [{ type: "Projects", id: "LIST" }],
     }),
     getTasks: build.query<ITask[], void>({
       query: () => ({

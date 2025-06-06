@@ -3,20 +3,18 @@ import React from "react";
 type Props = {
   title: string;
   buttonComponent?: React.ReactNode;
-  showBtn: boolean;
   isSmallText?: boolean;
 };
 
 const Header = (props: Props) => {
-  const { title, buttonComponent, isSmallText = false, showBtn } = props;
+  const { title, isSmallText = false } = props;
   return (
-    <div className="flex w-full items-center justify-between">
+    <div>
       {isSmallText ? (
         <h1 className="text-2xl font-semibold text-gray-800">{title}</h1>
       ) : (
         <h1 className="text-3xl font-semibold text-gray-800">{title}</h1>
       )}
-      {showBtn && buttonComponent}
     </div>
   );
 };

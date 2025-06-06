@@ -1,12 +1,14 @@
 "use client";
 
+import "react-toastify/dist/ReactToastify.css";
+
 import React, { useEffect } from "react";
-import Navbar from "./(components)/Navbar";
-import Sidebar from "./(components)/Sidebar";
 import StoreProvider, { useAppSelector } from "@/store/StoreProvider";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+
 import AuthProvider from "./AuthProvider";
+import Navbar from "./(components)/Navbar";
+import Sidebar from "./(components)/Sidebar";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const isSidebarCollapsed = useAppSelector(
@@ -30,7 +32,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         className={`flex w-full flex-col bg-gray-50 ${isSidebarCollapsed ? "" : "md:pl-64"}`}
       >
         <Navbar />
-        <div className="p-4">{children}</div>
+        <div>{children}</div>
       </main>
     </div>
   );

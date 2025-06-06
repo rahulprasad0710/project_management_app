@@ -10,5 +10,5 @@ export interface IPagination {
     skip?: number;
     take?: number;
     keyword?: string;
-    isPaginationEnabled: boolean | undefined;
+    isPaginationEnabled: boolean;
 }

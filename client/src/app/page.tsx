@@ -138,7 +138,7 @@ export default function Home() {
           </a>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-2 lg:gap-8">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-8">
           <div>
             <div className="flex flex-col rounded-lg border border-neutral-200 bg-white sm:col-span-2 lg:col-span-4">
               <div className="flex flex-col items-center justify-between gap-4 border-b border-neutral-100 p-5 text-center sm:flex-row sm:text-start">

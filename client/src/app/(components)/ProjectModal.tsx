@@ -14,20 +14,13 @@ import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useCreateProjectMutation, useLazyGetProjectsQuery } from "@/store/api";
 
+import DragList from "./molecules/DragList";
+import Dropzone from "./Dropzone";
 import MultiSelect from "./atoms/MultiSelect";
 import Spinner from "./Spinner";
 import { toast } from "react-toastify";
 import { useParams } from "next/navigation";
 import { yupResolver } from "@hookform/resolvers/yup";
-
-// {
-//     "name": "project221",
-//     "description":"Rahul Shah22",
-//     "startDate": "2024-09-25 10:00:00",
-//     "endDate": "2025-03-24 18:00:00",
-//     "admin": 3,
-//     "team_member" : [2,3,4]
-// }
 
 interface IFormInput {
   name: string;
@@ -132,7 +125,12 @@ const ProjectModal = (props: Props) => {
       const response = await createProjectMutation(payload).unwrap();
 
       if (response) {
-        fetchAllProject();
+        // fetchAllProject({
+        //   isPaginationEnabled: true,
+        //   page: 3,
+        //   pageSize: 10,
+        //   keyword: "",
+        // });
         toast.success("Project added successfully");
         onClose();
       }
@@ -176,7 +174,37 @@ const ProjectModal = (props: Props) => {
             className="focus:shadow-outline w-full resize-y rounded-md border border-gray-200 p-2 text-gray-700 focus:border-blue-300 focus:outline-none"
           ></textarea>
         </div>
+        <div className="mb-4">
+          <Dropzone />
+        </div>
         <div className="flex w-full gap-4">
+          <div className="mb-4 w-1/2">
+            <label className="mb-2 block text-sm font-bold text-gray-700">
+              Admin
+            </label>
+            <div className="relative">
+              <select
+                className="block w-full appearance-none rounded border border-gray-200 bg-white px-4 py-2 pr-8 leading-tight text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none"
+                id="grid-state"
+                {...register("admin")}
+              >
+                {assignToOptions.map((assignTo: IAssignedTo) => (
+                  <option value={assignTo.value} key={assignTo.value}>
+                    {assignTo.label}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                <svg
+                  className="h-4 w-4 fill-current"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                </svg>
+              </div>
+            </div>
+          </div>
           <div className="mb-4 w-1/2">
             <label className="mb-2 block text-sm font-bold text-gray-700">
               Priority
@@ -203,60 +231,8 @@ const ProjectModal = (props: Props) => {
               </div>
             </div>
           </div>
-          <div className="mb-4 w-1/2">
-            <label className="mb-2 block text-sm font-bold text-gray-700">
-              Status
-            </label>
-            <div className="relative">
-              <select
-                className="block w-full appearance-none rounded border border-gray-200 bg-white px-4 py-2 pr-8 leading-tight text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none"
-                {...register("status")}
-              >
-                {projectStatusOptions.map((status: IProjectStatusOptions) => (
-                  <option value={status.value} key={status.value}>
-                    {status.label}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <svg
-                  className="h-4 w-4 fill-current"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                </svg>
-              </div>
-            </div>
-          </div>
         </div>
-        <div className="mb-4 w-full">
-          <label className="mb-2 block text-sm font-bold text-gray-700">
-            Admin
-          </label>
-          <div className="relative">
-            <select
-              className="block w-full appearance-none rounded border border-gray-200 bg-white px-4 py-2 pr-8 leading-tight text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none"
-              id="grid-state"
-              {...register("admin")}
-            >
-              {assignToOptions.map((assignTo: IAssignedTo) => (
-                <option value={assignTo.value} key={assignTo.value}>
-                  {assignTo.label}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg
-                className="h-4 w-4 fill-current"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-              >
-                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-              </svg>
-            </div>
-          </div>
-        </div>
+
         <div className="mb-4 w-full">
           <label className="mb-2 block text-sm font-bold text-gray-700">
             Team Member
@@ -269,27 +245,29 @@ const ProjectModal = (props: Props) => {
             />
           </div>
         </div>
-        <div className="mb-4">
-          <label className="mb-2 block text-sm font-bold text-gray-700">
-            Start Date
-          </label>
-          <input
-            className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow-sm focus:border-blue-300 focus:outline-none"
-            type="date"
-            defaultValue={new Date().toISOString().split("T")[0]}
-            {...register("startDate")}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="mb-2 block text-sm font-bold text-gray-700">
-            End Date
-          </label>
-          <input
-            className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow-sm focus:border-blue-300 focus:outline-none"
-            type="date"
-            defaultValue={new Date().toISOString().split("T")[0]}
-            {...register("endDate")}
-          />
+        <div className="flex w-full gap-4">
+          <div className="mb-4 w-1/2">
+            <label className="mb-2 block text-sm font-bold text-gray-700">
+              Start Date
+            </label>
+            <input
+              className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow-sm focus:border-blue-300 focus:outline-none"
+              type="date"
+              defaultValue={new Date().toISOString().split("T")[0]}
+              {...register("startDate")}
+            />
+          </div>
+          <div className="mb-4 w-1/2">
+            <label className="mb-2 block text-sm font-bold text-gray-700">
+              End Date
+            </label>
+            <input
+              className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow-sm focus:border-blue-300 focus:outline-none"
+              type="date"
+              defaultValue={new Date().toISOString().split("T")[0]}
+              {...register("endDate")}
+            />
+          </div>
         </div>
         <div className="flex items-center justify-end gap-4">
           <button

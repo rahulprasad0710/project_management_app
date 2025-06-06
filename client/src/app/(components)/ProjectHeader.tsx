@@ -1,6 +1,3 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
-import Header from "../(components)/Header";
-import DarkSemiRoundedButtonWithIcon from "./ButtonWithIcon";
 import {
   Clock,
   Filter,
@@ -10,6 +7,10 @@ import {
   Share2,
   Table,
 } from "lucide-react";
+import React, { Dispatch, SetStateAction, useState } from "react";
+
+import DarkSemiRoundedButtonWithIcon from "./ButtonWithIcon";
+import Header from "../(components)/Header";
 import Modal from "./Modal";
 
 type BOARD_TYPES = "BOARD" | "LIST" | "CALENDAR" | "TIMELINE" | "TABLE";
@@ -51,50 +52,19 @@ const TabButton = ({
 
 const ProjectHeader = ({ activeTab, setActiveTab }: IProps) => {
   return (
-    <div className="mb-5 flex flex-wrap-reverse gap-2 border-y border-gray-200 pb-1 pt-2">
-      <div className="flex flex-1 items-center gap-2 md:gap-4">
-        <TabButton
-          tabTittle="BOARD"
-          activeTab={activeTab}
-          icon={<Grid3X3 className="h-5 w-5" />}
-          setActiveTab={setActiveTab}
-        />
-        <TabButton
-          tabTittle="LIST"
-          activeTab={activeTab}
-          icon={<List className="h-5 w-5" />}
-          setActiveTab={setActiveTab}
-        />
-        <TabButton
-          tabTittle="TIMELINE"
-          activeTab={activeTab}
-          icon={<Clock className="h-5 w-5" />}
-          setActiveTab={setActiveTab}
-        />
-        <TabButton
-          tabTittle="TABLE"
-          activeTab={activeTab}
-          icon={<Table className="h-5 w-5" />}
-          setActiveTab={setActiveTab}
-        />
-      </div>
-      <div className="flex items-center gap-2 md:gap-4">
-        <button className="text-gray-500 hover:text-gray-600">
-          <Filter className="h-5 w-5" />
-        </button>
-        <button className="text-gray-500 hover:text-gray-600">
-          <Share2 className="h-5 w-5" />
-        </button>
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search..."
-            className="rounded-sm border py-1 pl-10 pr-4 focus:border-gray-600 focus:outline-none focus:ring-gray-600"
-          />
-
-          <Grid3X3 className="absolute left-3 top-2 h-4 w-4 text-gray-400" />
-        </div>
-      </div>
+    <div className="flex flex-1 items-center gap-2 md:gap-4">
+      <TabButton
+        tabTittle="TIMELINE"
+        activeTab={activeTab}
+        icon={<Clock className="h-5 w-5" />}
+        setActiveTab={setActiveTab}
+      />
+      <TabButton
+        tabTittle="TABLE"
+        activeTab={activeTab}
+        icon={<Table className="h-5 w-5" />}
+        setActiveTab={setActiveTab}
+      />
     </div>
   );
 };
