@@ -14,6 +14,6 @@ export interface IProject {
     teamMember: number[];
     status: ProjectStatus;
     priority: Priority;
-    projectUploads: UploadFile[];
+    projectUploads: string[];
     profilePicture?: string;
 }

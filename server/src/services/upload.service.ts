@@ -1,7 +1,9 @@
+import { GetObjectCommandOutput } from "@aws-sdk/client-s3";
 import { UploadFile } from "../db/entity/uploads";
 import { User } from "../db/entity/User";
 import awsService from "../aws/s3.server";
 import dataSource from "../db/data-source";
+import { generateUniqueId } from "../utils/generateUniqueId";
 
 interface IAwsUploadFile {
     buffer: Buffer;
@@ -25,6 +27,11 @@ export interface IUploadFile {
     updatedAt: Date;
 }
 
+export interface IUploadFileURL extends IUploadFile {
+    id: string;
+    backendUrl: string;
+}
+
 export class UploadService {
     constructor(
         private readonly uploadRepository = dataSource.getRepository(
@@ -34,7 +41,10 @@ export class UploadService {
     ) {}
 
     async create(uploadFile: IAwsUploadFile, userId: number) {
-        const { ETag } = await awsService.putRequestToS3(uploadFile);
+        const id = await generateUniqueId();
+        const s3Key = `${id}_${uploadFile.originalname}`;
+
+        const { ETag } = await awsService.putRequestToS3(uploadFile, s3Key);
 
         const user = await this.userRepository.findOne({
             where: { id: userId },
@@ -46,15 +56,13 @@ export class UploadService {
 
         const uploadPayload = new UploadFile();
 
-        const id = Math.round(1000 * Math.random());
-
         uploadPayload.filename = `${id}_${uploadFile.originalname}`;
         uploadPayload.originalname = uploadFile.originalname;
         uploadPayload.size = uploadFile.size;
         uploadPayload.extension = uploadFile.mimetype;
         uploadPayload.mimetype = uploadFile.mimetype;
         uploadPayload.fileType = uploadFile.mimetype;
-        uploadPayload.cloudPath = uploadFile.originalname;
+        uploadPayload.cloudPath = `${id}_${uploadFile.originalname}`;
         uploadPayload.cloudId = ETag;
         uploadPayload.cloudUrl = uploadFile.originalname;
         uploadPayload.createdBy = user;
@@ -62,16 +70,34 @@ export class UploadService {
         uploadPayload.updatedAt = new Date();
 
         const result = await this.uploadRepository.save(uploadPayload);
-        console.log("LOG: ~ UploadService ~ create ~ result:", result);
-
         return result;
     }
 
     async getPresignedUrl({ bucketKey }: { bucketKey: string }) {
+        console.log({
+            bucketKey,
+        });
         const url = await awsService.getPreSignedUrl({
             bucketKey,
         });
         return url;
+    }
+
+    async getUrlList(EtagList: UploadFile[]) {
+        let response: IUploadFileURL[] = [];
+
+        response = await Promise.all(
+            EtagList.map(async (file: UploadFile) => {
+                const result = await this.getPresignedUrl({
+                    bucketKey: file.filename,
+                });
+                return {
+                    ...file,
+                    backendUrl: result,
+                };
+            })
+        );
+        return response;
     }
 }
 

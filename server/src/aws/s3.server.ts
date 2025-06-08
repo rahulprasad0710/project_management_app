@@ -5,6 +5,8 @@ import {
 } from "@aws-sdk/client-s3";
 
 import AWS_CONSTANT from "../constants/AWSConfig";
+import { generateUniqueId } from "../utils/generateUniqueId";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 // const randomKey = Math.random().toString(36).substring(2, 15);
 
@@ -40,11 +42,12 @@ const client = new S3Client({
     },
 });
 
-async function putRequestToS3(uploadFile: IAwsUploadFile) {
+async function putRequestToS3(uploadFile: IAwsUploadFile, key: string) {
     const bufferData = uploadFile.buffer;
+
     const params = {
         Bucket: AWS_CONSTANT.AWS_BUCKET_NAME,
-        Key: uploadFile.originalname,
+        Key: key,
         Body: bufferData,
         ContentType: uploadFile.mimetype,
     };
@@ -58,16 +61,22 @@ async function putRequestToS3(uploadFile: IAwsUploadFile) {
 }
 
 async function getPreSignedUrl({ bucketKey }: { bucketKey: string }) {
-    const params = {
-        Bucket: process.env.S3_BUCKET_NAME,
-        Key: bucketKey,
-        Expires: 60 * 60,
-    };
+    console.log({
+        bucketKey,
+    });
+    try {
+        const command = new GetObjectCommand({
+            Bucket: AWS_CONSTANT.AWS_BUCKET_NAME,
+            Key: bucketKey,
+        });
 
-    const command = new GetObjectCommand(params);
-    const results = await client.send(command);
-    console.log({ results });
-    return results;
+        const url = await getSignedUrl(client, command, { expiresIn: 3600 }); // 1 hour
+        console.log("LOG: ~ getPreSignedUrl ~ url:", url);
+        return url;
+    } catch (error) {
+        console.log("LOG: ~ getPreSignedUrl ~ error:", error);
+        throw new Error(error instanceof Error ? error.message : String(error));
+    }
 }
 
 export default {

@@ -66,8 +66,12 @@ const getAll = async (req: Request, res: Response) => {
 
 const getById = async (req: Request, res: Response) => {
     const { id } = req.params;
+    const { withTask } = req.query;
     try {
-        const users = await projectService.getById(Number(id));
+        const users = await projectService.getById(
+            Number(id),
+            withTask === "true" ? true : false
+        );
         res.status(200).json({
             success: true,
             data: users,

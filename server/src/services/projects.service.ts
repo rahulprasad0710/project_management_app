@@ -1,3 +1,5 @@
+import UploadService, { IUploadFileURL } from "./upload.service";
+
 import { IPagination } from "../types/express";
 import { IProject } from "../types/payload";
 import { Project } from "../db/entity/project";
@@ -7,6 +9,7 @@ import { User } from "../db/entity/User";
 import createPagination from "../utils/createPagination";
 import dataSource from "../db/data-source";
 
+const uploadService = new UploadService();
 export class ProjectService {
     constructor(
         private readonly projectRepository = dataSource.getRepository(Project),
@@ -40,7 +43,7 @@ export class ProjectService {
 
         for (let index = 0; index < project.projectUploads.length; index++) {
             const element = project.projectUploads[index];
-            await this.addProjectAttachments(newProjectResult.id, element.id);
+            await this.addProjectAttachments(newProjectResult.id, element);
         }
 
         return newProjectResult;
@@ -107,12 +110,16 @@ export class ProjectService {
             project?.teamMember.push(user);
             const response = await this.projectRepository.save(project);
             if (response) {
-                return await this.getById(projectId);
+                return response;
             }
         }
     }
 
     async addProjectAttachments(projectId: number, uploadId: string) {
+        console.log({
+            projectId,
+            uploadId,
+        });
         const project = await this.projectRepository.findOne({
             where: { id: projectId },
             relations: ["teamMember"],
@@ -120,6 +127,10 @@ export class ProjectService {
         const uploadResponse = await this.uploadRepository.findOne({
             where: { id: uploadId },
         });
+        console.log(
+            "LOG: ~ ProjectService ~ addProjectAttachments ~ uploadResponse:",
+            uploadResponse
+        );
 
         if (project == null || uploadResponse == null) {
             throw new Error("Attachment Error");
@@ -127,7 +138,7 @@ export class ProjectService {
             project?.projectUploads.push(uploadResponse);
             const response = await this.projectRepository.save(project);
             if (response) {
-                return await this.getById(projectId);
+                return response;
             }
         }
     }
@@ -135,7 +146,7 @@ export class ProjectService {
     async getById(id: number, withTask: boolean) {
         const response = await this.projectRepository.findOne({
             where: { id },
-            relations: ["admin", "teamMember"],
+            relations: ["admin", "teamMember", "projectUploads"],
         });
 
         let tasks: Task[] = [];
@@ -145,8 +156,21 @@ export class ProjectService {
             });
         }
 
+        let projectUploads: IUploadFileURL[] = [];
+
+        console.log({
+            response: response?.projectUploads,
+        });
+
+        if (response?.projectUploads && response?.projectUploads?.length > 0) {
+            projectUploads = await uploadService.getUrlList(
+                response?.projectUploads
+            );
+        }
+
         return {
             ...response,
+            projectUploads,
             tasks,
         };
     }
