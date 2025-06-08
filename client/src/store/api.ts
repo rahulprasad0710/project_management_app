@@ -1,5 +1,5 @@
 import {
-  IFileUploadsPayload,
+  IAddProjectPayload,
   IProject,
   ITask,
   ITaskPayload,
@@ -46,7 +46,7 @@ export const api = createApi({
   reducerPath: "api",
   tagTypes: ["Users", "Projects", "Tasks"],
   endpoints: (build) => ({
-    getUsers: build.query<IUser[], void>({
+    getUsers: build.query<Response<IUser[]>, void>({
       query: () => ({
         url: "users",
         method: "GET",
@@ -93,7 +93,7 @@ export const api = createApi({
         method: "GET",
       }),
     }),
-    createProject: build.mutation<Response<IProject>, Partial<IProject>>({
+    createProject: build.mutation<Response<IProject>, IAddProjectPayload>({
       query: (payload) => ({
         url: "projects",
         method: "POST",

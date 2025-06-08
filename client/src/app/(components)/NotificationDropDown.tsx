@@ -1,8 +1,6 @@
 import React from "react";
 
-type Props = {};
-
-const NotificationDropDown = (props: Props) => {
+const NotificationDropDown = () => {
   return (
     <div
       aria-labelledby="dropdown-notifications"

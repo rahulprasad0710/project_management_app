@@ -4,6 +4,7 @@ import {
   IAddProjectPayload,
   IPriorityOptions,
   IProject,
+  IUploadFile,
   Priority,
   ProjectStatus,
   priorityOptions,
@@ -13,6 +14,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import {
   useCreateProjectMutation,
   useCreateUploadsMutation,
+  useGetUsersQuery,
+  useLazyGetProjectByIdQuery,
 } from "@/store/api";
 
 import Dropzone from "./Dropzone";
@@ -25,21 +28,11 @@ import { yupResolver } from "@hookform/resolvers/yup";
 interface IFormInput {
   name: string;
   description: string;
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
   admin: number;
   priority: Priority;
   status: ProjectStatus;
-}
-
-interface IAssignedTo {
-  label: string;
-  value: number;
-}
-
-interface IAssignedTo {
-  label: string;
-  value: number;
 }
 
 type Props = {
@@ -50,21 +43,29 @@ type Props = {
 
 const ProjectModal = (props: Props) => {
   const { onClose, selectedData } = props;
-
+  const { isFetching: isUserFetching, data: userList } = useGetUsersQuery();
   const [files, setFiles] = useState<File[]>([]);
+  const [OldFiles, setOldFiles] = useState<IUploadFile[]>([]);
+
   const { id } = useParams();
   const [createProjectMutation] = useCreateProjectMutation();
-
+  const [fetchProject] = useLazyGetProjectByIdQuery();
   const [createUploadMutation] = useCreateUploadsMutation();
 
+  type IList = {
+    label: string;
+    value: number;
+    icon?: string | React.ReactNode;
+  };
+
   // const [fetchAllProject] = useLazyGetProjectsQuery();
-  const [selectedTeamMember, setSelectedTeamMember] = useState<number[]>([]);
+  const [selectedTeamMember, setSelectedTeamMember] = useState<IList[]>([]);
   const schema = yup.object().shape({
-    name: yup.string().required("Project name is required"), // Required field
+    name: yup.string().required("Project name is required"),
     description: yup.string().optional(),
     priority: yup.string().optional(),
-    startDate: yup.date().optional(), // Ensures undefined is allowed
-    endDate: yup.date().optional(),
+    startDate: yup.string().optional(),
+    endDate: yup.string().optional(),
     admin: yup.number().optional(),
     status: yup.string().optional(),
   });
@@ -75,34 +76,59 @@ const ProjectModal = (props: Props) => {
     priority: "MEDIUM",
     admin: 1,
     status: "STARTED",
-    startDate: new Date(),
-    endDate: new Date(),
+    startDate: new Date().toISOString().split("T")[0],
+    endDate: new Date().toISOString().split("T")[0],
   };
 
   const {
     register,
     handleSubmit,
-    setValue,
     reset,
-    resetField,
     formState: { errors, isSubmitting },
   } = useForm<IFormInput>({
     defaultValues: defaultValues,
     resolver: yupResolver(schema),
   });
 
+  const populateEditData = async () => {
+    const fetchProjectResponse = await fetchProject({
+      projectId: selectedData?.id || 0,
+    }).unwrap();
+    const { data } = fetchProjectResponse;
+    console.log(
+      "LOG: ~ populateEditData ~ fetchProjectResponse:",
+      fetchProjectResponse,
+    );
+
+    if (data.teamMember?.length > 0) {
+      const temp = data.teamMember.map((item) => {
+        return {
+          value: item.id,
+          label: item.firstName,
+        };
+      });
+
+      setSelectedTeamMember(temp);
+    }
+
+    if (data.projectUploads?.length > 0) {
+      setOldFiles(data.projectUploads);
+    }
+
+    reset({
+      name: data.name,
+      priority: data.priority,
+      description: data.description,
+      startDate: new Date(data.startDate).toISOString().split("T")[0],
+      endDate: new Date(data.endDate).toISOString().split("T")[0],
+      status: data.status,
+      admin: data.admin.id,
+    });
+  };
+
   useEffect(() => {
     if (selectedData) {
-      console.log("LOG: ~ useEffect ~ selectedData:", selectedData);
-      reset({
-        name: selectedData.name,
-        priority: selectedData.priority,
-        description: selectedData.description,
-        startDate: selectedData.startDate,
-        endDate: selectedData.endDate,
-        status: selectedData.status,
-        admin: Number(selectedData.admin),
-      });
+      populateEditData();
     }
   }, [selectedData]);
 
@@ -120,7 +146,7 @@ const ProjectModal = (props: Props) => {
       endDate: data.endDate,
       status: data.status,
       projectId: Number(id),
-      teamMember: selectedTeamMember,
+      teamMember: selectedTeamMember.map((item) => item.value),
       projectUploads: [],
     };
 
@@ -156,12 +182,6 @@ const ProjectModal = (props: Props) => {
     }
   };
 
-  const assignToOptions = [
-    { value: 1, label: "John Doe" },
-    { value: 2, label: "Jane Smith" },
-    { value: 3, label: "Bob Johnson" },
-  ];
-
   return (
     <div className="w-full">
       <form className="bg-white p-4" onSubmit={handleSubmit(onSubmit)}>
@@ -191,7 +211,12 @@ const ProjectModal = (props: Props) => {
           ></textarea>
         </div>
         <div className="mb-4">
-          <Dropzone setFiles={setFiles} files={files} />
+          <Dropzone
+            setFiles={setFiles}
+            files={files}
+            OldFiles={OldFiles}
+            setOldFiles={setOldFiles}
+          />
         </div>
         <div className="flex w-full gap-4">
           <div className="mb-4 w-1/2">
@@ -204,11 +229,15 @@ const ProjectModal = (props: Props) => {
                 id="grid-state"
                 {...register("admin")}
               >
-                {assignToOptions.map((assignTo: IAssignedTo) => (
-                  <option value={assignTo.value} key={assignTo.value}>
-                    {assignTo.label}
-                  </option>
-                ))}
+                {!isUserFetching && userList?.data && userList?.data?.length > 0
+                  ? userList?.data.map((item) => {
+                      return (
+                        <option value={item.id} key={item.id}>
+                          {`${item.firstName} ${item.lastName}`}
+                        </option>
+                      );
+                    })
+                  : []}
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                 <svg
@@ -255,7 +284,17 @@ const ProjectModal = (props: Props) => {
           </label>
           <div className="relative">
             <MultiSelect
-              list={assignToOptions}
+              list={
+                !isUserFetching && userList?.data && userList?.data?.length > 0
+                  ? userList?.data.map((item) => {
+                      return {
+                        label: `${item.firstName} ${item.lastName}`,
+                        value: item.id,
+                        icon: item.profilePictureUrl as string,
+                      };
+                    })
+                  : []
+              }
               selectedList={selectedTeamMember}
               setSelectList={setSelectedTeamMember}
             />
@@ -295,9 +334,9 @@ const ProjectModal = (props: Props) => {
           <button
             disabled={isSubmitting}
             className={` ${isSubmitting ? "opacity-50" : ""} focus:shadow-outline rounded bg-blue-500 px-8 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none`}
-            type="submit"
           >
-            {isSubmitting ? <Spinner /> : "Submit"}
+            {!!isSubmitting && <Spinner />}
+            <span> {selectedData ? "Update" : "Submit"}</span>
           </button>
         </div>
       </form>

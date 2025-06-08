@@ -1,13 +1,16 @@
-import React, { ChangeEvent, DragEvent, useRef, useState } from "react";
+import React, { ChangeEvent, DragEvent, useRef } from "react";
 
+import { IUploadFile } from "@/types/user.types";
 import { X } from "lucide-react";
 
 type FileProps = {
   files: File[];
   setFiles: React.Dispatch<React.SetStateAction<File[]>>;
+  OldFiles: IUploadFile[];
+  setOldFiles: React.Dispatch<React.SetStateAction<IUploadFile[]>>;
 };
 
-const Dropzone = ({ files, setFiles }: FileProps) => {
+const Dropzone = ({ files, setFiles, OldFiles, setOldFiles }: FileProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
@@ -26,6 +29,12 @@ const Dropzone = ({ files, setFiles }: FileProps) => {
       setFiles(selectedFiles);
     }
   };
+
+  const handleDeleteOldFiles = (id: string) => {
+    const temp = OldFiles.filter((item) => item.id !== id);
+    setOldFiles(temp);
+  };
+
   return (
     <div>
       {files.length === 0 && (
@@ -79,8 +88,24 @@ const Dropzone = ({ files, setFiles }: FileProps) => {
               key={idx}
             >
               <li>📎 {file.name}</li>
+              <button className="bg-gray-100 hover:bg-red-400 hover:text-black">
+                <X className="h-5 w-5 font-semibold text-gray-800" />
+              </button>
+            </div>
+          ))}
+        </ul>
+      )}
+
+      {OldFiles?.length > 0 && (
+        <ul className="mt-4 space-y-2">
+          {OldFiles?.map((file) => (
+            <div
+              className="flex cursor-pointer justify-between gap-4 rounded bg-gray-100 px-4 py-2 text-sm text-gray-700"
+              key={file.id}
+            >
+              <li>📎 {file.originalname}</li>
               <button
-                // onClick={onClose}
+                onClick={() => handleDeleteOldFiles(file.id)}
                 className="bg-gray-100 hover:bg-red-400 hover:text-black"
               >
                 <X className="h-5 w-5 font-semibold text-gray-800" />

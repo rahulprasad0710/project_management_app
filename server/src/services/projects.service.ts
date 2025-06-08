@@ -19,9 +19,6 @@ export class ProjectService {
     ) {}
 
     async create(project: IProject) {
-        console.log({
-            project,
-        });
         const projectObj = new Project();
         projectObj.name = project.name;
         projectObj.description = project.description;
@@ -51,10 +48,7 @@ export class ProjectService {
 
     async getAll(query: IPagination) {
         const { skip, take, isPaginationEnabled } = query;
-        console.log({
-            skip,
-            take,
-        });
+
         const result = await this.projectRepository.find({
             select: [
                 "id",
@@ -63,12 +57,14 @@ export class ProjectService {
                 "endDate",
                 "status",
                 "priority",
-                "description",
                 "profilePicture",
                 "admin",
             ],
             skip: skip,
             take: take,
+            order: {
+                id: "DESC",
+            },
         });
         const totalCount = await this.projectRepository.count();
         return {
@@ -127,10 +123,6 @@ export class ProjectService {
         const uploadResponse = await this.uploadRepository.findOne({
             where: { id: uploadId },
         });
-        console.log(
-            "LOG: ~ ProjectService ~ addProjectAttachments ~ uploadResponse:",
-            uploadResponse
-        );
 
         if (project == null || uploadResponse == null) {
             throw new Error("Attachment Error");
@@ -157,10 +149,6 @@ export class ProjectService {
         }
 
         let projectUploads: IUploadFileURL[] = [];
-
-        console.log({
-            response: response?.projectUploads,
-        });
 
         if (response?.projectUploads && response?.projectUploads?.length > 0) {
             projectUploads = await uploadService.getUrlList(

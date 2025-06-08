@@ -1,5 +1,12 @@
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
 import { X } from "lucide-react";
-import React, { useState, useRef, useEffect } from "react";
 
 type IList = {
   label: string;
@@ -9,8 +16,8 @@ type IList = {
 
 type Props = {
   list: IList[];
-  selectedList: number[];
-  setSelectList: (value: number[]) => void;
+  selectedList: IList[];
+  setSelectList: Dispatch<SetStateAction<IList[]>>;
   placeholder?: string;
   required?: boolean;
 };
@@ -18,21 +25,27 @@ type Props = {
 const MultiSelect = (props: Props) => {
   const { list, selectedList, setSelectList, placeholder } = props;
   const [openSelect, setOpenSelect] = useState<boolean>(false);
-  const [showList, setShowList] = useState<IList[]>([]);
+  // const [showList, setShowList] = useState<IList[]>([]);
   const multiSelectRef = useRef(null);
 
-  const handleSelect = (value: number) => {
-    if (selectedList.includes(value)) {
-      const temp = selectedList.filter((item) => item !== value);
-      const showTemp = showList.filter((item) => item.value !== value);
-      setShowList(showTemp);
+  console.log({
+    selectedList,
+  });
+
+  const handleSelect = (valueSelected: number) => {
+    const isItemAlreadyPresent = selectedList.find(
+      (item) => item.value === valueSelected,
+    );
+
+    if (isItemAlreadyPresent) {
+      const temp = selectedList.filter((item) => item.value !== valueSelected);
       setSelectList(temp);
     } else {
-      setSelectList([...selectedList, value]);
-      setShowList([
-        ...showList,
-        list.filter((item) => item.value === value)[0],
-      ]);
+      const temp = list.find((item) => item.value === valueSelected);
+
+      if (temp) {
+        setSelectList([...selectedList, temp]);
+      }
     }
   };
 
@@ -59,13 +72,13 @@ const MultiSelect = (props: Props) => {
         className="block w-full rounded border border-gray-200 bg-white px-4 py-2 text-left text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none"
         type="button"
       >
-        {showList?.length === 0 && (
+        {selectedList?.length === 0 && (
           <span>{placeholder ? placeholder : "Please select"}</span>
         )}
 
-        {showList?.length > 0 && (
+        {selectedList?.length > 0 && (
           <div className="flex gap-1">
-            {showList?.map((item: IList) => (
+            {selectedList?.map((item: IList) => (
               <div
                 className="mr-1 flex items-center gap-1 rounded-sm bg-gray-100 px-2 font-semibold text-gray-700"
                 key={item.value}
@@ -111,7 +124,9 @@ const MultiSelect = (props: Props) => {
               )}
               <div
                 className={
-                  selectedList?.includes(item.value)
+                  selectedList.find(
+                    (selectedItem) => selectedItem.value === item.value,
+                  )
                     ? "text-md font-semibold text-gray-800"
                     : "text-md text-gray-800"
                 }
@@ -122,7 +137,11 @@ const MultiSelect = (props: Props) => {
               <div className="ms-auto">
                 <span
                   className={
-                    selectedList?.includes(item.value) ? "block" : "hidden"
+                    selectedList.find(
+                      (selectedItem) => selectedItem.value === item.value,
+                    )
+                      ? "block"
+                      : "hidden"
                   }
                 >
                   <svg

@@ -4,6 +4,7 @@ export interface IUser {
   lastName: string;
   username: string;
   cognitoId: string;
+  profilePictureUrl: string | null;
 }
 
 export interface IProject {
@@ -12,11 +13,12 @@ export interface IProject {
   description: string;
   startDate: Date;
   endDate: Date;
-  admin: IUser | number;
-  teamMembers: IUser[];
+  admin: IUser;
+  teamMember: IUser[];
   tasks: ITask[];
   status: ProjectStatus;
   priority: Priority;
+  projectUploads: IUploadFile[];
 }
 
 export interface ITask {
@@ -49,12 +51,33 @@ export interface IAddProjectPayload {
   description: string;
   priority: Priority;
   admin: number;
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
   teamMember: number[];
   status: ProjectStatus;
   projectId: number;
   projectUploads: string[];
+}
+
+export interface IFileUploadsPayload {
+  formData: FormData;
+}
+
+export interface IUploadFile {
+  id: string;
+  filename: string;
+  originalname: string;
+  size: number;
+  extension: string;
+  mimetype?: string;
+  fileType?: string;
+  cloudPath?: string;
+  cloudId?: string;
+  cloudUrl?: string;
+  createdBy: IUser; // Or use a custom IUser interface if you have one
+  createdAt: Date;
+  updatedAt: Date;
+  backendUrl: string;
 }
 
 export type TaskStatus =
@@ -110,23 +133,3 @@ export const projectStatusOptions: IProjectStatusOptions[] = [
   { value: "UNDER_REVIEW", label: "Under Review" },
   { value: "COMPLETED", label: "Completed" },
 ];
-
-export interface IFileUploadsPayload {
-  formData: FormData;
-}
-
-export interface IUploadFile {
-  id: string;
-  filename: string;
-  originalname: string;
-  size: number;
-  extension: string;
-  mimetype?: string;
-  fileType?: string;
-  cloudPath?: string;
-  cloudId?: string;
-  cloudUrl?: string;
-  createdBy: IUser; // Or use a custom IUser interface if you have one
-  createdAt: Date;
-  updatedAt: Date;
-}

@@ -7,7 +7,6 @@ import ProjectModal from "./ProjectModal";
 import ReactTable from "./ReactTable";
 import { createColumnHelper } from "@tanstack/react-table";
 import { format } from "date-fns";
-import { useGetProjectsQuery } from "@/store/api";
 import { useLazyGetProjectsQuery } from "@/store/api";
 import { useRouter } from "next/navigation";
 
@@ -97,18 +96,20 @@ function ProjectTable(props: IProps) {
           <button
             title="edit"
             onClick={() => handleEdit(info.row.original)}
-            className="mt-4 text-blue-500 hover:text-blue-600"
+            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm font-semibold leading-5 text-neutral-800 hover:border-neutral-300 hover:text-neutral-950 active:border-neutral-200"
           >
-            <SquarePen className="h-5 w-5" />
+            <span>Edit</span>
+            <SquarePen className="h-5 w-5 text-blue-400" />
           </button>
 
-          <div
+          <button
+            title="View details"
             onClick={() => handleNavigate(info.row.original)}
             className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm font-semibold leading-5 text-neutral-800 hover:border-neutral-300 hover:text-neutral-950 active:border-neutral-200"
           >
             <span>View</span>
             <svg
-              className="hi-mini hi-arrow-right inline-block size-5 text-neutral-400 group-hover:text-blue-600 group-active:translate-x-0.5"
+              className="hi-mini hi-arrow-right inline-block size-5 text-teal-400 group-hover:text-blue-600 group-active:translate-x-0.5"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
               fill="currentColor"
@@ -120,7 +121,7 @@ function ProjectTable(props: IProps) {
                 clip-rule="evenodd"
               ></path>
             </svg>
-          </div>
+          </button>
         </div>
       ),
       header: () => <span>Action</span>,
@@ -174,7 +175,7 @@ function ProjectTable(props: IProps) {
         />
       </div>
       <Modal
-        modalTitle="Add new project"
+        modalTitle={selectedData ? "Edit new project" : "Add new project"}
         isOpen={toggle}
         onClose={() => setToggle(false)}
       >

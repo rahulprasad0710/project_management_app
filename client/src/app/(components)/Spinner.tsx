@@ -2,7 +2,7 @@ import React from "react";
 
 const Spinner = () => {
   return (
-    <div role="status">
+    <span role="status">
       <svg
         aria-hidden="true"
         className="inline h-5 w-5 animate-spin fill-yellow-400 text-gray-200 dark:text-gray-600"
@@ -19,7 +19,7 @@ const Spinner = () => {
           fill="currentFill"
         />
       </svg>
-    </div>
+    </span>
   );
 };
 
