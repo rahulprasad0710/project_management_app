@@ -132,14 +132,19 @@ export class ProjectService {
         }
     }
 
-    async getById(id: number) {
+    async getById(id: number, withTask: boolean) {
         const response = await this.projectRepository.findOne({
             where: { id },
             relations: ["admin", "teamMember"],
         });
-        const tasks = await this.taskRepository.find({
-            where: { project: { id } },
-        });
+
+        let tasks: Task[] = [];
+        if (withTask) {
+            tasks = await this.taskRepository.find({
+                where: { project: { id } },
+            });
+        }
+
         return {
             ...response,
             tasks,

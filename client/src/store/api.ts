@@ -93,7 +93,7 @@ export const api = createApi({
         method: "GET",
       }),
     }),
-    createProject: build.mutation<IProject, Partial<IProject>>({
+    createProject: build.mutation<Response<IProject>, Partial<IProject>>({
       query: (payload) => ({
         url: "projects",
         method: "POST",

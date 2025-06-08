@@ -51,9 +51,10 @@ export interface IAddProjectPayload {
   admin: number;
   startDate: Date;
   endDate: Date;
-  team_member: number[];
+  teamMember: number[];
   status: ProjectStatus;
   projectId: number;
+  projectUploads: string[];
 }
 
 export type TaskStatus =

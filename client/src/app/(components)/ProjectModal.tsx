@@ -4,21 +4,17 @@ import {
   IAddProjectPayload,
   IPriorityOptions,
   IProject,
-  IProjectStatusOptions,
   Priority,
   ProjectStatus,
   priorityOptions,
-  projectStatusOptions,
 } from "@/types/user.types";
 import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
   useCreateProjectMutation,
   useCreateUploadsMutation,
-  useLazyGetProjectsQuery,
 } from "@/store/api";
 
-import DragList from "./molecules/DragList";
 import Dropzone from "./Dropzone";
 import MultiSelect from "./atoms/MultiSelect";
 import Spinner from "./Spinner";
@@ -124,7 +120,8 @@ const ProjectModal = (props: Props) => {
       endDate: data.endDate,
       status: data.status,
       projectId: Number(id),
-      team_member: selectedTeamMember,
+      teamMember: selectedTeamMember,
+      projectUploads: [],
     };
 
     console.log({
@@ -132,11 +129,24 @@ const ProjectModal = (props: Props) => {
     });
 
     try {
-      const fileResponseList = await createUploadMutation({ files }).unwrap();
+      if (files?.length > 0) {
+        const fileResponseList = await Promise.all(
+          files.map(async (file: File) => {
+            const response = await createUploadMutation({
+              files: [file],
+            }).unwrap();
+            return response;
+          }),
+        );
 
-      console.log("LOG: ~ fileResponseList:", fileResponseList);
+        payload.projectUploads = fileResponseList.map((items) => {
+          return items.data.id;
+        });
+      }
 
-      if (fileResponseList) {
+      const response = await createProjectMutation(payload).unwrap();
+
+      if (response.success) {
         toast.success("Project added successfully");
         onClose();
       }
