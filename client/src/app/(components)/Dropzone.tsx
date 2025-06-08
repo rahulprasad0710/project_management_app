@@ -2,10 +2,12 @@ import React, { ChangeEvent, DragEvent, useRef, useState } from "react";
 
 import { X } from "lucide-react";
 
-type Props = {};
+type FileProps = {
+  files: File[];
+  setFiles: React.Dispatch<React.SetStateAction<File[]>>;
+};
 
-const Dropzone = (props: Props) => {
-  const [files, setFiles] = useState<File[]>([]);
+const Dropzone = ({ files, setFiles }: FileProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {

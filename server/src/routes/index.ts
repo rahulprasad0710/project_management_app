@@ -1,4 +1,9 @@
 import { Router as ExpressRouter } from "express";
+import projectRoute from "./projects.route";
+import taskRoute from "./tasks.route";
+import uploadRoute from "./uploads.route";
+// import routes
+import usersRoute from "./users.route";
 
 export type Route = {
     path: string;
@@ -6,11 +11,6 @@ export type Route = {
 };
 
 const router: ExpressRouter = ExpressRouter();
-
-// import routes
-import usersRoute from "./users.route";
-import projectRoute from "./projects.route";
-import taskRoute from "./tasks.route";
 
 const routes = [
     {
@@ -24,6 +24,10 @@ const routes = [
     {
         path: "/tasks",
         route: taskRoute,
+    },
+    {
+        path: "/uploads",
+        route: uploadRoute,
     },
 ];
 

@@ -28,7 +28,6 @@ const ProjectPage = () => {
   const handleToggleProjectModal = () => {
     setIsModalNewProjectOpen(!isModalNewProjectOpen);
   };
-  const isActive = true;
   const [keyword, setKeyword] = useState<string>("");
 
   return (

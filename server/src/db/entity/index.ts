@@ -1,5 +1,6 @@
-import { User } from "./User";
 import { Project } from "./project";
 import { Task } from "./task";
+import { UploadFile } from "./uploads";
+import { User } from "./User";
 
-export default [User, Project, Task];
+export default [User, Project, Task, UploadFile];

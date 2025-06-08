@@ -1,27 +1,18 @@
-import { Priority, ProjectStatus } from "../enums/Priority";
-
 import { IPagination } from "../types/express";
+import { IProject } from "../types/payload";
 import { Project } from "../db/entity/project";
 import { Task } from "../db/entity/task";
+import { UploadFile } from "../db/entity/uploads";
 import { User } from "../db/entity/User";
 import createPagination from "../utils/createPagination";
 import dataSource from "../db/data-source";
 
-interface IProject {
-    name: string;
-    description: string;
-    startDate: Date;
-    endDate: Date;
-    admin: User;
-    team_member: number[];
-    status: ProjectStatus;
-    priority: Priority;
-}
-
 export class ProjectService {
     constructor(
         private readonly projectRepository = dataSource.getRepository(Project),
-        private readonly taskRepository = dataSource.getRepository(Task)
+        private readonly taskRepository = dataSource.getRepository(Task),
+        private readonly userRepository = dataSource.getRepository(User),
+        private readonly uploadRepository = dataSource.getRepository(UploadFile)
     ) {}
 
     async create(project: IProject) {
@@ -34,12 +25,22 @@ export class ProjectService {
         projectObj.startDate = project.startDate;
         projectObj.endDate = project.endDate;
         projectObj.admin = project.admin;
+        projectObj.status = project.status;
+        projectObj.priority = project.priority;
 
+        if (project?.profilePicture) {
+            projectObj.profilePicture = project?.profilePicture ?? "";
+        }
         const newProjectResult = await this.projectRepository.save(projectObj);
 
-        for (let index = 0; index < project.team_member.length; index++) {
-            const element = project.team_member[index];
+        for (let index = 0; index < project.teamMember.length; index++) {
+            const element = project.teamMember[index];
             await this.addTeamMember(newProjectResult.id, element);
+        }
+
+        for (let index = 0; index < project.projectUploads.length; index++) {
+            const element = project.projectUploads[index];
+            await this.addProjectAttachments(newProjectResult.id, element.id);
         }
 
         return newProjectResult;
@@ -98,12 +99,32 @@ export class ProjectService {
             where: { id: projectId },
             relations: ["teamMember"],
         });
-        const user = await dataSource.getRepository(User).findOne({
+        const user = await this.userRepository.findOne({
             where: { id: userId },
         });
 
         if (project !== null && user !== null) {
             project?.teamMember.push(user);
+            const response = await this.projectRepository.save(project);
+            if (response) {
+                return await this.getById(projectId);
+            }
+        }
+    }
+
+    async addProjectAttachments(projectId: number, uploadId: string) {
+        const project = await this.projectRepository.findOne({
+            where: { id: projectId },
+            relations: ["teamMember"],
+        });
+        const uploadResponse = await this.uploadRepository.findOne({
+            where: { id: uploadId },
+        });
+
+        if (project == null || uploadResponse == null) {
+            throw new Error("Attachment Error");
+        } else {
+            project?.projectUploads.push(uploadResponse);
             const response = await this.projectRepository.save(project);
             if (response) {
                 return await this.getById(projectId);

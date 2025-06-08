@@ -1,4 +1,11 @@
-import { IProject, ITask, ITaskPayload, IUser } from "../types/user.types";
+import {
+  IFileUploadsPayload,
+  IProject,
+  ITask,
+  ITaskPayload,
+  IUploadFile,
+  IUser,
+} from "../types/user.types";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 import dotenv from "dotenv";
@@ -137,6 +144,21 @@ export const api = createApi({
         return [{ type: "Tasks", id }];
       },
     }),
+    createUploads: build.mutation<Response<IUploadFile>, { files: File[] }>({
+      query: (body) => {
+        const formData = new FormData();
+        body.files.forEach((file: File) => {
+          formData.append("file", file);
+        });
+
+        return {
+          url: "uploads",
+          method: "POST",
+          body: formData,
+          formData: true,
+        };
+      },
+    }),
   }),
 });
 
@@ -150,4 +172,5 @@ export const {
   useCreateProjectMutation,
   useLazyGetProjectsQuery,
   useGetProjectsQuery,
+  useCreateUploadsMutation,
 } = api;

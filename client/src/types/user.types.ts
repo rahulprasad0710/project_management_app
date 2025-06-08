@@ -109,3 +109,23 @@ export const projectStatusOptions: IProjectStatusOptions[] = [
   { value: "UNDER_REVIEW", label: "Under Review" },
   { value: "COMPLETED", label: "Completed" },
 ];
+
+export interface IFileUploadsPayload {
+  formData: FormData;
+}
+
+export interface IUploadFile {
+  id: string;
+  filename: string;
+  originalname: string;
+  size: number;
+  extension: string;
+  mimetype?: string;
+  fileType?: string;
+  cloudPath?: string;
+  cloudId?: string;
+  cloudUrl?: string;
+  createdBy: IUser; // Or use a custom IUser interface if you have one
+  createdAt: Date;
+  updatedAt: Date;
+}

@@ -2,9 +2,13 @@ import { Request, Response } from "express";
 
 import { IPagination } from "../types/express";
 import ProjectService from "../services/projects.service";
+
 const projectService = new ProjectService();
 
 const create = async (req: Request, res: Response): Promise<void> => {
+    console.log({
+        body: req.body,
+    });
     try {
         const data = await projectService.create({
             name: req.body.name,
@@ -12,9 +16,10 @@ const create = async (req: Request, res: Response): Promise<void> => {
             startDate: req.body.startDate,
             endDate: req.body.endDate,
             admin: req.body.admin,
-            team_member: req.body.team_member,
+            teamMember: req.body.teamMember,
             status: req.body.status,
             priority: req.body.priority,
+            projectUploads: req.body.projectUploads,
         });
         res.status(201).json({
             success: true,

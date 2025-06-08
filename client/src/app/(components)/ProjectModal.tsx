@@ -12,7 +12,11 @@ import {
 } from "@/types/user.types";
 import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useCreateProjectMutation, useLazyGetProjectsQuery } from "@/store/api";
+import {
+  useCreateProjectMutation,
+  useCreateUploadsMutation,
+  useLazyGetProjectsQuery,
+} from "@/store/api";
 
 import DragList from "./molecules/DragList";
 import Dropzone from "./Dropzone";
@@ -50,9 +54,14 @@ type Props = {
 
 const ProjectModal = (props: Props) => {
   const { onClose, selectedData } = props;
+
+  const [files, setFiles] = useState<File[]>([]);
   const { id } = useParams();
   const [createProjectMutation] = useCreateProjectMutation();
-  const [fetchAllProject] = useLazyGetProjectsQuery();
+
+  const [createUploadMutation] = useCreateUploadsMutation();
+
+  // const [fetchAllProject] = useLazyGetProjectsQuery();
   const [selectedTeamMember, setSelectedTeamMember] = useState<number[]>([]);
   const schema = yup.object().shape({
     name: yup.string().required("Project name is required"), // Required field
@@ -102,6 +111,7 @@ const ProjectModal = (props: Props) => {
   }, [selectedData]);
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
+    console.log(files);
     console.log(data);
     console.log(selectedTeamMember);
 
@@ -122,15 +132,11 @@ const ProjectModal = (props: Props) => {
     });
 
     try {
-      const response = await createProjectMutation(payload).unwrap();
+      const fileResponseList = await createUploadMutation({ files }).unwrap();
 
-      if (response) {
-        // fetchAllProject({
-        //   isPaginationEnabled: true,
-        //   page: 3,
-        //   pageSize: 10,
-        //   keyword: "",
-        // });
+      console.log("LOG: ~ fileResponseList:", fileResponseList);
+
+      if (fileResponseList) {
         toast.success("Project added successfully");
         onClose();
       }
@@ -175,7 +181,7 @@ const ProjectModal = (props: Props) => {
           ></textarea>
         </div>
         <div className="mb-4">
-          <Dropzone />
+          <Dropzone setFiles={setFiles} files={files} />
         </div>
         <div className="flex w-full gap-4">
           <div className="mb-4 w-1/2">
