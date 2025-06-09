@@ -1,8 +1,9 @@
-import TaskService from "../services/task.service";
-const taskService = new TaskService();
 import { Request, Response } from "express";
+
 import { IPagination } from "../types/express";
-import { TaskStatus } from "../enums/Priority";
+import TaskService from "../services/task.service";
+
+const taskService = new TaskService();
 
 const create = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -10,11 +11,14 @@ const create = async (req: Request, res: Response): Promise<void> => {
             title: req.body.title,
             description: req.body.description,
             priority: req.body.priority,
-            startDate: req.body.startDate,
-            endDate: req.body.endDate,
+            addedDate: req.body.addedDate,
             addedBy: req.body.addedBy,
             project: req.body.projectId,
             status: req.body.status,
+            assignedBy: req.body.assignedBy,
+            assignedTo: req.body.assignedTo,
+            taskLabel: req.body.taskLabel,
+            taskUploads: req.body.taskUploads,
         });
         res.status(201).json({
             success: true,
@@ -22,7 +26,11 @@ const create = async (req: Request, res: Response): Promise<void> => {
             message: "Task created successfully",
         });
     } catch (error) {
-        res.status(500).json({ message: error });
+        res.status(500).json({
+            success: false,
+            data: null,
+            message: error,
+        });
     }
 };
 

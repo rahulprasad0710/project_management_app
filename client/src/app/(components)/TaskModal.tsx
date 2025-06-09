@@ -1,24 +1,28 @@
-import React from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import * as yup from "yup";
+
 import {
-  useCreateTasksMutation,
-  useLazyGetProjectByIdQuery,
-} from "@/store/api";
-import {
+  IPriorityOptions,
+  IStatusOptions,
+  ITaskPayload,
+  IUploadFile,
   Priority,
   TaskStatus,
   priorityOptions,
-  IPriorityOptions,
   statusOptions,
-  IStatusOptions,
-  ITaskPayload,
 } from "@/types/user.types";
+import React, { useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import {
+  useCreateTasksMutation,
+  useGetUsersQuery,
+  useLazyGetProjectByIdQuery,
+} from "@/store/api";
 
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { useParams } from "next/navigation";
-import { toast } from "react-toastify";
+import Dropzone from "./Dropzone";
 import Spinner from "./Spinner";
+import { toast } from "react-toastify";
+import { useParams } from "next/navigation";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 interface IFormInput {
   title: string;
@@ -31,11 +35,6 @@ interface IFormInput {
   status: TaskStatus;
 }
 
-interface IAssignedTo {
-  label: string;
-  value: number;
-}
-
 type Props = {
   onClose: () => void;
 };
@@ -45,6 +44,9 @@ const TaskModal = (props: Props) => {
   const { id } = useParams();
   const [createTasksMutation] = useCreateTasksMutation();
   const [fetchProject] = useLazyGetProjectByIdQuery();
+  const [files, setFiles] = useState<File[]>([]);
+  const [OldFiles, setOldFiles] = useState<IUploadFile[]>([]);
+  const { isFetching: isUserFetching, data: userList } = useGetUsersQuery();
 
   const schema = yup.object().shape({
     title: yup.string().required("Title is required"), // Required field
@@ -109,12 +111,6 @@ const TaskModal = (props: Props) => {
     }
   };
 
-  const assignToOptions = [
-    { value: 1, label: "John Doe" },
-    { value: 2, label: "Jane Smith" },
-    { value: 3, label: "Bob Johnson" },
-  ];
-
   return (
     <div className="w-full">
       <form className="bg-white p-4" onSubmit={handleSubmit(onSubmit)}>
@@ -142,6 +138,14 @@ const TaskModal = (props: Props) => {
             {...register("description")}
             className="focus:shadow-outline w-full resize-y rounded-md border border-gray-200 p-2 text-gray-700 focus:border-blue-300 focus:outline-none"
           ></textarea>
+        </div>
+        <div className="mb-4">
+          <Dropzone
+            setFiles={setFiles}
+            files={files}
+            OldFiles={OldFiles}
+            setOldFiles={setOldFiles}
+          />
         </div>
         <div className="flex w-full gap-4">
           <div className="mb-4 w-1/2">
@@ -197,82 +201,97 @@ const TaskModal = (props: Props) => {
             </div>
           </div>
         </div>
-        <div className="mb-4 w-full">
-          <label className="mb-2 block text-sm font-bold text-gray-700">
-            Report By
-          </label>
-          <div className="relative">
-            <select
-              className="block w-full appearance-none rounded border border-gray-200 bg-white px-4 py-2 pr-8 leading-tight text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none"
-              id="grid-state"
-              {...register("addedBy")}
-            >
-              {assignToOptions.map((assignTo: IAssignedTo) => (
-                <option value={assignTo.value} key={assignTo.value}>
-                  {assignTo.label}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg
-                className="h-4 w-4 fill-current"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
+
+        <div className="flex w-full gap-4">
+          <div className="mb-4 w-1/2">
+            <label className="mb-2 block text-sm font-bold text-gray-700">
+              Assign By
+            </label>
+            <div className="relative">
+              <select
+                className="block w-full appearance-none rounded border border-gray-200 bg-white px-4 py-2 pr-8 leading-tight text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none"
+                id="grid-state"
+                {...register("addedBy")}
               >
-                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-              </svg>
+                {!isUserFetching && userList?.data && userList?.data?.length > 0
+                  ? userList?.data.map((item) => {
+                      return (
+                        <option value={item.id} key={item.id}>
+                          {`${item.firstName} ${item.lastName}`}
+                        </option>
+                      );
+                    })
+                  : []}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                <svg
+                  className="h-4 w-4 fill-current"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div className="mb-4 w-1/2">
+            <label className="mb-2 block text-sm font-bold text-gray-700">
+              Assign to
+            </label>
+            <div className="relative">
+              <select
+                className="block w-full appearance-none rounded border border-gray-200 bg-white px-4 py-2 pr-8 leading-tight text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none"
+                id="grid-state"
+                {...register("assignTo")}
+              >
+                {!isUserFetching && userList?.data && userList?.data?.length > 0
+                  ? userList?.data.map((item) => {
+                      return (
+                        <option value={item.id} key={item.id}>
+                          {`${item.firstName} ${item.lastName}`}
+                        </option>
+                      );
+                    })
+                  : []}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                <svg
+                  className="h-4 w-4 fill-current"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                </svg>
+              </div>
             </div>
           </div>
         </div>
-        <div className="mb-4 w-full">
-          <label className="mb-2 block text-sm font-bold text-gray-700">
-            Assign to
-          </label>
-          <div className="relative">
-            <select
-              className="block w-full appearance-none rounded border border-gray-200 bg-white px-4 py-2 pr-8 leading-tight text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none"
-              id="grid-state"
-              {...register("assignTo")}
-            >
-              {assignToOptions.map((assignTo: IAssignedTo) => (
-                <option value={assignTo.value} key={assignTo.value}>
-                  {assignTo.label}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg
-                className="h-4 w-4 fill-current"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-              >
-                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-              </svg>
-            </div>
+
+        <div className="flex w-full gap-4">
+          <div className="mb-4 w-1/2">
+            <label className="mb-2 block text-sm font-bold text-gray-700">
+              Start Date
+            </label>
+            <input
+              className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow-sm focus:border-blue-300 focus:outline-none"
+              type="date"
+              value={new Date().toISOString().split("T")[0]}
+              {...register("startDate")}
+            />
+          </div>
+          <div className="mb-4 w-1/2">
+            <label className="mb-2 block text-sm font-bold text-gray-700">
+              End Date
+            </label>
+            <input
+              className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow-sm focus:border-blue-300 focus:outline-none"
+              type="date"
+              value={new Date().toISOString().split("T")[0]}
+              {...register("endDate")}
+            />
           </div>
         </div>
-        <div className="mb-4">
-          <label className="mb-2 block text-sm font-bold text-gray-700">
-            Start Date
-          </label>
-          <input
-            className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow-sm focus:border-blue-300 focus:outline-none"
-            type="date"
-            value={new Date().toISOString().split("T")[0]}
-            {...register("startDate")}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="mb-2 block text-sm font-bold text-gray-700">
-            End Date
-          </label>
-          <input
-            className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow-sm focus:border-blue-300 focus:outline-none"
-            type="date"
-            value={new Date().toISOString().split("T")[0]}
-            {...register("endDate")}
-          />
-        </div>
+
         <div className="flex items-center justify-end gap-4">
           <button
             onClick={onClose}

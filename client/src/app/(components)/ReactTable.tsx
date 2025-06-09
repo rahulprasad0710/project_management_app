@@ -48,7 +48,7 @@ const ReactTable = <T extends object>({
 
   return (
     <div className="min-w-full overflow-x-auto rounded-lg border border-neutral-200">
-      <div className="max-h-[700px] overflow-y-auto overflow-x-hidden">
+      <div className="max-h-[700px] min-h-[700px] overflow-y-auto overflow-x-hidden">
         <table className="min-w-full table-fixed align-middle text-sm">
           <thead className="sticky top-0 z-10 bg-white">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -73,14 +73,17 @@ const ReactTable = <T extends object>({
             ))}
           </thead>
           <tbody className="divide-y divide-neutral-200">
-            {isFetching
+            {isFetching || data?.length === 0
               ? Array.from({ length: 10 }).map((_, index) => (
                   <tr
                     key={`skeleton-${index}`}
                     className="animate-pulse border-b border-neutral-100"
                   >
                     {table.getAllColumns().map((col, colIndex) => (
-                      <td key={`skeleton-td-${colIndex}`} className="p-3">
+                      <td
+                        key={`skeleton-td-${colIndex}`}
+                        className="p-6 text-start font-semibold text-neutral-600"
+                      >
                         <div className="h-4 w-full rounded bg-neutral-200"></div>
                       </td>
                     ))}

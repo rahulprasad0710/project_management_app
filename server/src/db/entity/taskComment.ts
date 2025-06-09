@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from "typeorm";
-import { User } from "./User";
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+
 import { Task } from "./task";
+import { User } from "./User";
 
 @Entity()
 export class TaskComment {
@@ -11,7 +12,7 @@ export class TaskComment {
     description: string;
 
     @Column()
-    addedat: Date;
+    addedAt: Date;
 
     @OneToOne(() => User, (user) => user.id)
     addedBy: User;

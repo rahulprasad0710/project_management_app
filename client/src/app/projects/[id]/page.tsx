@@ -1,21 +1,26 @@
 "use client";
-import ProjectHeader from "@/app/(components)/ProjectHeader";
-import TableView from "@/app/(components)/TableView";
-import { useParams } from "next/navigation";
+
 import React, { useState } from "react";
+
+import BoardView from "@/app/(components)/BoardView";
+import Header from "@/app/(components)/Header";
+import Modal from "@/app/(components)/Modal";
+import ProjectHeader from "@/app/(components)/ProjectHeader";
+import SearchBar from "@/app/(components)/molecules/SearchBar";
+import { SquarePlus } from "lucide-react";
+import TableView from "@/app/(components)/TableView";
+import TaskModal from "@/app/(components)/TaskModal";
+import TimelineView from "@/app/(components)/TimelineView";
 import { useGetProjectByIdQuery } from "@/store/api";
+import { useParams } from "next/navigation";
 
 type BOARD_TYPES = "BOARD" | "LIST" | "CALENDAR" | "TIMELINE" | "TABLE";
-import Modal from "@/app/(components)/Modal";
-import BoardView from "@/app/(components)/BoardView";
-import TimelineView from "@/app/(components)/TimelineView";
-import Header from "@/app/(components)/Header";
-import { SquarePlus } from "lucide-react";
-import TaskModal from "@/app/(components)/TaskModal";
 
 const ProjectDetails = () => {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState<BOARD_TYPES>("BOARD");
+  const [keyword, setKeyword] = useState<string>("");
+
   const {
     isFetching,
     data: projectResponse,
@@ -45,23 +50,24 @@ const ProjectDetails = () => {
   return (
     <div className="px-4 xl:px-6">
       <div className="pb-4 pt-4 lg:pb-4">
-        <Header
-          title="Project"
-          showBtn={true}
-          buttonComponent={
-            <div>
-              <button
-                onClick={handleToggleProjectModal}
-                className="flex items-center rounded bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700"
-              >
-                <span>
-                  <SquarePlus className="mr-3 h-5 w-5" />
-                </span>
-                <span>Add new task</span>
-              </button>
-            </div>
-          }
-        />
+        <Header title="Project" />
+
+        <div className="flex justify-end gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
+            <ProjectHeader activeTab={activeTab} setActiveTab={setActiveTab} />
+            <SearchBar setKeyword={setKeyword} keyword={keyword} />
+          </div>
+
+          <button
+            onClick={handleToggleProjectModal}
+            className="flex items-center rounded bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700"
+          >
+            <span>
+              <SquarePlus className="mr-3 h-5 w-5" />
+            </span>
+            <span>Add new task</span>
+          </button>
+        </div>
       </div>
       <ProjectHeader activeTab={activeTab} setActiveTab={setActiveTab} />
       {activeTab === "TABLE" && <TableView projectResponse={projectResponse} />}

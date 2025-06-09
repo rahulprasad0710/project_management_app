@@ -1,22 +1,12 @@
 "use client";
 
-import {
-  Clock,
-  Filter,
-  Grid3X3,
-  Search,
-  Share2,
-  SquarePlus,
-  Table,
-} from "lucide-react";
 import React, { useState } from "react";
 
 import Header from "../(components)/Header";
-import Modal from "../(components)/Modal";
 import ProjectHeader from "../(components)/ProjectHeader";
-import ProjectModal from "../(components)/ProjectModal";
 import ProjectTable from "../(components)/ProjectTable";
 import SearchBar from "../(components)/molecules/SearchBar";
+import { SquarePlus } from "lucide-react";
 
 type BOARD_TYPES = "BOARD" | "LIST" | "CALENDAR" | "TIMELINE" | "TABLE";
 
@@ -54,14 +44,6 @@ const ProjectPage = () => {
       </div>
 
       <ProjectTable keyword={keyword} />
-
-      <Modal
-        modalTitle="Add new project"
-        isOpen={isModalNewProjectOpen}
-        onClose={() => setIsModalNewProjectOpen(false)}
-      >
-        <ProjectModal onClose={() => setIsModalNewProjectOpen(false)} />
-      </Modal>
     </div>
   );
 };

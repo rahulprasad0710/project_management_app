@@ -1,36 +1,58 @@
+import { Priority, TaskStatus } from "../enums/Priority";
+
+import { IPagination } from "../types/express";
+import { Label } from "../db/entity/taskLabel";
 import { Project } from "../db/entity/project";
+import { Task } from "../db/entity/task";
+import { UploadFile } from "../db/entity/uploads";
 import { User } from "../db/entity/User";
 import dataSource from "../db/data-source";
-import { Task } from "../db/entity/task";
-import { Priority, TaskStatus } from "../enums/Priority";
-import { IPagination } from "../types/express";
 
 interface ITask {
     title: string;
     description: string;
-    startDate: Date;
-    endDate: Date;
+    addedDate: Date;
     addedBy: User;
+    assignedTo: User;
+    assignedBy: User;
     project: Project;
     status: TaskStatus;
     priority: Priority;
+    taskLabel?: Label;
+    taskUploads: string[];
 }
 
 export class TaskService {
     constructor(
-        private readonly taskRepository = dataSource.getRepository(Task)
+        private readonly taskRepository = dataSource.getRepository(Task),
+        private readonly uploadRepository = dataSource.getRepository(UploadFile)
     ) {}
 
     async create(task: ITask) {
         const taskObj = new Task();
+
+        const totalCount = await this.taskRepository.count();
+        const taskNumber = String(totalCount + 1).padStart(4, "0");
+
         taskObj.title = task.title;
-        taskObj.description = task.description;
-        taskObj.startDate = task.startDate;
-        taskObj.endDate = task.endDate;
+        taskObj.taskNumber = `JT-${taskNumber}`;
         taskObj.addedBy = task.addedBy;
-        taskObj.project = task.project;
+        taskObj.assignedTo = task.assignedTo;
+        taskObj.description = task.description;
+        taskObj.addedDate = task.addedDate;
+        taskObj.assignedBy = task.assignedBy;
         taskObj.status = task.status;
         taskObj.priority = task.priority;
+        taskObj.project = task.project;
+        if (task.taskLabel) {
+            taskObj.taskLabel = task.taskLabel;
+        }
+
+        const result = await this.taskRepository.save(taskObj);
+
+        if (task.taskUploads.length > 0) {
+            await this.addAttachments(result.id, task.taskUploads);
+        }
 
         return await this.taskRepository.save(taskObj);
     }
@@ -53,8 +75,7 @@ export class TaskService {
 
         taskObj.title = task.title;
         taskObj.description = task.description;
-        taskObj.startDate = task.startDate;
-        taskObj.endDate = task.endDate;
+        taskObj.addedDate = task.addedDate;
 
         return await this.taskRepository.save(taskObj);
     }
@@ -109,6 +130,35 @@ export class TaskService {
         return await this.taskRepository.findOne({
             where: { id },
         });
+    }
+
+    async addAttachments(taskId: number, uploadIds: string[]) {
+        const task = await this.taskRepository.findOne({
+            where: { id: taskId },
+            relations: ["taskUploads"],
+        });
+
+        const uploadResponse = (
+            await Promise.all(
+                uploadIds.map(async (uploadId) => {
+                    return await this.uploadRepository.findOne({
+                        where: { id: uploadId },
+                    });
+                })
+            )
+        ).filter((uploadId): uploadId is UploadFile => uploadId !== null);
+
+        if (
+            task !== null &&
+            uploadResponse !== null &&
+            uploadResponse.length > 0
+        ) {
+            task.taskUploads = uploadResponse;
+            const response = await this.taskRepository.save(task);
+            if (response) {
+                return response;
+            }
+        }
     }
 }
 

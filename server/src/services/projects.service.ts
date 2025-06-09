@@ -1,7 +1,6 @@
 import { IProject, IUpdateProjectPayload } from "../types/payload";
 import UploadService, { IUploadFileURL } from "./upload.service";
 
-import { DataSource } from "typeorm";
 import { IPagination } from "../types/express";
 import { Project } from "../db/entity/project";
 import { Task } from "../db/entity/task";

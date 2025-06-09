@@ -1,14 +1,18 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
     Column,
-    ManyToOne,
+    Entity,
     JoinColumn,
+    JoinTable,
+    ManyToMany,
+    ManyToOne,
+    PrimaryGeneratedColumn,
 } from "typeorm";
-import { User } from "./User";
-import { Project } from "./project";
-
 import { Priority, TaskStatus } from "../../enums/Priority";
+
+import { Label } from "./taskLabel";
+import { Project } from "./project";
+import { UploadFile } from "./uploads";
+import { User } from "./User";
 
 @Entity()
 export class Task {
@@ -18,7 +22,11 @@ export class Task {
     @Column()
     title: string;
 
-    @ManyToOne(() => User, (user) => user.id)
+    // remove nullable for new DB.
+    @Column({ nullable: true })
+    taskNumber: string;
+
+    @ManyToOne(() => User, (user) => user.id, { nullable: true })
     @JoinColumn()
     addedBy: User;
 
@@ -30,10 +38,15 @@ export class Task {
     description: string;
 
     @Column()
-    startDate: Date;
+    addedDate: Date;
 
-    @Column()
-    endDate: Date;
+    @ManyToOne(() => User, (user) => user.id)
+    @JoinColumn()
+    assignedBy: User;
+
+    @ManyToOne(() => Label, (label) => label.id, { nullable: true })
+    @JoinColumn()
+    taskLabel: Label;
 
     @Column({
         type: "enum",
@@ -54,4 +67,21 @@ export class Task {
         name: "projectId",
     })
     project: Project;
+
+    @ManyToMany(() => UploadFile, (upload) => upload.id, {
+        cascade: true,
+        eager: true,
+    })
+    @JoinTable({
+        name: "task_uploads",
+        joinColumn: {
+            name: "taskId",
+            referencedColumnName: "id",
+        },
+        inverseJoinColumn: {
+            name: "uploadId",
+            referencedColumnName: "id",
+        },
+    })
+    taskUploads: UploadFile[];
 }
