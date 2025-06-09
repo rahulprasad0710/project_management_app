@@ -5,7 +5,6 @@ import {
 } from "@aws-sdk/client-s3";
 
 import AWS_CONSTANT from "../constants/AWSConfig";
-import { generateUniqueId } from "../utils/generateUniqueId";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 // const randomKey = Math.random().toString(36).substring(2, 15);
@@ -24,15 +23,6 @@ if (
 ) {
     throw new Error("Missing AWS configuration");
 }
-
-console.log({
-    region: AWS_CONSTANT.S3_REGION,
-    Bucket: AWS_CONSTANT.AWS_BUCKET_NAME,
-    credentials: {
-        accessKeyId: AWS_CONSTANT.S3_ACCESS_KEY_ID,
-        secretAccessKey: AWS_CONSTANT.S3_SECRET_ACCESS_KEY,
-    },
-});
 
 const client = new S3Client({
     region: AWS_CONSTANT.S3_REGION,
@@ -71,10 +61,8 @@ async function getPreSignedUrl({ bucketKey }: { bucketKey: string }) {
         });
 
         const url = await getSignedUrl(client, command, { expiresIn: 3600 }); // 1 hour
-        console.log("LOG: ~ getPreSignedUrl ~ url:", url);
         return url;
     } catch (error) {
-        console.log("LOG: ~ getPreSignedUrl ~ error:", error);
         throw new Error(error instanceof Error ? error.message : String(error));
     }
 }

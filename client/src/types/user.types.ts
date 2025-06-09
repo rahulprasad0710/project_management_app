@@ -55,8 +55,12 @@ export interface IAddProjectPayload {
   endDate: string;
   teamMember: number[];
   status: ProjectStatus;
-  projectId: number;
+
   projectUploads: string[];
+}
+export interface IUpdateProjectPayload extends IAddProjectPayload {
+  projectId: number;
+  updatedProjectUploads: string[];
 }
 
 export interface IFileUploadsPayload {

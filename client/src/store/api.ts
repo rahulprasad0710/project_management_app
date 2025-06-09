@@ -3,6 +3,7 @@ import {
   IProject,
   ITask,
   ITaskPayload,
+  IUpdateProjectPayload,
   IUploadFile,
   IUser,
 } from "../types/user.types";
@@ -101,6 +102,14 @@ export const api = createApi({
       }),
       invalidatesTags: [{ type: "Projects", id: "LIST" }],
     }),
+    updateProject: build.mutation<Response<IProject>, IUpdateProjectPayload>({
+      query: ({ projectId, ...payload }) => ({
+        url: `projects/${projectId}`,
+        method: "PUT",
+        body: payload,
+      }),
+      invalidatesTags: [{ type: "Projects", id: "LIST" }],
+    }),
     getTasks: build.query<ITask[], void>({
       query: () => ({
         url: "projects",
@@ -173,4 +182,5 @@ export const {
   useLazyGetProjectsQuery,
   useGetProjectsQuery,
   useCreateUploadsMutation,
+  useUpdateProjectMutation,
 } = api;

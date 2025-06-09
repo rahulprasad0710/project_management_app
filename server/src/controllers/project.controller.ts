@@ -6,9 +6,6 @@ import ProjectService from "../services/projects.service";
 const projectService = new ProjectService();
 
 const create = async (req: Request, res: Response): Promise<void> => {
-    console.log({
-        body: req.body,
-    });
     try {
         const data = await projectService.create({
             name: req.body.name,
@@ -20,6 +17,36 @@ const create = async (req: Request, res: Response): Promise<void> => {
             status: req.body.status,
             priority: req.body.priority,
             projectUploads: req.body.projectUploads,
+        });
+        res.status(201).json({
+            success: true,
+            data: data,
+            message: "Project created successfully",
+        });
+    } catch (error) {
+        res.status(500).json({
+            data: null,
+            success: false,
+            message: "Error creating project",
+            error: error,
+        });
+    }
+};
+
+const update = async (req: Request, res: Response): Promise<void> => {
+    const { id } = req.params;
+    try {
+        const data = await projectService.update(Number(id), {
+            name: req.body.name,
+            description: req.body.description,
+            startDate: req.body.startDate,
+            endDate: req.body.endDate,
+            admin: req.body.admin,
+            teamMember: req.body.teamMember,
+            status: req.body.status,
+            priority: req.body.priority,
+            projectUploads: req.body.projectUploads,
+            updatedProjectUploads: req.body.updatedProjectUploads,
         });
         res.status(201).json({
             success: true,
@@ -105,4 +132,5 @@ export default {
     getAll,
     getById,
     addTeamMember,
+    update,
 };

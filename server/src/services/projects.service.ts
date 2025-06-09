@@ -1,7 +1,8 @@
+import { IProject, IUpdateProjectPayload } from "../types/payload";
 import UploadService, { IUploadFileURL } from "./upload.service";
 
+import { DataSource } from "typeorm";
 import { IPagination } from "../types/express";
-import { IProject } from "../types/payload";
 import { Project } from "../db/entity/project";
 import { Task } from "../db/entity/task";
 import { UploadFile } from "../db/entity/uploads";
@@ -33,14 +34,15 @@ export class ProjectService {
         }
         const newProjectResult = await this.projectRepository.save(projectObj);
 
-        for (let index = 0; index < project.teamMember.length; index++) {
-            const element = project.teamMember[index];
-            await this.addTeamMember(newProjectResult.id, element);
+        if (project.teamMember.length > 0) {
+            await this.addTeamMember(newProjectResult.id, project.teamMember);
         }
 
-        for (let index = 0; index < project.projectUploads.length; index++) {
-            const element = project.projectUploads[index];
-            await this.addProjectAttachments(newProjectResult.id, element);
+        if (project.projectUploads.length > 0) {
+            await this.addProjectAttachments(
+                newProjectResult.id,
+                project.projectUploads
+            );
         }
 
         return newProjectResult;
@@ -78,32 +80,65 @@ export class ProjectService {
         };
     }
 
-    async update(id: number, project: IProject) {
-        const projectObj = new Project();
-        projectObj.name = project.name;
-        projectObj.description = project.description;
-        projectObj.startDate = project.startDate;
-        projectObj.endDate = project.endDate;
-        projectObj.admin = project.admin;
+    async update(id: number, project: IUpdateProjectPayload) {
+        const queryRunner = dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            const projectObj = new Project();
+            projectObj.name = project.name;
+            projectObj.description = project.description;
+            projectObj.startDate = project.startDate;
+            projectObj.endDate = project.endDate;
+            projectObj.admin = project.admin;
 
-        return await this.projectRepository.update(id, projectObj);
+            const projectResponse = await this.projectRepository.update(
+                id,
+                projectObj
+            );
+
+            if (project.teamMember) {
+                await this.addTeamMember(id, project.teamMember);
+            }
+            if (project.projectUploads && project.updatedProjectUploads) {
+                await this.addProjectAttachments(id, [
+                    ...project.projectUploads,
+                    ...project.updatedProjectUploads,
+                ]);
+            }
+
+            await queryRunner.commitTransaction();
+            return projectResponse;
+        } catch (error) {
+            await queryRunner.rollbackTransaction();
+            throw error;
+        } finally {
+            await queryRunner.release();
+        }
     }
 
     async delete(id: number) {
         return await this.projectRepository.delete(id);
     }
 
-    async addTeamMember(projectId: number, userId: number) {
+    async addTeamMember(projectId: number, userIds: number[]) {
         const project = await this.projectRepository.findOne({
             where: { id: projectId },
             relations: ["teamMember"],
         });
-        const user = await this.userRepository.findOne({
-            where: { id: userId },
-        });
 
-        if (project !== null && user !== null) {
-            project?.teamMember.push(user);
+        const userList = (
+            await Promise.all(
+                userIds.map(async (userId) => {
+                    return await this.userRepository.findOne({
+                        where: { id: userId },
+                    });
+                })
+            )
+        ).filter((user): user is User => user !== null);
+
+        if (project !== null && userList !== null && userList.length > 0) {
+            project.teamMember = userList;
             const response = await this.projectRepository.save(project);
             if (response) {
                 return response;
@@ -111,23 +146,28 @@ export class ProjectService {
         }
     }
 
-    async addProjectAttachments(projectId: number, uploadId: string) {
-        console.log({
-            projectId,
-            uploadId,
-        });
+    async addProjectAttachments(projectId: number, uploadIds: string[]) {
         const project = await this.projectRepository.findOne({
             where: { id: projectId },
-            relations: ["teamMember"],
-        });
-        const uploadResponse = await this.uploadRepository.findOne({
-            where: { id: uploadId },
+            relations: ["projectUploads"],
         });
 
-        if (project == null || uploadResponse == null) {
-            throw new Error("Attachment Error");
-        } else {
-            project?.projectUploads.push(uploadResponse);
+        const uploadResponse = (
+            await Promise.all(
+                uploadIds.map(async (uploadId) => {
+                    return await this.uploadRepository.findOne({
+                        where: { id: uploadId },
+                    });
+                })
+            )
+        ).filter((uploadId): uploadId is UploadFile => uploadId !== null);
+
+        if (
+            project !== null &&
+            uploadResponse !== null &&
+            uploadResponse.length > 0
+        ) {
+            project.projectUploads = uploadResponse;
             const response = await this.projectRepository.save(project);
             if (response) {
                 return response;

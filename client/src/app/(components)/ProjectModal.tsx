@@ -4,6 +4,7 @@ import {
   IAddProjectPayload,
   IPriorityOptions,
   IProject,
+  IUpdateProjectPayload,
   IUploadFile,
   Priority,
   ProjectStatus,
@@ -16,13 +17,13 @@ import {
   useCreateUploadsMutation,
   useGetUsersQuery,
   useLazyGetProjectByIdQuery,
+  useUpdateProjectMutation,
 } from "@/store/api";
 
 import Dropzone from "./Dropzone";
 import MultiSelect from "./atoms/MultiSelect";
 import Spinner from "./Spinner";
 import { toast } from "react-toastify";
-import { useParams } from "next/navigation";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 interface IFormInput {
@@ -47,8 +48,8 @@ const ProjectModal = (props: Props) => {
   const [files, setFiles] = useState<File[]>([]);
   const [OldFiles, setOldFiles] = useState<IUploadFile[]>([]);
 
-  const { id } = useParams();
   const [createProjectMutation] = useCreateProjectMutation();
+  const [updateProjectMutation] = useUpdateProjectMutation();
   const [fetchProject] = useLazyGetProjectByIdQuery();
   const [createUploadMutation] = useCreateUploadsMutation();
 
@@ -136,8 +137,9 @@ const ProjectModal = (props: Props) => {
     console.log(files);
     console.log(data);
     console.log(selectedTeamMember);
+    // projectId: Number(id),
 
-    const payload: IAddProjectPayload = {
+    const payload: IAddProjectPayload | IUpdateProjectPayload = {
       name: data.name,
       description: data.description,
       priority: data.priority,
@@ -145,14 +147,9 @@ const ProjectModal = (props: Props) => {
       startDate: data.startDate,
       endDate: data.endDate,
       status: data.status,
-      projectId: Number(id),
       teamMember: selectedTeamMember.map((item) => item.value),
       projectUploads: [],
     };
-
-    console.log({
-      payload,
-    });
 
     try {
       if (files?.length > 0) {
@@ -170,11 +167,31 @@ const ProjectModal = (props: Props) => {
         });
       }
 
-      const response = await createProjectMutation(payload).unwrap();
+      if (selectedData?.id) {
+        const updateProjectPayload: IUpdateProjectPayload = {
+          ...payload,
+          projectId: selectedData.id,
+          updatedProjectUploads: OldFiles.map((items) => {
+            return items.id;
+          }),
+        };
 
-      if (response.success) {
-        toast.success("Project added successfully");
-        onClose();
+        const response =
+          await updateProjectMutation(updateProjectPayload).unwrap();
+        if (response.success) {
+          toast.success("Project updated successfully");
+          onClose();
+        }
+      } else {
+        const addProjectPayload: IAddProjectPayload = {
+          ...payload,
+        };
+        const response =
+          await createProjectMutation(addProjectPayload).unwrap();
+        if (response.success) {
+          toast.success("Project added successfully");
+          onClose();
+        }
       }
     } catch (error) {
       console.log(error);

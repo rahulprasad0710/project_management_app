@@ -1,8 +1,5 @@
 import { Priority, ProjectStatus } from "../enums/Priority";
 
-import { Project } from "../db/entity/project";
-import { Task } from "../db/entity/task";
-import { UploadFile } from "../db/entity/uploads";
 import { User } from "../db/entity/User";
 
 export interface IProject {
@@ -16,4 +13,8 @@ export interface IProject {
     priority: Priority;
     projectUploads: string[];
     profilePicture?: string;
+}
+
+export interface IUpdateProjectPayload extends IProject {
+    updatedProjectUploads: string[];
 }
