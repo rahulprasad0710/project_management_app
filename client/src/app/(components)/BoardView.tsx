@@ -1,11 +1,3 @@
-import React from "react";
-import { Response } from "@/store/api";
-import { IProject, ITask } from "@/types/user.types";
-import { format } from "date-fns";
-import {
-  useUpdateTaskStatusMutation,
-  useLazyGetProjectByIdQuery,
-} from "@/store/api";
 import {
   DndProvider,
   DragLayerMonitor,
@@ -13,9 +5,27 @@ import {
   useDrag,
   useDrop,
 } from "react-dnd";
+import {
+  EllipsisVertical,
+  MessageSquare,
+  Paperclip,
+  TicketCheck,
+  User,
+} from "lucide-react";
+import { IProject, ITask } from "@/types/user.types";
+import {
+  useLazyGetProjectByIdQuery,
+  useUpdateTaskStatusMutation,
+} from "@/store/api";
+
 import { HTML5Backend } from "react-dnd-html5-backend";
+import PriorityTag from "./molecules/PriorityTag";
+import React from "react";
+import { Response } from "@/store/api";
 import { TaskStatus } from "@/types/user.types";
-import { EllipsisVertical, MessageSquare, Paperclip } from "lucide-react";
+import UserAvatar from "./molecules/UserAvatar";
+
+// import { format } from "date-fns";
 
 type IProps = {
   projectResponse: Response<IProject> | undefined;
@@ -153,14 +163,6 @@ const TaskItem = (props: TaskItemProps) => {
     }),
   }));
 
-  const formattedStartDate = task.startDate
-    ? format(task.startDate, "dd/MM/yyyy")
-    : "";
-
-  const formattedEndDate = task.endDate
-    ? format(task.startDate, "dd/MM/yyyy")
-    : "";
-
   const priorityTag = task.priority;
 
   return (
@@ -170,17 +172,22 @@ const TaskItem = (props: TaskItemProps) => {
       }}
     >
       <div
-        className={`mx-2 mb-4 rounded-md bg-white shadow ${isDragging ? "opacity-50 shadow-sm shadow-green-300" : "opacity-100"}`}
+        className={`mx-2 mb-4 cursor-pointer rounded-sm bg-white shadow ${isDragging ? "opacity-50 shadow-sm shadow-green-300" : "opacity-100"}`}
       >
         <div className="w-full px-4 py-2">
-          <h3 className="text-md font-semibold">{task.title}</h3>
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-500">
-              {formattedStartDate} - {formattedEndDate}
+          <div className="flex items-center gap-2">
+            <PriorityTag priority={task.priority} />
+            <span className="text-md"> {task.title}</span>
+          </div>
+          <div className="mt-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <TicketCheck className="text-blue-600" />
+              <span className="text-sm text-gray-500">{task.taskNumber}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Paperclip className="h-4 w-4 text-gray-500" />
-              <MessageSquare className="h-4 w-4 text-gray-500" />
+              {/* <Paperclip className="h-4 w-4 text-gray-500" />
+              <MessageSquare className="h-4 w-4 text-gray-500" /> */}
+              <UserAvatar user={task.assignedTo} />
             </div>
           </div>
         </div>

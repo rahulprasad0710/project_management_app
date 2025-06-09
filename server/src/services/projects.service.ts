@@ -184,6 +184,15 @@ export class ProjectService {
         if (withTask) {
             tasks = await this.taskRepository.find({
                 where: { project: { id } },
+                select: [
+                    "id",
+                    "title",
+                    "assignedTo",
+                    "taskNumber",
+                    "status",
+                    "priority",
+                ],
+                relations: ["assignedTo"],
             });
         }
 

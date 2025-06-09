@@ -13,7 +13,7 @@ const create = async (req: Request, res: Response): Promise<void> => {
             priority: req.body.priority,
             addedDate: req.body.addedDate,
             addedBy: req.body.addedBy,
-            project: req.body.projectId,
+            project: req.body.project,
             status: req.body.status,
             assignedBy: req.body.assignedBy,
             assignedTo: req.body.assignedTo,

@@ -90,7 +90,7 @@ export const api = createApi({
     }),
     getProjectById: build.query<Response<IProject>, { projectId: number }>({
       query: ({ projectId }) => ({
-        url: `projects/${projectId}`,
+        url: `projects/${projectId}?withTask=true`,
         method: "GET",
       }),
     }),
@@ -118,7 +118,7 @@ export const api = createApi({
     }),
     getTasksByProjectId: build.query<ITask[], { projectId: number }>({
       query: ({ projectId }) => ({
-        url: `tasks/projects/${projectId}`,
+        url: `tasks/projects/${projectId}?withTask=true`,
         method: "GET",
         providesTags: (result: ITask[]) =>
           result

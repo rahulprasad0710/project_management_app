@@ -25,13 +25,14 @@ export interface ITask {
   id: number;
   title: string;
   description: string;
-  startDate: Date;
-  endDate: Date;
+  addedDate: Date;
   addedBy: IUser;
   assignedTo: IUser;
   projectId: IProject;
   status: TaskStatus;
+  taskNumber: string;
   priority: Priority;
+  taskUploads: IUploadFile[];
 }
 
 export interface ITaskPayload {

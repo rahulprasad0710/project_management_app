@@ -62,7 +62,7 @@ export class Task {
     })
     priority: Priority;
 
-    @ManyToOne(() => Project, (project) => project.id)
+    @ManyToOne(() => Project, (project) => project.id, { nullable: false })
     @JoinColumn({
         name: "projectId",
     })
