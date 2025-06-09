@@ -20,6 +20,8 @@ const UserAvatar = ({ user }: Props) => {
               ? `${user?.firstName} ${user?.lastName}`
               : "user"
           }
+          width={32}
+          height={32}
           className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200"
         />
       ) : (

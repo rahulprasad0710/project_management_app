@@ -13,15 +13,17 @@ import {
   User,
 } from "lucide-react";
 import { IProject, ITask } from "@/types/user.types";
+import React, { useState } from "react";
 import {
   useLazyGetProjectByIdQuery,
   useUpdateTaskStatusMutation,
 } from "@/store/api";
 
 import { HTML5Backend } from "react-dnd-html5-backend";
+import Modal from "./Modal";
 import PriorityTag from "./molecules/PriorityTag";
-import React from "react";
 import { Response } from "@/store/api";
+import TaskDetails from "./TaskDetails";
 import { TaskStatus } from "@/types/user.types";
 import UserAvatar from "./molecules/UserAvatar";
 
@@ -155,6 +157,9 @@ type TaskItemProps = {
 const TaskItem = (props: TaskItemProps) => {
   const { task } = props;
 
+  const [toggle, setToggle] = useState<boolean>(false);
+  const [selectedData, setSelectedData] = useState<undefined | ITask>();
+
   const [{ isDragging }, dragRef] = useDrag(() => ({
     type: "task",
     item: { id: task.id },
@@ -163,7 +168,10 @@ const TaskItem = (props: TaskItemProps) => {
     }),
   }));
 
-  const priorityTag = task.priority;
+  const handleOpenTaskDetails = (data: ITask) => {
+    setSelectedData(data);
+    setToggle(true);
+  };
 
   return (
     <div
@@ -174,7 +182,10 @@ const TaskItem = (props: TaskItemProps) => {
       <div
         className={`mx-2 mb-4 cursor-pointer rounded-sm bg-white shadow ${isDragging ? "opacity-50 shadow-sm shadow-green-300" : "opacity-100"}`}
       >
-        <div className="w-full px-4 py-2">
+        <div
+          onClick={() => handleOpenTaskDetails(task)}
+          className="w-full px-4 py-2"
+        >
           <div className="flex items-center gap-2">
             <PriorityTag priority={task.priority} />
             <span className="text-md"> {task.title}</span>
@@ -192,6 +203,13 @@ const TaskItem = (props: TaskItemProps) => {
           </div>
         </div>
       </div>
+      <Modal
+        modalTitle={"Task"}
+        isOpen={toggle}
+        onClose={() => setToggle(false)}
+      >
+        <TaskDetails />
+      </Modal>
     </div>
   );
 };

@@ -27,7 +27,7 @@ const Modal = (props: Props) => {
 
       {/* Modal Content */}
       <div
-        className={`relative z-10 w-full max-w-2xl transform rounded-md bg-white p-4 shadow-lg transition-all duration-200 ${
+        className={`relative z-10 w-full max-w-5xl transform rounded-sm bg-white p-4 shadow-lg transition-all duration-200 ${
           isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"
         }`}
       >
