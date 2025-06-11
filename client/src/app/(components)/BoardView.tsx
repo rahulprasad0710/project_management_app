@@ -204,9 +204,17 @@ const TaskItem = (props: TaskItemProps) => {
         </div>
       </div>
       <Modal
-        modalTitle={"Task"}
         isOpen={toggle}
         onClose={() => setToggle(false)}
+        modalTitleChildren={
+          <div className="flex items-center gap-4">
+            <TicketCheck className="text-blue-600" />
+
+            <h2 className="text-xl font-semibold text-gray-800">
+              {task.taskNumber}
+            </h2>
+          </div>
+        }
       >
         <TaskDetails />
       </Modal>

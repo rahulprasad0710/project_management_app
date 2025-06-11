@@ -6,11 +6,12 @@ type Props = {
   children: React.ReactNode;
   isOpen: boolean;
   onClose: () => void;
-  modalTitle: string;
+  modalTitle?: string;
+  modalTitleChildren?: React.ReactNode;
 };
 
 const Modal = (props: Props) => {
-  const { children, isOpen, onClose, modalTitle } = props;
+  const { children, isOpen, onClose, modalTitle, modalTitleChildren } = props;
 
   if (!isOpen) return null;
   return ReactDOM.createPortal(
@@ -32,7 +33,14 @@ const Modal = (props: Props) => {
         }`}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-800">{modalTitle}</h2>
+          {modalTitle ? (
+            <h2 className="text-xl font-semibold text-gray-800">
+              {modalTitle}
+            </h2>
+          ) : (
+            modalTitleChildren
+          )}
+
           <button onClick={onClose} className="rounded p-1 hover:bg-gray-200">
             <X className="h-5 w-5 text-gray-800" />
           </button>
