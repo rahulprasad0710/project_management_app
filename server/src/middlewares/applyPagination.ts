@@ -7,20 +7,21 @@ const applyPaginationMiddleware = async (
     _res: Response,
     next: NextFunction
 ): Promise<void> => {
-    const { page, pageSize, keyword, isPaginationEnabled } = req.query;
-    console.log({
-        isPaginationEnabled,
-    });
-    const pagination = applyPagination(
-        isPaginationEnabled === undefined
-            ? true
-            : isPaginationEnabled === "true",
-        keyword as string,
-        page ? Number(page) : undefined,
-        pageSize ? Number(pageSize) : undefined
-    );
-    req.pagination = pagination;
-    next();
+    try {
+        const { page, pageSize, keyword, isPaginationEnabled } = req.query;
+        const pagination = applyPagination(
+            isPaginationEnabled === undefined
+                ? true
+                : isPaginationEnabled === "true",
+            keyword as string,
+            page ? Number(page) : undefined,
+            pageSize ? Number(pageSize) : undefined
+        );
+        req.pagination = pagination;
+        next();
+    } catch (error) {
+        throw error;
+    }
 };
 
 const applyPagination = <T extends FindManyOptions<T>>(
