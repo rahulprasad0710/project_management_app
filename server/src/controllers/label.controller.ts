@@ -1,23 +1,21 @@
 import { Request, Response } from "express";
 
-import SprintService from "../services/sprint.service";
+import LabelService from "../services/label.service";
 
-const sprintService = new SprintService();
+const labelService = new LabelService();
 
 const create = async (req: Request, res: Response): Promise<void> => {
     try {
-        const data = await sprintService.create({
+        const data = await labelService.create({
             name: req.body.name,
-            goal: req.body.goal,
-            startDate: req.body.startDate,
-            endDate: req.body.endDate,
+            description: req.body.description,
             addedBy: req.body.addedBy,
         });
 
         res.status(201).json({
             success: true,
             data,
-            message: "Sprint created successfully",
+            message: "Label created successfully",
         });
     } catch (error) {
         res.status(500).json({
@@ -28,12 +26,11 @@ const create = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-const getAll = async (_req: Request, res: Response): Promise<void> => {
-    const { isActive } = _req.query; // isActive is a string
+const getAll = async (req: Request, res: Response): Promise<void> => {
+    const { isActive } = req.query;
+
     try {
-        const data = await sprintService.getAll(
-            isActive === "true" ? true : false
-        );
+        const data = await labelService.getAll(isActive === "true");
 
         res.status(200).json({
             success: true,
@@ -45,7 +42,7 @@ const getAll = async (_req: Request, res: Response): Promise<void> => {
                     totalPages: 1,
                 },
             },
-            message: "Sprints fetched successfully",
+            message: "Labels fetched successfully",
         });
     } catch (error) {
         res.status(500).json({
@@ -58,12 +55,12 @@ const getAll = async (_req: Request, res: Response): Promise<void> => {
 
 const getById = async (req: Request, res: Response): Promise<void> => {
     try {
-        const data = await sprintService.getById(Number(req.params.id));
+        const data = await labelService.getById(Number(req.params.id));
 
         res.status(200).json({
             success: true,
             data,
-            message: "Sprint fetched successfully",
+            message: "Label fetched successfully",
         });
     } catch (error) {
         res.status(500).json({
@@ -79,12 +76,12 @@ const updateStatus = async (req: Request, res: Response): Promise<void> => {
     const { isActive } = req.body;
 
     try {
-        const result = await sprintService.deactivate(Number(id), isActive);
+        const result = await labelService.deactivate(Number(id), isActive);
 
         res.status(200).json({
             success: true,
             data: result,
-            message: `Sprint marked as ${isActive ? "active" : "inactive"}`,
+            message: `Label marked as ${isActive ? "active" : "inactive"}`,
         });
     } catch (error) {
         res.status(500).json({

@@ -1,11 +1,22 @@
 import {
   IAddProjectPayload,
+  ILabelPayload,
+  ILabelResponse,
+  ILabelUpdatePayload,
   IProject,
+  ISprintPayload,
+  ISprintResponse,
+  ISprintUpdatePayload,
   ITask,
   ITaskPayload,
   IUpdateProjectPayload,
   IUploadFile,
   IUser,
+  LabelPagination,
+  Pagination,
+  Response,
+  ResponseWithPagination,
+  SprintPagination,
 } from "../types/user.types";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
@@ -13,39 +24,12 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export interface Response<T> {
-  message: string;
-  success: boolean;
-  data: T;
-}
-
-export interface ResponseWithPagination<T> {
-  message: string;
-  success: boolean;
-  data: {
-    result: T;
-    pagination: {
-      currentPage: number;
-      pageSize: number;
-      totalCount: number;
-      totalPages: number;
-    };
-  };
-}
-
-export interface Pagination {
-  page: number;
-  pageSize: number;
-  isPaginationEnabled: boolean;
-  keyword?: string;
-}
-
 // /* REDUX API */
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL }),
   reducerPath: "api",
-  tagTypes: ["Users", "Projects", "Tasks"],
+  tagTypes: ["Users", "Projects", "Tasks", "Sprints", "Labels"],
   endpoints: (build) => ({
     getUsers: build.query<Response<IUser[]>, void>({
       query: () => ({
@@ -130,7 +114,7 @@ export const api = createApi({
               ],
       }),
     }),
-    createTasks: build.mutation<ITask, ITaskPayload>({
+    createTasks: build.mutation<Response<ITask>, ITaskPayload>({
       query: (payload) => ({
         url: "tasks",
         method: "POST",
@@ -168,6 +152,162 @@ export const api = createApi({
         };
       },
     }),
+    // ! SPRINTS-STARTS
+    getSprints: build.query<
+      ResponseWithPagination<ISprintResponse[]>,
+      SprintPagination
+    >({
+      query: ({
+        isPaginationEnabled = true,
+        page = 1,
+        pageSize = 10,
+        keyword,
+        isActive,
+      }) => ({
+        url: "sprints",
+        method: "GET",
+        params: {
+          isPaginationEnabled,
+          page,
+          pageSize,
+          keyword: keyword ? keyword : undefined,
+          isActive,
+        },
+      }),
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.data.result.map((sprint) => ({
+                type: "Sprints" as const,
+                id: sprint.id,
+              })),
+              { type: "Sprints" as const, id: "LIST" },
+            ]
+          : [{ type: "Sprints" as const, id: "LIST" }],
+    }),
+
+    getSprintById: build.query<Response<ISprintResponse>, { sprintId: number }>(
+      {
+        query: ({ sprintId }) => ({
+          url: `sprints/${sprintId}`,
+          method: "GET",
+        }),
+      },
+    ),
+
+    createSprint: build.mutation<Response<ISprintResponse>, ISprintPayload>({
+      query: (payload) => ({
+        url: "sprints",
+        method: "POST",
+        body: payload,
+      }),
+      invalidatesTags: [{ type: "Sprints", id: "LIST" }],
+    }),
+    updateSprint: build.mutation<
+      Response<ISprintResponse>,
+      ISprintUpdatePayload
+    >({
+      query: ({ id, ...payload }) => ({
+        url: `sprints/${id}`,
+        method: "PUT",
+        body: payload,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Sprints", id: id },
+        { type: "Sprints", id: "LIST" },
+      ],
+    }),
+
+    updateSprintStatus: build.mutation<
+      Response<ISprintResponse>,
+      { sprintId: number; isActive: boolean }
+    >({
+      query: ({ sprintId, isActive }) => ({
+        url: `sprints/${sprintId}/status`,
+        method: "PUT",
+        body: { isActive },
+      }),
+      invalidatesTags: (result, error, { sprintId }) => [
+        { type: "Sprints", id: sprintId },
+        { type: "Sprints", id: "LIST" },
+      ],
+    }),
+    // ! SPRINTS-ENDS
+    getLabels: build.query<
+      ResponseWithPagination<ILabelResponse[]>,
+      LabelPagination
+    >({
+      query: ({
+        isPaginationEnabled = true,
+        page = 1,
+        pageSize = 10,
+        keyword,
+        isActive,
+      }) => ({
+        url: "labels",
+        method: "GET",
+        params: {
+          isPaginationEnabled,
+          page,
+          pageSize,
+          keyword: keyword ? keyword : undefined,
+          isActive,
+        },
+      }),
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.data.result.map((label) => ({
+                type: "Labels" as const,
+                id: label.id,
+              })),
+              { type: "Labels" as const, id: "LIST" },
+            ]
+          : [{ type: "Labels" as const, id: "LIST" }],
+    }),
+
+    getLabelById: build.query<Response<ILabelResponse>, { labelId: number }>({
+      query: ({ labelId }) => ({
+        url: `labels/${labelId}`,
+        method: "GET",
+      }),
+    }),
+
+    createLabel: build.mutation<Response<ILabelResponse>, ILabelPayload>({
+      query: (payload) => ({
+        url: "labels",
+        method: "POST",
+        body: payload,
+      }),
+      invalidatesTags: [{ type: "Labels", id: "LIST" }],
+    }),
+
+    updateLabel: build.mutation<Response<ILabelResponse>, ILabelUpdatePayload>({
+      query: ({ id, ...payload }) => ({
+        url: `labels/${id}`,
+        method: "PUT",
+        body: payload,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Labels", id },
+        { type: "Labels", id: "LIST" },
+      ],
+    }),
+
+    updateLabelStatus: build.mutation<
+      Response<ILabelResponse>,
+      { labelId: number; isActive: boolean }
+    >({
+      query: ({ labelId, isActive }) => ({
+        url: `labels/${labelId}/status`,
+        method: "PUT",
+        body: { isActive },
+      }),
+      invalidatesTags: (result, error, { labelId }) => [
+        { type: "Labels", id: labelId },
+        { type: "Labels", id: "LIST" },
+      ],
+    }),
   }),
 });
 
@@ -182,5 +322,17 @@ export const {
   useLazyGetProjectsQuery,
   useGetProjectsQuery,
   useCreateUploadsMutation,
+  // SPRINTS
   useUpdateProjectMutation,
+  useGetSprintsQuery,
+  useCreateSprintMutation,
+  useGetSprintByIdQuery,
+  useUpdateSprintStatusMutation,
+  useUpdateSprintMutation,
+  //LABEL
+  useGetLabelsQuery,
+  useCreateLabelMutation,
+  useUpdateLabelMutation,
+  useUpdateLabelStatusMutation,
+  useLazyGetLabelsQuery,
 } = api;

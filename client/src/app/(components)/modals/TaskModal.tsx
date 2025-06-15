@@ -14,25 +14,30 @@ import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
   useCreateTasksMutation,
+  useCreateUploadsMutation,
+  useGetLabelsQuery,
+  useGetProjectsQuery,
+  useGetSprintsQuery,
   useGetUsersQuery,
   useLazyGetProjectByIdQuery,
 } from "@/store/api";
 
-import Dropzone from "./Dropzone";
-import Spinner from "./Spinner";
+import Dropzone from "../Dropzone";
+import Spinner from "../Spinner";
+import TextEditor from "../TextEditor";
 import { toast } from "react-toastify";
 import { useParams } from "next/navigation";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 interface IFormInput {
   title: string;
-  description: string;
-  priority: Priority;
   assignTo: number;
-  startDate: Date;
-  endDate: Date;
-  addedBy: number;
+  assignedBy: number;
   status: TaskStatus;
+  priority: Priority;
+  sprint: number;
+  project: number;
+  label: number;
 }
 
 type Props = {
@@ -41,33 +46,56 @@ type Props = {
 
 const TaskModal = (props: Props) => {
   const { onClose } = props;
-  const { id } = useParams();
+  const { id: projectIdFromParams } = useParams();
   const [createTasksMutation] = useCreateTasksMutation();
   const [fetchProject] = useLazyGetProjectByIdQuery();
   const [files, setFiles] = useState<File[]>([]);
   const [OldFiles, setOldFiles] = useState<IUploadFile[]>([]);
-  const { isFetching: isUserFetching, data: userList } = useGetUsersQuery();
+  const editorPlaceholder = `Type here...`;
+  const [editorContent, setEditorContent] = useState(editorPlaceholder);
+  const [createUploadMutation] = useCreateUploadsMutation();
 
+  const { isFetching: isLabelFetching, data: labelList } = useGetLabelsQuery({
+    isPaginationEnabled: false,
+    page: 1,
+    pageSize: 10,
+    isActive: true,
+  });
+  const { isFetching: isUserFetching, data: userList } = useGetUsersQuery();
+  const { data: sprintList, isFetching: isSprintFetching } = useGetSprintsQuery(
+    {
+      isPaginationEnabled: false,
+      page: 1,
+      pageSize: 10,
+      isActive: true,
+    },
+  );
+
+  const { data: projectList, isFetching: isProjectFetching } =
+    useGetProjectsQuery({
+      isPaginationEnabled: false,
+      page: 1,
+      pageSize: 10,
+    });
   const schema = yup.object().shape({
-    title: yup.string().required("Title is required"), // Required field
-    description: yup.string().optional(),
-    priority: yup.string().optional(),
-    startDate: yup.date().optional(), // Ensures undefined is allowed
-    endDate: yup.date().optional(),
-    addedBy: yup.number().optional(),
-    status: yup.string().optional(),
-    assignTo: yup.number().optional(),
+    title: yup.string().required("Title is required"),
+    priority: yup.string(),
+    status: yup.string(),
+    assignTo: yup.number(),
+    sprint: yup.number(),
+    project: yup.number().optional(),
+    label: yup.number(),
   });
 
   const defaultValues: IFormInput = {
     title: "",
-    description: "",
     priority: "MEDIUM",
     assignTo: 1,
-    addedBy: 1,
+    assignedBy: 1,
     status: "TODO",
-    startDate: new Date(),
-    endDate: new Date(),
+    sprint: 2,
+    label: 1,
+    project: Number(projectIdFromParams) ?? 1,
   };
 
   const {
@@ -81,26 +109,46 @@ const TaskModal = (props: Props) => {
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     console.log(data);
-
-    const payload: ITaskPayload = {
-      title: data.title,
-      description: data.description,
-      priority: data.priority,
-      assignTo: Number(data.assignTo),
-      startDate: data.startDate,
-      endDate: data.endDate,
-      addedBy: Number(data.addedBy),
-      status: data.status,
-      projectId: Number(id),
-    };
+    console.log({
+      editorContent,
+    });
 
     try {
+      const payload: ITaskPayload = {
+        title: data.title,
+        priority: data.priority,
+        assignTo: Number(data.assignTo),
+        addedDate: new Date(),
+        addedBy: Number(data.assignedBy),
+        assignedBy: Number(data.assignedBy),
+        status: data.status,
+        project: Number(projectIdFromParams),
+        taskLabel: data.label,
+        description: editorContent === editorPlaceholder ? "" : editorContent,
+        taskUploads: [],
+      };
+
+      if (files?.length > 0) {
+        const fileResponseList = await Promise.all(
+          files.map(async (file: File) => {
+            const response = await createUploadMutation({
+              files: [file],
+            }).unwrap();
+            return response;
+          }),
+        );
+
+        payload.taskUploads = fileResponseList.map((items) => {
+          return items.data.id;
+        });
+      }
+
       const response = await createTasksMutation(payload).unwrap();
       console.log("response", response);
 
-      if (response) {
+      if (response?.success) {
         fetchProject({
-          projectId: Number(id) || 0,
+          projectId: Number(projectIdFromParams) || 0,
         });
         toast.success("Task added successfully");
         onClose();
@@ -111,9 +159,11 @@ const TaskModal = (props: Props) => {
     }
   };
 
+  // max-h-[700px] overflow-y-auto
+
   return (
     <div className="w-full">
-      <form className="bg-white p-4" onSubmit={handleSubmit(onSubmit)}>
+      <form className="bg-white px-4 pb-4" onSubmit={handleSubmit(onSubmit)}>
         <div className="mb-4">
           <label className="mb-2 block text-sm font-bold text-gray-700">
             Title
@@ -134,10 +184,16 @@ const TaskModal = (props: Props) => {
           <label className="mb-2 block text-sm font-bold text-gray-700">
             Description
           </label>
-          <textarea
+          <div>
+            <TextEditor
+              setEditorContent={setEditorContent}
+              editorContent={editorContent}
+            />
+          </div>
+          {/* <textarea
             {...register("description")}
             className="focus:shadow-outline w-full resize-y rounded-md border border-gray-200 p-2 text-gray-700 focus:border-blue-300 focus:outline-none"
-          ></textarea>
+          ></textarea> */}
         </div>
         <div className="mb-4">
           <Dropzone
@@ -211,7 +267,7 @@ const TaskModal = (props: Props) => {
               <select
                 className="block w-full appearance-none rounded border border-gray-200 bg-white px-4 py-2 pr-8 leading-tight text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none"
                 id="grid-state"
-                {...register("addedBy")}
+                {...register("assignedBy")}
               >
                 {!isUserFetching && userList?.data && userList?.data?.length > 0
                   ? userList?.data.map((item) => {
@@ -270,27 +326,77 @@ const TaskModal = (props: Props) => {
         <div className="flex w-full gap-4">
           <div className="mb-4 w-1/2">
             <label className="mb-2 block text-sm font-bold text-gray-700">
-              Start Date
+              Label
             </label>
-            <input
-              className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow-sm focus:border-blue-300 focus:outline-none"
-              type="date"
-              value={new Date().toISOString().split("T")[0]}
-              {...register("startDate")}
-            />
+            <select
+              className="block w-full appearance-none rounded border border-gray-200 bg-white px-4 py-2 pr-8 leading-tight text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none"
+              id="grid-state"
+              {...register("label")}
+            >
+              {!isLabelFetching &&
+              labelList?.data &&
+              labelList?.data?.result?.length > 0
+                ? labelList?.data.result?.map((item) => {
+                    return (
+                      <option
+                        className="text-capitalize"
+                        value={item.id}
+                        key={item.id}
+                      >
+                        {item.name}
+                      </option>
+                    );
+                  })
+                : []}
+            </select>
           </div>
           <div className="mb-4 w-1/2">
             <label className="mb-2 block text-sm font-bold text-gray-700">
-              End Date
+              Sprint
             </label>
-            <input
-              className="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow-sm focus:border-blue-300 focus:outline-none"
-              type="date"
-              value={new Date().toISOString().split("T")[0]}
-              {...register("endDate")}
-            />
+            <select
+              className="block w-full appearance-none rounded border border-gray-200 bg-white px-4 py-2 pr-8 leading-tight text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none"
+              id="grid-state"
+              {...register("sprint")}
+            >
+              {!isSprintFetching &&
+              sprintList?.data &&
+              sprintList?.data?.result?.length > 0
+                ? sprintList?.data?.result.map((item) => {
+                    return (
+                      <option value={item.id} key={item.id}>
+                        {item.name}
+                      </option>
+                    );
+                  })
+                : []}
+            </select>
           </div>
         </div>
+        {!projectIdFromParams && (
+          <div className="mb-4">
+            <label className="mb-2 block text-sm font-bold text-gray-700">
+              Project
+            </label>
+            <select
+              className="block w-full appearance-none rounded border border-gray-200 bg-white px-4 py-2 pr-8 leading-tight text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none"
+              id="grid-state"
+              {...register("project")}
+            >
+              {!isProjectFetching &&
+              projectList?.data &&
+              projectList?.data?.result?.length > 0
+                ? projectList?.data.result?.map((item) => {
+                    return (
+                      <option value={item.id} key={item.id}>
+                        {item.id} : {item.name}
+                      </option>
+                    );
+                  })
+                : []}
+            </select>
+          </div>
+        )}
 
         <div className="flex items-center justify-end gap-4">
           <button

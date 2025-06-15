@@ -9,7 +9,7 @@ import ProjectHeader from "@/app/(components)/ProjectHeader";
 import SearchBar from "@/app/(components)/molecules/SearchBar";
 import { SquarePlus } from "lucide-react";
 import TableView from "@/app/(components)/TableView";
-import TaskModal from "@/app/(components)/TaskModal";
+import TaskModal from "@/app/(components)/modals/TaskModal";
 import TimelineView from "@/app/(components)/TimelineView";
 import { useGetProjectByIdQuery } from "@/store/api";
 import { useParams } from "next/navigation";
@@ -49,7 +49,7 @@ const ProjectDetails = () => {
     );
   return (
     <div className="px-4 xl:px-6">
-      <div className="pb-4 pt-4 lg:pb-4">
+      <div className="flex items-center justify-between pb-4 pt-4 lg:pb-4">
         <Header title="Project" />
 
         <div className="flex justify-end gap-4">

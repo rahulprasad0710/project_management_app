@@ -13,6 +13,9 @@ export class Label {
     @Column({ type: "text", nullable: true })
     description: string;
 
+    @Column({ type: "text", default: "#023047" })
+    colorCode: string;
+
     @Column({ default: true })
     isActive: boolean;
 

@@ -1,3 +1,4 @@
+import { ITask, IUpdateTaskPayload } from "../types/payload";
 import { Priority, TaskStatus } from "../enums/Priority";
 
 import { IPagination } from "../types/express";
@@ -8,20 +9,6 @@ import { UploadFile } from "../db/entity/uploads";
 import { User } from "../db/entity/User";
 import dataSource from "../db/data-source";
 
-interface ITask {
-    title: string;
-    description: string;
-    addedDate: Date;
-    addedBy: User;
-    assignedTo: User;
-    assignedBy: User;
-    project: Project;
-    status: TaskStatus;
-    priority: Priority;
-    taskLabel?: Label;
-    taskUploads: string[];
-}
-
 export class TaskService {
     constructor(
         private readonly taskRepository = dataSource.getRepository(Task),
@@ -29,6 +16,9 @@ export class TaskService {
     ) {}
 
     async create(task: ITask) {
+        console.log({
+            task,
+        });
         const taskObj = new Task();
 
         const totalCount = await this.taskRepository.count();
@@ -64,7 +54,7 @@ export class TaskService {
         });
     }
 
-    async update(id: number, task: ITask) {
+    async update2(id: number, task: ITask) {
         const taskObj = await this.taskRepository.findOne({
             where: { id },
         });
@@ -78,6 +68,40 @@ export class TaskService {
         taskObj.addedDate = task.addedDate;
 
         return await this.taskRepository.save(taskObj);
+    }
+
+    async update(id: number, task: IUpdateTaskPayload) {
+        const queryRunner = dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            const taskObj = new Task();
+            taskObj.title = task.title;
+            taskObj.addedBy = task.addedBy;
+            taskObj.assignedTo = task.assignedTo;
+            taskObj.description = task.description;
+            taskObj.addedDate = task.addedDate;
+            taskObj.assignedBy = task.assignedBy;
+            taskObj.status = task.status;
+            taskObj.priority = task.priority;
+            taskObj.project = task.project;
+            const response = await this.taskRepository.update(id, taskObj);
+
+            if (task.taskUploads && task.updatedTaskUploads) {
+                await this.addAttachments(id, [
+                    ...task.taskUploads,
+                    ...task.updatedTaskUploads,
+                ]);
+            }
+
+            await queryRunner.commitTransaction();
+            return response;
+        } catch (error) {
+            await queryRunner.rollbackTransaction();
+            throw error;
+        } finally {
+            await queryRunner.release();
+        }
     }
 
     async updateStatus(id: number, status: TaskStatus) {

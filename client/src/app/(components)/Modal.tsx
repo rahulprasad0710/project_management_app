@@ -8,10 +8,14 @@ type Props = {
   onClose: () => void;
   modalTitle?: string;
   modalTitleChildren?: React.ReactNode;
+  size?: number;
 };
 
 const Modal = (props: Props) => {
-  const { children, isOpen, onClose, modalTitle, modalTitleChildren } = props;
+  const { children, isOpen, onClose, modalTitle, modalTitleChildren, size } =
+    props;
+
+  const modalSize = size ? `max-w-${size}xl` : `max-w-4xl`;
 
   if (!isOpen) return null;
   return ReactDOM.createPortal(
@@ -28,7 +32,7 @@ const Modal = (props: Props) => {
 
       {/* Modal Content */}
       <div
-        className={`relative z-10 w-full max-w-5xl transform rounded-sm bg-white p-4 shadow-lg transition-all duration-200 ${
+        className={`relative z-10 w-full ${modalSize} transform rounded-sm bg-white p-4 shadow-lg transition-all duration-200 ${
           isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"
         }`}
       >

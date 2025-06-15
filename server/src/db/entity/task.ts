@@ -11,6 +11,7 @@ import { Priority, TaskStatus } from "../../enums/Priority";
 
 import { Label } from "./taskLabel";
 import { Project } from "./project";
+import { Sprint } from "./sprint";
 import { UploadFile } from "./uploads";
 import { User } from "./User";
 
@@ -47,6 +48,10 @@ export class Task {
     @ManyToOne(() => Label, (label) => label.id, { nullable: true })
     @JoinColumn()
     taskLabel: Label;
+
+    @ManyToOne(() => Sprint, (sprint) => sprint.id, { nullable: true })
+    @JoinColumn()
+    sprint: Label;
 
     @Column({
         type: "enum",

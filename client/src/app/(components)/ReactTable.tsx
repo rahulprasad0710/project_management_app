@@ -73,7 +73,7 @@ const ReactTable = <T extends object>({
             ))}
           </thead>
           <tbody className="divide-y divide-neutral-200">
-            {isFetching || data?.length === 0
+            {isFetching
               ? Array.from({ length: 10 }).map((_, index) => (
                   <tr
                     key={`skeleton-${index}`}

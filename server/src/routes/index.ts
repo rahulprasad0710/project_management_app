@@ -1,4 +1,5 @@
 import { Router as ExpressRouter } from "express";
+import labelRoute from "./label.route";
 import projectRoute from "./projects.route";
 import sprintRoute from "./sprint.route";
 import taskRoute from "./tasks.route";
@@ -33,6 +34,10 @@ const routes = [
     {
         path: "/sprints",
         route: sprintRoute,
+    },
+    {
+        path: "/labels",
+        route: labelRoute,
     },
 ];
 

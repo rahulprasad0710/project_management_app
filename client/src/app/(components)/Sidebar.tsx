@@ -2,6 +2,8 @@
 
 import {
   Briefcase,
+  Brush,
+  CalendarCog,
   Home,
   LockIcon,
   LucideIcon,
@@ -61,38 +63,28 @@ const Sidebar = () => {
     (state) => state.global.isSidebarCollapsed,
   );
 
-  const sidebarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-xl
+  const sidebarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-xl border-y-[1.5px] border-y-[1.5px] border-gray-100
     transition-all duration-300 h-full z-40  overflow-y-auto bg-white
     ${isSidebarCollapsed ? "w-0  " : "w-64"}
   `;
   return (
     <div className={sidebarClassNames}>
       <div className="flex h-[100%] w-full flex-col justify-start">
-        <div className="z-50 flex h-16 min-h-[56px] w-64 items-center justify-between bg-white px-6">
-          <div className="text-xl font-bold text-gray-800">LOGO</div>
+        <div className="z-50 flex h-16 min-h-[56px] w-64 items-center justify-between border-y-[1.5px] border-gray-200 bg-white px-6">
+          <Image src="/icons/inventory.png" alt="LOGO" width={40} height={40} />
           <button
             onClick={() => dispatch(setIsSidebarCollapsed(!isSidebarCollapsed))}
           >
             <X className="mt-[0.1rem] h-6 w-6 cursor-pointer font-bold text-gray-800 hover:text-gray-500" />
           </button>
         </div>
-        {/* TEAM */}
-        <div className="flex items-center gap-5 border-y-[1.5px] border-gray-200 px-8 py-3">
-          <Image src="/icons/inventory.png" alt="LOGO" width={40} height={40} />
 
-          <div>
-            <h3 className="text-md font-bold tracking-wide">MYNTRA</h3>
-            <div className="mt-1 flex items-start gap-2">
-              <LockIcon className="mt-[0.1rem] h-3 w-3 text-gray-500" />
-              <p className="text-xs text-gray-500">Private</p>
-            </div>
-          </div>
-        </div>
         <nav className="z-10 w-full">
           <SidebarLink href="/" icon={Home} title="Dashboard" />
           <SidebarLink href="/projects" icon={Projector} title="Project" />
-          <SidebarLink href="/timeline" icon={Briefcase} title="Timeline" />
-          <SidebarLink href="/team-members" icon={Users} title="Team members" />
+          <SidebarLink href="/employees" icon={Users} title="Employees" />
+          <SidebarLink href="/sprints" icon={CalendarCog} title="Sprint" />
+          <SidebarLink href="/labels" icon={Brush} title="Labels" />
         </nav>
       </div>
     </div>

@@ -16,7 +16,7 @@ const create = async (req: Request, res: Response): Promise<void> => {
             project: req.body.project,
             status: req.body.status,
             assignedBy: req.body.assignedBy,
-            assignedTo: req.body.assignedTo,
+            assignedTo: req.body.assignTo,
             taskLabel: req.body.taskLabel,
             taskUploads: req.body.taskUploads,
         });
@@ -92,9 +92,42 @@ const updateStatus = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
+const update = async (req: Request, res: Response): Promise<void> => {
+    const { id } = req.params;
+
+    try {
+        const response = await taskService.update(Number(id), {
+            title: req.body.title,
+            description: req.body.description,
+            priority: req.body.priority,
+            addedDate: req.body.addedDate,
+            addedBy: req.body.addedBy,
+            project: req.body.project,
+            status: req.body.status,
+            assignedBy: req.body.assignedBy,
+            assignedTo: req.body.assignedTo,
+            taskLabel: req.body.taskLabel,
+            taskUploads: req.body.taskUploads,
+            updatedTaskUploads: req.body.updatedTaskUploads,
+        });
+        res.status(200).json({
+            success: true,
+            data: response,
+            message: "Task Updated successfully",
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: error,
+            success: false,
+            data: null,
+        });
+    }
+};
+
 export default {
     create,
     getAll,
     getById,
     updateStatus,
+    update,
 };

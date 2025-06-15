@@ -1,3 +1,34 @@
+export interface Response<T> {
+  message: string;
+  success: boolean;
+  data: T;
+}
+
+export interface ResponseWithPagination<T> {
+  message: string;
+  success: boolean;
+  data: {
+    result: T;
+    pagination: {
+      currentPage: number;
+      pageSize: number;
+      totalCount: number;
+      totalPages: number;
+    };
+  };
+}
+
+export interface Pagination {
+  page: number;
+  pageSize: number;
+  isPaginationEnabled: boolean;
+  keyword?: string;
+}
+
+export interface SprintPagination extends Pagination {
+  isActive: boolean;
+}
+
 export interface IUser {
   id: number;
   firstName: string;
@@ -40,11 +71,13 @@ export interface ITaskPayload {
   description: string;
   priority: Priority;
   assignTo: number;
-  startDate: Date;
-  endDate: Date;
+  assignedBy: number;
   addedBy: number;
+  addedDate: Date;
   status: TaskStatus;
-  projectId: number;
+  project: number;
+  taskLabel?: number;
+  taskUploads: string[];
 }
 
 export interface IAddProjectPayload {
@@ -56,7 +89,6 @@ export interface IAddProjectPayload {
   endDate: string;
   teamMember: number[];
   status: ProjectStatus;
-
   projectUploads: string[];
 }
 export interface IUpdateProjectPayload extends IAddProjectPayload {
@@ -138,3 +170,47 @@ export const projectStatusOptions: IProjectStatusOptions[] = [
   { value: "UNDER_REVIEW", label: "Under Review" },
   { value: "COMPLETED", label: "Completed" },
 ];
+
+export interface ISprintPayload {
+  name: string;
+  goal?: string;
+  startDate: string;
+  endDate: string;
+}
+
+export interface ISprintResponse extends ISprintPayload {
+  id: number;
+  addedBy: number | IUser;
+  isActive: boolean;
+}
+
+export interface ISprintUpdatePayload extends ISprintPayload {
+  id: number;
+}
+
+export interface ILabelPayload {
+  name: string;
+  description?: string;
+  addedBy: number; // or User if populated
+}
+
+export interface ILabelUpdatePayload extends Partial<ILabelPayload> {
+  id: number;
+}
+
+export interface ILabelResponse {
+  id: number;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  addedAt: string;
+  addedBy: IUser | number;
+}
+
+export interface LabelPagination {
+  isPaginationEnabled?: boolean;
+  page?: number;
+  pageSize?: number;
+  keyword?: string;
+  isActive?: boolean;
+}

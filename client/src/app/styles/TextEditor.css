@@ -1,4 +1,9 @@
 /* Basic editor styles */
+
+.tiptap-container {
+  border: 1px solid #ccc;
+  min-height: 150px;
+}
 .tiptap :first-child {
   margin-top: 0;
 }
@@ -107,5 +112,16 @@
   flex-wrap: wrap;
   margin-bottom: 1rem;
   background-color: #f2f4f5;
-  border-bottom: 1px solid #ccc;
+}
+
+.button2 {
+  padding: 0.5rem 1rem;
+  font-size: 16px;
+  font-weight: 500;
+  color: #374151; /* dark gray */
+  background-color: transparent;
+  border: 2px solid #374151;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
 }
