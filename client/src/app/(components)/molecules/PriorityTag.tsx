@@ -4,20 +4,47 @@ import { Priority } from "@/types/user.types";
 
 type Props = {
   priority: Priority;
+  withLabel?: boolean;
 };
 
-const PriorityTag = ({ priority }: Props) => {
+const PriorityTag = ({ priority, withLabel }: Props) => {
   switch (priority) {
     case "HIGH":
-      return <ChevronsUp className="text-red-500" size={18} />;
+      return (
+        <div className="flex items-center gap-2">
+          <ChevronsUp className="text-red-500" size={18} />
+          {withLabel && <div>High</div>}
+        </div>
+      );
+
     case "MEDIUM":
-      return <Menu className="text-teal-500" size={18} />;
+      return (
+        <div className="flex items-center gap-2">
+          <Menu className="text-teal-500" size={18} />
+          {withLabel && <div>Medium</div>}
+        </div>
+      );
     case "LOW":
-      return <ChevronsDown className="text-teal-500" size={18} />;
+      return (
+        <div className="flex items-center gap-2">
+          <ChevronsDown className="text-teal-500" size={18} />
+          {withLabel && <div>Low</div>}
+        </div>
+      );
     case "BACKLOG":
-      return <WrapText className="text-gray-500" size={18} />;
+      return (
+        <div className="flex items-center gap-2">
+          <WrapText className="text-gray-500" size={18} />
+          {withLabel && <div>Backlog</div>}
+        </div>
+      );
     default:
-      return <Menu className="text-teal-500" size={18} />;
+      return (
+        <div className="flex items-center gap-2">
+          <Menu className="text-teal-500" size={18} />
+          {withLabel && <div>Medium</div>}
+        </div>
+      );
   }
 };
 

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { IProject, ITask } from "@/types/user.types";
 import React, { useState } from "react";
+import { Response, TaskStatus } from "@/types/user.types";
 import {
   useLazyGetProjectByIdQuery,
   useUpdateTaskStatusMutation,
@@ -22,9 +23,7 @@ import {
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Modal from "./Modal";
 import PriorityTag from "./molecules/PriorityTag";
-import { Response } from "@/store/api";
 import TaskDetails from "./TaskDetails";
-import { TaskStatus } from "@/types/user.types";
 import UserAvatar from "./molecules/UserAvatar";
 
 // import { format } from "date-fns";
@@ -216,7 +215,10 @@ const TaskItem = (props: TaskItemProps) => {
           </div>
         }
       >
-        <TaskDetails />
+        <TaskDetails
+          setSelectedData={setSelectedData}
+          selectedData={selectedData}
+        />
       </Modal>
     </div>
   );

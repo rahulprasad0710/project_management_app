@@ -51,7 +51,7 @@ export class Task {
 
     @ManyToOne(() => Sprint, (sprint) => sprint.id, { nullable: true })
     @JoinColumn()
-    sprint: Label;
+    sprint: Sprint;
 
     @Column({
         type: "enum",

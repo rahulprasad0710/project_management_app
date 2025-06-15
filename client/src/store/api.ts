@@ -94,9 +94,16 @@ export const api = createApi({
       }),
       invalidatesTags: [{ type: "Projects", id: "LIST" }],
     }),
+    // ! TASKS-STARTS
     getTasks: build.query<ITask[], void>({
       query: () => ({
         url: "projects",
+        method: "GET",
+      }),
+    }),
+    getTasksByTaskId: build.query<Response<ITask>, { taskId: number }>({
+      query: ({ taskId }) => ({
+        url: `tasks/${taskId}`,
         method: "GET",
       }),
     }),
@@ -315,6 +322,7 @@ export const {
   useGetUsersQuery,
   useCreateUsersMutation,
   useGetProjectByIdQuery,
+  //TASKS
   useUpdateTaskStatusMutation,
   useLazyGetProjectByIdQuery,
   useCreateTasksMutation,
@@ -322,6 +330,7 @@ export const {
   useLazyGetProjectsQuery,
   useGetProjectsQuery,
   useCreateUploadsMutation,
+  useLazyGetTasksByTaskIdQuery,
   // SPRINTS
   useUpdateProjectMutation,
   useGetSprintsQuery,

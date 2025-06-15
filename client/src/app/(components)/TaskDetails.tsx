@@ -1,30 +1,45 @@
-import React, { useState } from "react";
+import { IStatusOptions, ITask, statusOptions } from "@/types/user.types";
+import React, { useEffect, useState } from "react";
 
 import CommentBox from "./CommentBox";
 import LatestActivity from "./dashboard/Activity";
 import PriorityTag from "./molecules/PriorityTag";
+import UserAvatar from "./molecules/UserAvatar";
+import { format } from "date-fns";
+import { useLazyGetTasksByTaskIdQuery } from "@/store/api";
 
-type Props = {};
+type Props = {
+  selectedData: ITask;
+  setSelectedData: (data: ITask | undefined) => void;
+};
 
 type TAB_TYPES = "ACTIVITY" | "COMMENTS";
 
-const TaskDetails = (props: Props) => {
+const TaskDetails = ({ selectedData }: Props) => {
   const [activeTab, setActiveTab] = useState<TAB_TYPES>("COMMENTS");
+
+  const [fetchTaskByTaskId, { data, isLoading, error }] =
+    useLazyGetTasksByTaskIdQuery();
+
+  useEffect(() => {
+    if (selectedData?.id) {
+      fetchTaskByTaskId({ taskId: selectedData.id });
+    }
+  }, [selectedData]);
 
   return (
     <div className="flex max-h-[600px] flex-col gap-4 overflow-y-scroll px-4 md:flex-row">
       <div className="flex-1 space-y-4">
-        {/* <div className="text-sm text-gray-500">/ SIMSV2-4182</div> */}
-        <h1 className="text-2xl font-semibold">
-          Rate Limit Issue in the Backend
-        </h1>
+        <h1 className="text-xl font-semibold">{data?.data?.title}</h1>
 
         <div className="mt-4">
           <h2 className="text-lg font-medium">Description</h2>
-          <p className="mt-1 text-sm text-gray-700">
-            Rate Limit Issue in the Backend
-          </p>
-          <p className="mt-1 text-sm text-gray-500">Environment: None</p>
+          <div
+            className="border p-4"
+            dangerouslySetInnerHTML={{
+              __html: data?.data?.description as string,
+            }}
+          />
         </div>
 
         <div className="mt-6">
@@ -58,36 +73,78 @@ const TaskDetails = (props: Props) => {
         </div>
       </div>
       <div className="w-full space-y-4 md:w-80">
-        <div className="flex items-center justify-between">
-          <div className="text-sm font-medium">To Do</div>
-          <span className="text-gray-500">⚡</span>
+        <div className="flex items-center gap-4">
+          <div className="font-medium">Status:</div>
+
+          <div className="relative w-full">
+            <select className="block w-full appearance-none rounded border border-gray-200 bg-white px-4 py-2 pr-8 font-semibold leading-tight text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none">
+              {statusOptions.map((status: IStatusOptions) => (
+                <option value={status.value} key={status.value}>
+                  {status.label}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+              <svg
+                className="h-4 w-4 fill-current"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+              >
+                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+              </svg>
+            </div>
+          </div>
         </div>
 
         <div className="rounded-sm border bg-white p-4 shadow-sm">
           <div className="space-y-2 text-sm">
-            <div>
-              <span className="font-semibold">Assignee:</span> Rahul Prasad
+            <div className="flex items-center gap-2">
+              <div className="font-semibold">Assignee:</div>
+              <div className="flex items-center gap-2">
+                {data?.data?.assignedTo?.firstName}{" "}
+                {data?.data?.assignedTo?.lastName}
+              </div>
             </div>
-            <div>
-              <span className="font-semibold">Reporter:</span> Rahul Prasad
+            <div className="flex items-center gap-2">
+              <div className="font-semibold">Reporter:</div>
+              {data?.data?.assignedTo?.firstName}{" "}
+              {data?.data?.assignedTo?.lastName}
             </div>
-            {/* <div className="cursor-pointer text-blue-600">
-              Open with Atlassian...
-            </div> */}
-            {/* <div className="cursor-pointer text-blue-600">Create branch</div>
-            <div className="cursor-pointer text-blue-600">Create commit</div> */}
-            <div className="my-2 border-t border-gray-200"></div>
-            <div>
-              <span className="font-semibold">Labels:</span> None
+            <div className="my-1 border-t border-gray-200"></div>
+            <div className="flex items-center gap-2">
+              <div className="font-semibold">Label:</div>
+              <div
+                style={{
+                  borderColor: data?.data?.taskLabel?.colorCode ?? "#023047",
+                }}
+                className="rounded-md border px-2 py-1"
+              >
+                {data?.data?.taskLabel?.name ?? "None"}
+              </div>
             </div>
 
             <div className="flex items-center gap-2">
               <span className="font-semibold">Priority:</span>
-              <PriorityTag priority="HIGH" />
+              <PriorityTag
+                withLabel={true}
+                priority={data?.data?.priority ?? "MEDIUM"}
+              />
             </div>
             <div className="my-2 border-t border-gray-200"></div>
-            <div className="text-gray-500">Created May 19, 2025 at 1:53 PM</div>
-            <div className="text-gray-500">Updated May 28, 2025 at 2:50 PM</div>
+            <div className="text-gray-500">
+              Created :
+              {format(
+                data?.data?.addedDate ?? new Date(),
+                "dd-MM-yyyy hh:mm a",
+              )}
+            </div>
+            <div className="text-gray-500">
+              Updated :
+              {format(
+                data?.data?.addedDate ?? new Date(),
+                "dd-MM-yyyy hh:mm a",
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -96,3 +153,14 @@ const TaskDetails = (props: Props) => {
 };
 
 export default TaskDetails;
+
+// {
+//   "id": 38,
+//   "title": "Quia iusto asperiore",
+//   "taskNumber": "JT-0029",
+//   "description": "<p>Dolor voluptates in .</p>",
+//   "addedDate": "2025-06-15T08:34:57.014Z",
+//   "status": "IN_PROGRESS",
+//   "priority": "HIGH",
+//   "taskUploads": []
+// }

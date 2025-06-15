@@ -153,6 +153,13 @@ export class TaskService {
     async getById(id: number) {
         return await this.taskRepository.findOne({
             where: { id },
+            relations: [
+                "taskUploads",
+                "taskLabel",
+                "assignedBy",
+                "assignedTo",
+                "sprint",
+            ],
         });
     }
 

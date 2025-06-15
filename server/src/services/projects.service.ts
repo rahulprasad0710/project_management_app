@@ -193,6 +193,9 @@ export class ProjectService {
                     "priority",
                 ],
                 relations: ["assignedTo"],
+                order: {
+                    id: "DESC",
+                },
             });
         }
 

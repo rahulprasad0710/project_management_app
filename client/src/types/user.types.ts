@@ -61,6 +61,8 @@ export interface ITask {
   assignedTo: IUser;
   projectId: IProject;
   status: TaskStatus;
+  taskLabel: ILabelResponse;
+  sprint: ISprintResponse;
   taskNumber: string;
   priority: Priority;
   taskUploads: IUploadFile[];
@@ -205,6 +207,7 @@ export interface ILabelResponse {
   isActive: boolean;
   addedAt: string;
   addedBy: IUser | number;
+  colorCode: string;
 }
 
 export interface LabelPagination {
