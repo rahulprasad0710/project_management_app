@@ -1,13 +1,21 @@
 import { Router as ExpressRouter } from "express";
-
-import taskController from "../controllers/task.controller";
 import applyPagination from "../middlewares/applyPagination";
-
+import commentController from "../controllers/comments.controller";
+import taskController from "../controllers/task.controller";
 const router = ExpressRouter();
 
 router.post("", taskController.create);
 router.get("", applyPagination, taskController.getAll);
 router.put("/status/:taskId", taskController.updateStatus);
 router.get("/:id", taskController.getById);
+// COMMENTS
+router.post("/:taskId/comments", commentController.addComment);
+router.get(
+    "/:taskId/comments",
+    applyPagination,
+    commentController.getCommentsByTaskId
+);
+router.put("/:taskId/comments/:id", commentController.updateComment);
+router.delete("/:taskId/comments/:id", commentController.deleteComment);
 
 export default router;

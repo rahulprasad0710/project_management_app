@@ -217,3 +217,30 @@ export interface LabelPagination {
   keyword?: string;
   isActive?: boolean;
 }
+
+// types.ts
+
+export interface IComment {
+  id: number;
+  content: string;
+  isActive: boolean;
+  addedAt: string;
+  addedBy: IUser;
+  task: number;
+}
+
+export interface ICommentPayload {
+  content: string;
+  task: number;
+  addedBy: number;
+}
+
+export interface ICommentUpdatePayload {
+  content: string;
+}
+
+export interface Response<T> {
+  success: boolean;
+  data: T;
+  message: string;
+}

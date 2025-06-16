@@ -5,24 +5,24 @@ import { User } from "lucide-react";
 
 type Props = {
   user?: IUser;
+  size?: "sm" | "md";
 };
 
-const UserAvatar = ({ user }: Props) => {
+const UserAvatar = ({ user, size = "md" }: Props) => {
+  const imageSize = size === "sm" ? 28 : 40;
   return (
     <div>
       {user?.profilePictureUrl ? (
         <Image
-          src={
-            "https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          }
+          src={user?.profilePictureUrl}
           alt={
             user?.firstName && user?.firstName
               ? `${user?.firstName} ${user?.lastName}`
               : "user"
           }
-          width={32}
-          height={32}
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200"
+          width={imageSize}
+          height={imageSize}
+          className="flex items-center justify-center rounded-full bg-gray-200"
         />
       ) : (
         <div

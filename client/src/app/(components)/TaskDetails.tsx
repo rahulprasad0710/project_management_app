@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import CommentBox from "./CommentBox";
 import LatestActivity from "./dashboard/Activity";
 import PriorityTag from "./molecules/PriorityTag";
+import TaskComments from "./TaskComments";
 import UserAvatar from "./molecules/UserAvatar";
 import { format } from "date-fns";
 import { useLazyGetTasksByTaskIdQuery } from "@/store/api";
@@ -27,10 +28,16 @@ const TaskDetails = ({ selectedData }: Props) => {
     }
   }, [selectedData]);
 
+  if (isLoading) return <div>Loading...</div>;
+
+  if (data?.data === undefined || error) return <div>Task not found </div>;
+
   return (
     <div className="flex max-h-[600px] flex-col gap-4 overflow-y-scroll px-4 md:flex-row">
       <div className="flex-1 space-y-4">
-        <h1 className="text-xl font-semibold">{data?.data?.title}</h1>
+        <h1 className="text-xl font-semibold">
+          {data?.data?.id} -{data?.data?.title}
+        </h1>
 
         <div className="mt-4">
           <h2 className="text-lg font-medium">Description</h2>
@@ -68,7 +75,9 @@ const TaskDetails = ({ selectedData }: Props) => {
           <div className="mt-2">
             {" "}
             {activeTab === "ACTIVITY" && <LatestActivity />}
-            {activeTab === "COMMENTS" && <CommentBox />}
+            {activeTab === "COMMENTS" && (
+              <TaskComments taskId={data?.data?.id} />
+            )}
           </div>
         </div>
       </div>

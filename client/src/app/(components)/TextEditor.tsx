@@ -26,6 +26,7 @@ import {
 import { EditorProvider, useCurrentEditor } from "@tiptap/react";
 
 import { Color } from "@tiptap/extension-color";
+import { Editor } from "@tiptap/react";
 import ListItem from "@tiptap/extension-list-item";
 import React from "react";
 import StarterKit from "@tiptap/starter-kit";
@@ -34,9 +35,14 @@ import TextStyle from "@tiptap/extension-text-style";
 type Props = {
   setEditorContent: React.Dispatch<React.SetStateAction<string>>;
   editorContent: string;
+  setEditorInstance: React.Dispatch<React.SetStateAction<Editor | undefined>>;
 };
 
-const TextEditor = ({ editorContent, setEditorContent }: Props) => {
+const TextEditor = ({
+  editorContent,
+  setEditorContent,
+  setEditorInstance,
+}: Props) => {
   const MenuBar = () => {
     const { editor } = useCurrentEditor();
 
@@ -283,8 +289,12 @@ const TextEditor = ({ editorContent, setEditorContent }: Props) => {
       <div className="tiptap">
         <EditorProvider
           editable
+          immediatelyRender={false}
           onUpdate={({ editor }) => {
             setEditorContent(editor.getHTML());
+          }}
+          onCreate={({ editor }) => {
+            setEditorInstance(editor);
           }}
           slotBefore={<MenuBar />}
           extensions={extensions}
