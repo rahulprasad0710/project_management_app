@@ -1,11 +1,9 @@
 "use client";
 
 import {
-  Briefcase,
   Brush,
   CalendarCog,
   Home,
-  LockIcon,
   LucideIcon,
   Projector,
   Users,

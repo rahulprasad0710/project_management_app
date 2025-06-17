@@ -244,3 +244,29 @@ export interface Response<T> {
   data: T;
   message: string;
 }
+
+export enum ActivityAction {
+  CREATED_TICKET = "CREATED_TICKET",
+  ASSIGNED_TICKET = "ASSIGNED_TICKET",
+  MOVED_TICKET = "MOVED_TICKET",
+  UPDATED_TICKET = "UPDATED_TICKET",
+  COMMENTED_TICKET = "COMMENTED_TICKET",
+  DELETED_COMMENT = "DELETED_COMMENT",
+  EDITED_COMMENT = "EDITED_COMMENT",
+}
+
+export type IActivityResponse = {
+  id: number;
+  action: ActivityAction;
+  details?: string;
+  comment?: string;
+  createdAt: Date;
+  activityBy: IUser;
+  task: {
+    id: number;
+    projectId: number;
+    taskNumber: string;
+    title: string;
+    assignedTo: IUser;
+  };
+};

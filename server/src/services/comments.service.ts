@@ -1,7 +1,11 @@
+import { ActivityAction } from "../enums/ActivityAction";
+import ActivityService from "./activity.service";
 import { Comment } from "../db/entity/comment";
 import { Task } from "../db/entity/task";
 import { User } from "../db/entity/User";
 import dataSource from "../db/data-source";
+
+const activityService = new ActivityService();
 
 interface IComment {
     content: string;
@@ -29,7 +33,16 @@ export class CommentService {
         comment.task = task;
         comment.isActive = true;
 
-        return await this.commentRepository.save(comment);
+        const response = await this.commentRepository.save(comment);
+
+        await activityService.create({
+            activityBy: commentData.addedBy,
+            action: ActivityAction.COMMENTED_TICKET,
+            task: task,
+            comment: commentData.content,
+        });
+
+        return response;
     }
 
     // 2. Soft delete (mark as inactive)
@@ -40,7 +53,9 @@ export class CommentService {
         if (!comment) throw new Error("Comment not found");
 
         comment.isActive = false;
-        return await this.commentRepository.save(comment);
+        const response = await this.commentRepository.save(comment);
+
+        return response;
     }
 
     // 3. Update comment content

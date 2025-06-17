@@ -1,4 +1,5 @@
 import {
+  IActivityResponse,
   IAddProjectPayload,
   IComment,
   ICommentPayload,
@@ -32,7 +33,15 @@ dotenv.config();
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL }),
   reducerPath: "api",
-  tagTypes: ["Users", "Projects", "Tasks", "Sprints", "Labels", "Comments"],
+  tagTypes: [
+    "Users",
+    "Projects",
+    "Tasks",
+    "Sprints",
+    "Labels",
+    "Comments",
+    "Activity",
+  ],
   endpoints: (build) => ({
     getUsers: build.query<Response<IUser[]>, void>({
       query: () => ({
@@ -374,6 +383,26 @@ export const api = createApi({
         { type: "Comments", commentId },
       ],
     }),
+    // Task Activity
+    getActivityByTaskId: build.query<
+      Response<IActivityResponse[]>,
+      { taskId: number }
+    >({
+      query: ({ taskId }) => ({
+        url: `tasks/${taskId}/activities`,
+        method: "GET",
+      }),
+      providesTags: (result, error, taskId) =>
+        result
+          ? [
+              ...result.data.map((activity) => ({
+                type: "Activity" as const,
+                id: activity.id,
+              })),
+              { type: "Activity" as const, id: `TASK_${taskId}` },
+            ]
+          : [{ type: "Activity", id: `TASK_${taskId}` }],
+    }),
   }),
 });
 
@@ -408,4 +437,6 @@ export const {
   useCreateCommentMutation,
   useUpdateCommentMutation,
   useDeleteCommentMutation,
+  // ACTIVITY
+  useLazyGetActivityByTaskIdQuery,
 } = api;

@@ -6,6 +6,8 @@ const router = ExpressRouter();
 
 router.post("", taskController.create);
 router.get("", applyPagination, taskController.getAll);
+router.get("/:taskId/activities", taskController.getActivityByTaskId);
+
 router.put("/status/:taskId", taskController.updateStatus);
 router.get("/:id", taskController.getById);
 // COMMENTS

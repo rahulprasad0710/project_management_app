@@ -33,7 +33,7 @@ const CommentView = ({ comment }: Props) => {
           handleCancel={() => setIsCommentBoxOpen(false)}
         />
       ) : (
-        <div className="flex cursor-pointer gap-3 rounded-md p-2 py-2 shadow-sm transition-colors duration-200 hover:bg-gray-100">
+        <div className="mb-4 flex cursor-pointer gap-3 rounded-md p-2 py-2 shadow-sm transition-colors duration-200 hover:bg-gray-100">
           <div className="mr-2 flex w-[96] items-center gap-2">
             <div className="relative flex flex-col items-center gap-2 p-2">
               <UserAvatar size="sm" user={comment.addedBy} />
