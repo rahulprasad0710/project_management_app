@@ -25,7 +25,7 @@ const TaskComments = ({ taskId }: Props) => {
 
   if (data?.data === undefined || error) return <div>Task not found </div>;
   return (
-    <div className="rounded-md border border-gray-200 p-1">
+    <div className="mt-4 rounded-sm border border-gray-200 p-4">
       <div className="max-h-[300px] overflow-y-auto">
         {data?.data?.map((comment) => (
           <CommentView key={comment.id} comment={comment} />
@@ -39,7 +39,7 @@ const TaskComments = ({ taskId }: Props) => {
         />
       )}
 
-      <div className="flex items-center justify-end gap-4 border-t border-gray-200 p-2">
+      <div className="flex items-center justify-end gap-4">
         {!isCommentBoxOpen && (
           <button
             onClick={() => setIsCommentBoxOpen(true)}

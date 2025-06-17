@@ -4,9 +4,9 @@ import {
   useLazyGetCommentsByTaskIdQuery,
 } from "@/store/api";
 
-import { Editor } from "@tiptap/react";
 import { IComment } from "@/types/user.types";
-import TextEditor from "./TextEditor";
+import { User } from "lucide-react";
+import UserAvatar from "./molecules/UserAvatar";
 import { toast } from "react-toastify";
 
 type Props = {
@@ -18,26 +18,26 @@ type Props = {
 const CommentBox = ({ handleCancel, taskId, comment }: Props) => {
   const [createCommentMutation] = useCreateCommentMutation();
   const [fetchCommentsByTaskId] = useLazyGetCommentsByTaskIdQuery();
-  const [editorContent, setEditorContent] = useState("type here....");
+  const [content, setContent] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [editorInstance, setEditorInstance] = useState<Editor>();
   useEffect(() => {
-    if (comment?.id && editorInstance) {
-      console.log({ commentContent: comment?.content });
-      editorInstance.commands.setContent(comment?.content || "");
+    if (comment?.id) {
+      setContent(comment?.content || "");
     }
-  }, [comment, editorInstance]);
+  }, [comment]);
 
   const handleSubmit = async () => {
     try {
+      setIsSubmitting(true);
       const response = await createCommentMutation({
-        content: editorContent,
+        content: content,
         task: taskId,
         addedBy: 1,
       }).unwrap();
 
       fetchCommentsByTaskId({ taskId: taskId });
-      setEditorContent("");
+      setContent("");
       handleCancel();
 
       console.log(response);
@@ -49,25 +49,30 @@ const CommentBox = ({ handleCancel, taskId, comment }: Props) => {
 
   return (
     <div className="rounded-md border border-gray-200 p-1">
-      <TextEditor
-        editorContent={editorContent}
-        setEditorContent={setEditorContent}
-        setEditorInstance={setEditorInstance}
-      />
-      <div className="flex items-center justify-end gap-4 border-t border-gray-200 p-2">
-        <button
-          onClick={handleCancel}
-          className="hover:bg-gary-200 translate-x-1 rounded bg-gray-200 px-2 py-1 text-black hover:bg-gray-300"
-        >
-          Cancel
-        </button>
+      <div className="flex-1">
+        <textarea
+          className="min-h-[80px] w-full resize-y rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          placeholder="Add a comment..."
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          disabled={isSubmitting}
+        />
+        <div className="flex items-center justify-end gap-4 p-2">
+          <button
+            onClick={handleCancel}
+            className="rounded-md bg-gray-100 px-4 py-1.5 text-gray-600 hover:bg-gray-200"
+          >
+            Cancel
+          </button>
 
-        <button
-          onClick={() => handleSubmit()}
-          className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
-        >
-          Add Comment
-        </button>
+          <button
+            onClick={() => handleSubmit()}
+            disabled={isSubmitting}
+            className="rounded-sm bg-blue-500 px-4 py-1 text-white hover:bg-blue-600 disabled:opacity-50"
+          >
+            {isSubmitting ? "Commenting..." : "Comment"}
+          </button>
+        </div>
       </div>
     </div>
   );

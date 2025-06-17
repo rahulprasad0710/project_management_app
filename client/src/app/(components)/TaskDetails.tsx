@@ -1,16 +1,14 @@
 import { IStatusOptions, ITask, statusOptions } from "@/types/user.types";
 import React, { useEffect, useState } from "react";
 
-import CommentBox from "./CommentBox";
-import LatestActivity from "./dashboard/Activity";
+import ActivityBox from "./ActivityBox";
 import PriorityTag from "./molecules/PriorityTag";
 import TaskComments from "./TaskComments";
-import UserAvatar from "./molecules/UserAvatar";
 import { format } from "date-fns";
 import { useLazyGetTasksByTaskIdQuery } from "@/store/api";
 
 type Props = {
-  selectedData: ITask;
+  selectedData: ITask | undefined;
   setSelectedData: (data: ITask | undefined) => void;
 };
 
@@ -74,7 +72,7 @@ const TaskDetails = ({ selectedData }: Props) => {
           </div>
           <div className="mt-2">
             {" "}
-            {activeTab === "ACTIVITY" && <LatestActivity />}
+            {activeTab === "ACTIVITY" && <ActivityBox />}
             {activeTab === "COMMENTS" && (
               <TaskComments taskId={data?.data?.id} />
             )}
@@ -121,24 +119,25 @@ const TaskDetails = ({ selectedData }: Props) => {
             </div>
             <div className="my-1 border-t border-gray-200"></div>
             <div className="flex items-center gap-2">
-              <div className="font-semibold">Label:</div>
-              <div
-                style={{
-                  borderColor: data?.data?.taskLabel?.colorCode ?? "#023047",
-                }}
-                className="rounded-md border px-2 py-1"
-              >
-                {data?.data?.taskLabel?.name ?? "None"}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
               <span className="font-semibold">Priority:</span>
               <PriorityTag
                 withLabel={true}
                 priority={data?.data?.priority ?? "MEDIUM"}
               />
             </div>
+            <div className="flex items-center gap-2">
+              <div className="font-semibold">Label:</div>
+              <div
+                style={{
+                  backgroundColor:
+                    data?.data?.taskLabel?.colorCode ?? "#023047",
+                }}
+                className="rounded-sm border px-4 py-1 text-white"
+              >
+                {data?.data?.taskLabel?.name ?? "None"}
+              </div>
+            </div>
+
             <div className="my-2 border-t border-gray-200"></div>
             <div className="text-gray-500">
               Created :

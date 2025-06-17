@@ -23,6 +23,7 @@ import {
 } from "@/store/api";
 
 import Dropzone from "../Dropzone";
+import RectTextEditor from "../RectTextEditor";
 import Spinner from "../Spinner";
 import TextEditor from "../TextEditor";
 import { toast } from "react-toastify";
@@ -163,7 +164,10 @@ const TaskModal = (props: Props) => {
 
   return (
     <div className="w-full">
-      <form className="bg-white px-4 pb-4" onSubmit={handleSubmit(onSubmit)}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="max-h-[700px] overflow-y-auto bg-white px-4 pb-4"
+      >
         <div className="mb-4">
           <label className="mb-2 block text-sm font-bold text-gray-700">
             Title
@@ -185,10 +189,11 @@ const TaskModal = (props: Props) => {
             Description
           </label>
           <div>
-            <TextEditor
+            {/* <TextEditor
               setEditorContent={setEditorContent}
               editorContent={editorContent}
-            />
+            /> */}
+            <RectTextEditor setValue={setEditorContent} value={editorContent} />
           </div>
           {/* <textarea
             {...register("description")}
@@ -397,23 +402,23 @@ const TaskModal = (props: Props) => {
             </select>
           </div>
         )}
-
-        <div className="flex items-center justify-end gap-4">
-          <button
-            onClick={onClose}
-            className="focus:shadow-outline rounded bg-gray-100 px-4 py-2 font-bold text-gray-500 hover:text-gray-800"
-          >
-            Cancel
-          </button>
-          <button
-            disabled={isSubmitting}
-            className={` ${isSubmitting ? "opacity-50" : ""} focus:shadow-outline rounded bg-blue-500 px-8 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none`}
-            type="submit"
-          >
-            {isSubmitting ? <Spinner /> : "Submit"}
-          </button>
-        </div>
       </form>
+      <div className="flex items-center justify-end gap-4">
+        <button
+          onClick={onClose}
+          className="focus:shadow-outline rounded bg-gray-100 px-4 py-2 font-bold text-gray-500 hover:text-gray-800"
+        >
+          Cancel
+        </button>
+        <button
+          disabled={isSubmitting}
+          onClick={handleSubmit(onSubmit)}
+          className={` ${isSubmitting ? "opacity-50" : ""} focus:shadow-outline rounded bg-blue-500 px-8 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none`}
+          type="submit"
+        >
+          {isSubmitting ? <Spinner /> : "Submit"}
+        </button>
+      </div>
     </div>
   );
 };

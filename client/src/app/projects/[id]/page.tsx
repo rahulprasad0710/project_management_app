@@ -20,6 +20,7 @@ const ProjectDetails = () => {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState<BOARD_TYPES>("BOARD");
   const [keyword, setKeyword] = useState<string>("");
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState<boolean>(false);
 
   const {
     isFetching,
@@ -34,11 +35,8 @@ const ProjectDetails = () => {
     projectResponse,
   });
 
-  const [isModalNewProjectOpen, setIsModalNewProjectOpen] =
-    useState<boolean>(false);
-
   const handleToggleProjectModal = () => {
-    setIsModalNewProjectOpen(!isModalNewProjectOpen);
+    setIsTaskModalOpen(!isTaskModalOpen);
   };
 
   if (isLoading)
@@ -72,7 +70,13 @@ const ProjectDetails = () => {
       <ProjectHeader activeTab={activeTab} setActiveTab={setActiveTab} />
       {activeTab === "TABLE" && <TableView projectResponse={projectResponse} />}
 
-      {activeTab === "BOARD" && <BoardView projectResponse={projectResponse} />}
+      {activeTab === "BOARD" && (
+        <BoardView
+          setIsTaskModalOpen={setIsTaskModalOpen}
+          isTaskModalOpen={isTaskModalOpen}
+          projectResponse={projectResponse}
+        />
+      )}
 
       {activeTab === "TIMELINE" && (
         <TimelineView projectResponse={projectResponse} />
@@ -80,10 +84,10 @@ const ProjectDetails = () => {
 
       <Modal
         modalTitle="Add new task"
-        isOpen={isModalNewProjectOpen}
-        onClose={() => setIsModalNewProjectOpen(false)}
+        isOpen={isTaskModalOpen}
+        onClose={() => setIsTaskModalOpen(false)}
       >
-        <TaskModal onClose={() => setIsModalNewProjectOpen(false)} />
+        <TaskModal onClose={() => setIsTaskModalOpen(false)} />
       </Modal>
     </div>
   );

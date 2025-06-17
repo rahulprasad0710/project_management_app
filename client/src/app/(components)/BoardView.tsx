@@ -5,13 +5,7 @@ import {
   useDrag,
   useDrop,
 } from "react-dnd";
-import {
-  EllipsisVertical,
-  MessageSquare,
-  Paperclip,
-  TicketCheck,
-  User,
-} from "lucide-react";
+import { Edit, EllipsisVertical, TicketCheck } from "lucide-react";
 import { IProject, ITask } from "@/types/user.types";
 import React, { useState } from "react";
 import { Response, TaskStatus } from "@/types/user.types";
@@ -29,6 +23,8 @@ import UserAvatar from "./molecules/UserAvatar";
 // import { format } from "date-fns";
 
 type IProps = {
+  isTaskModalOpen: boolean;
+  setIsTaskModalOpen: (isOpen: boolean) => void;
   projectResponse: Response<IProject> | undefined;
 };
 
@@ -41,7 +37,7 @@ const taskStatus: TaskStatus[] = [
 ];
 
 const BoardView = (props: IProps) => {
-  const { projectResponse } = props;
+  const { projectResponse, setIsTaskModalOpen, isTaskModalOpen } = props;
   const [fetchProject] = useLazyGetProjectByIdQuery();
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
   const tasksList = projectResponse?.data?.tasks || [];
@@ -66,6 +62,8 @@ const BoardView = (props: IProps) => {
           {taskStatus.map((status: TaskStatus) => {
             return (
               <TaskColumn
+                setIsTaskModalOpen={setIsTaskModalOpen}
+                isTaskModalOpen={isTaskModalOpen}
                 key={status}
                 status={status}
                 tasks={tasksList}
@@ -82,11 +80,14 @@ const BoardView = (props: IProps) => {
 type TaskColumnProps = {
   status: TaskStatus;
   tasks: ITask[];
+  isTaskModalOpen: boolean;
+  setIsTaskModalOpen: (isOpen: boolean) => void;
   moveTask: (taskId: number, status: TaskStatus) => void;
 };
 
 const TaskColumn = (props: TaskColumnProps) => {
-  const { status, tasks, moveTask } = props;
+  const { status, tasks, moveTask, setIsTaskModalOpen, isTaskModalOpen } =
+    props;
 
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "task",
@@ -142,7 +143,14 @@ const TaskColumn = (props: TaskColumnProps) => {
         {tasks
           .filter((task) => task.status === status)
           .map((task: ITask) => {
-            return <TaskItem key={task.id} task={task} />;
+            return (
+              <TaskItem
+                setIsTaskModalOpen={setIsTaskModalOpen}
+                isTaskModalOpen={isTaskModalOpen}
+                key={task.id}
+                task={task}
+              />
+            );
           })}
       </div>
     </div>
@@ -151,10 +159,12 @@ const TaskColumn = (props: TaskColumnProps) => {
 
 type TaskItemProps = {
   task: ITask;
+  isTaskModalOpen: boolean;
+  setIsTaskModalOpen: (isOpen: boolean) => void;
 };
 
 const TaskItem = (props: TaskItemProps) => {
-  const { task } = props;
+  const { task, setIsTaskModalOpen } = props;
 
   const [toggle, setToggle] = useState<boolean>(false);
   const [selectedData, setSelectedData] = useState<undefined | ITask>();
@@ -170,6 +180,12 @@ const TaskItem = (props: TaskItemProps) => {
   const handleOpenTaskDetails = (data: ITask) => {
     setSelectedData(data);
     setToggle(true);
+  };
+
+  const handleEdit = (data: ITask) => {
+    setSelectedData(data);
+    setToggle(false);
+    setIsTaskModalOpen(true);
   };
 
   return (
@@ -207,11 +223,18 @@ const TaskItem = (props: TaskItemProps) => {
         onClose={() => setToggle(false)}
         modalTitleChildren={
           <div className="flex items-center gap-4">
-            <TicketCheck className="text-blue-600" />
+            {/* <TicketCheck className="text-blue-600" /> */}
 
             <h2 className="text-xl font-semibold text-gray-800">
               {task.taskNumber}
             </h2>
+            <button
+              type="button"
+              onClick={() => handleEdit(task)}
+              className="flex h-6 w-6 items-center justify-center rounded bg-gray-100"
+            >
+              <Edit className="h-4 w-4 text-blue-500 hover:text-blue-600" />
+            </button>
           </div>
         }
       >
