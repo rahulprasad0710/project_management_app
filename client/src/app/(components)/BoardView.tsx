@@ -36,6 +36,14 @@ const taskStatus: TaskStatus[] = [
   "UNDER_REVIEW",
 ];
 
+// const taskStatus: TaskStatus[] = [
+//   "TODO",
+//   "IN_PROGRESS",
+//   "COMPLETED",
+//   "FOR_FIX",
+//   "UNDER_REVIEW",
+// ];
+
 const BoardView = (props: IProps) => {
   const { projectResponse, setIsTaskModalOpen, isTaskModalOpen } = props;
   const [fetchProject] = useLazyGetProjectByIdQuery();
@@ -225,7 +233,7 @@ const TaskItem = (props: TaskItemProps) => {
           <div className="flex items-center gap-4">
             {/* <TicketCheck className="text-blue-600" /> */}
 
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="ml-2 text-xl font-semibold text-gray-800">
               {task.taskNumber}
             </h2>
             <button

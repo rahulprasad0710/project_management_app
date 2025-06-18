@@ -1,11 +1,20 @@
-import { IStatusOptions, ITask, statusOptions } from "@/types/user.types";
+import {
+  IStatusOptions,
+  ITask,
+  TaskStatus,
+  statusOptions,
+} from "@/types/user.types";
 import React, { useEffect, useState } from "react";
+import {
+  useLazyGetTasksByTaskIdQuery,
+  useUpdateTaskStatusMutation,
+} from "@/store/api";
 
 import ActivityBox from "./ActivityBox";
 import PriorityTag from "./molecules/PriorityTag";
 import TaskComments from "./TaskComments";
 import { format } from "date-fns";
-import { useLazyGetTasksByTaskIdQuery } from "@/store/api";
+import { toast } from "react-toastify";
 
 type Props = {
   selectedData: ITask | undefined;
@@ -16,6 +25,7 @@ type TAB_TYPES = "ACTIVITY" | "COMMENTS";
 
 const TaskDetails = ({ selectedData }: Props) => {
   const [activeTab, setActiveTab] = useState<TAB_TYPES>("COMMENTS");
+  const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
   const [fetchTaskByTaskId, { data, isLoading, error }] =
     useLazyGetTasksByTaskIdQuery();
@@ -25,6 +35,17 @@ const TaskDetails = ({ selectedData }: Props) => {
       fetchTaskByTaskId({ taskId: selectedData.id });
     }
   }, [selectedData]);
+
+  const handleUpdateTaskStatus = async (status: TaskStatus) => {
+    const response = await updateTaskStatus({
+      id: selectedData?.id,
+      status,
+    });
+
+    if (response?.data?.id) {
+      toast.success("Task status updated successfully");
+    }
+  };
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -84,7 +105,13 @@ const TaskDetails = ({ selectedData }: Props) => {
           <div className="font-medium">Status:</div>
 
           <div className="relative w-full">
-            <select className="block w-full appearance-none rounded border border-gray-200 bg-white px-4 py-2 pr-8 font-semibold leading-tight text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none">
+            <select
+              onChange={(e) =>
+                handleUpdateTaskStatus(e.target.value as TaskStatus)
+              }
+              value={data?.data?.status}
+              className="block w-full appearance-none rounded border border-gray-200 bg-white px-4 py-2 pr-8 font-semibold leading-tight text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none"
+            >
               {statusOptions.map((status: IStatusOptions) => (
                 <option value={status.value} key={status.value}>
                   {status.label}
