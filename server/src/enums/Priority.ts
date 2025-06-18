@@ -2,6 +2,9 @@ export enum TaskStatus {
     TODO = "TODO",
     IN_PROGRESS = "IN_PROGRESS",
     DONE = "DONE",
+    COMPLETED = "COMPLETED",
+    FOR_FIX = "FOR_FIX",
+    UNDER_REVIEW = "UNDER_REVIEW",
 }
 
 export enum ProjectStatus {

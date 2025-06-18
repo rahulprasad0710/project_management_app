@@ -141,7 +141,7 @@ export const api = createApi({
       }),
       invalidatesTags: ["Tasks"],
     }),
-    updateTaskStatus: build.mutation<ITask, Partial<ITask>>({
+    updateTaskStatus: build.mutation<Response<ITask>, Partial<ITask>>({
       query: ({ id, status }) => ({
         url: `tasks/status/${id}`,
         method: "PUT",

@@ -1,7 +1,7 @@
 /* Basic editor styles */
 
 .tiptap-container {
-  border: 1px solid #ccc;
+  /* border: 1px solid #ccc; */
   min-height: 150px;
 }
 .tiptap :first-child {
@@ -111,7 +111,15 @@
   justify-content: space-between;
   flex-wrap: wrap;
   margin-bottom: 1rem;
-  background-color: #f2f4f5;
+  /* background-color: #f2f4f5; */
+  border: 1px solid #ccc;
+  border-radius: 0.2rem;
+  padding: 0.25rem;
+  gap: 0.5rem;
+}
+
+.tiptap .button-group button {
+  cursor: pointer;
 }
 
 .button2 {
@@ -125,3 +133,19 @@
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 }
+
+.tiptap .ProseMirror {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.2rem;
+  min-height: 150px;
+}
+
+.tiptap .ProseMirror:focus {
+  outline: none;
+}
+
+/* .control-group {
+  border: 1px solid #ccc;
+  border-radius: 0.2rem;
+} */
