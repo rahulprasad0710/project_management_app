@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { IProject, ResponseWithPagination } from "@/types/user.types";
 
-import { IProject } from "@/types/user.types";
 import PriorityTag from "./molecules/PriorityTag";
 import { ProjectStatusBadge } from "./molecules/ProjectStatusBadge";
 import ReactTable from "./ReactTable";
 import { SquarePen } from "lucide-react";
 import { createColumnHelper } from "@tanstack/react-table";
 import { format } from "date-fns";
-import { useLazyGetProjectsQuery } from "@/store/api";
 import { useRouter } from "next/navigation";
 
 type IProps = {
@@ -15,21 +13,15 @@ type IProps = {
   setToggle: React.Dispatch<React.SetStateAction<boolean>>;
   setSelectedData: React.Dispatch<React.SetStateAction<IProject | undefined>>;
   toggle: boolean;
+  data?: ResponseWithPagination<IProject[]>;
+  isFetching: boolean;
+  handlePrevious: () => void;
+  handleNext: () => void;
 };
 
 function ProjectTable(props: IProps) {
-  const { keyword, setToggle, setSelectedData } = props;
+  const { keyword, setToggle, setSelectedData, data, isFetching } = props;
   const router = useRouter();
-
-  useEffect(() => {
-    fetchAllProject({
-      isPaginationEnabled: true,
-      page: 1,
-      pageSize: 10,
-    });
-  }, []);
-
-  const [fetchAllProject, { isFetching, data }] = useLazyGetProjectsQuery();
 
   const handleEdit = (data: IProject) => {
     setSelectedData(data);

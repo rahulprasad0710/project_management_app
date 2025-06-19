@@ -1,4 +1,4 @@
-import { Grid3X3, Search } from "lucide-react";
+import { Grid3X3, Search, X } from "lucide-react";
 
 import React from "react";
 
@@ -11,7 +11,17 @@ const SearchBar = (props: IProps) => {
   const { keyword, setKeyword } = props;
   return (
     <div className="relative">
-      <Search className="absolute right-[4px] top-1/2 mr-2 h-5 w-5 -translate-y-1/2 transform cursor-pointer" />
+      {!keyword && (
+        <Search className="absolute right-[4px] top-1/2 mr-2 h-5 w-5 -translate-y-1/2 transform cursor-pointer" />
+      )}
+      {keyword && (
+        <button
+          onClick={() => setKeyword("")}
+          className="absolute right-[4px] top-1/2 mr-2 h-5 w-5 -translate-y-1/2 transform cursor-pointer"
+        >
+          <X />
+        </button>
+      )}
       <input
         onChange={(e) => setKeyword(e.target.value)}
         value={keyword}

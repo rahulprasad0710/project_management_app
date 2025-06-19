@@ -8,6 +8,7 @@ import {
   ILabelResponse,
   ILabelUpdatePayload,
   IProject,
+  IProjectPagination,
   ISprintPayload,
   ISprintResponse,
   ISprintUpdatePayload,
@@ -57,12 +58,17 @@ export const api = createApi({
       }),
       invalidatesTags: ["Users"],
     }),
-    getProjects: build.query<ResponseWithPagination<IProject[]>, Pagination>({
+    getProjects: build.query<
+      ResponseWithPagination<IProject[]>,
+      IProjectPagination
+    >({
       query: ({
         isPaginationEnabled = true,
         page = 1,
         pageSize = 10,
         keyword,
+        status,
+        priority,
       }) => ({
         url: "projects",
         method: "GET",
@@ -71,6 +77,8 @@ export const api = createApi({
           page,
           pageSize,
           keyword: keyword ? keyword : undefined,
+          status,
+          priority,
         },
       }),
       providesTags: (result) =>

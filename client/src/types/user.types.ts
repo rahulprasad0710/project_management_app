@@ -25,6 +25,11 @@ export interface Pagination {
   keyword?: string;
 }
 
+export interface IProjectPagination extends Pagination {
+  status?: ProjectStatus[] | undefined;
+  priority?: Priority | undefined;
+}
+
 export interface SprintPagination extends Pagination {
   isActive: boolean;
 }

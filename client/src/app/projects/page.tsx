@@ -5,10 +5,12 @@ import {
   IMultiList,
   IPriorityOptions,
   IProject,
+  Priority,
+  ProjectStatus,
   priorityOptions,
   statusOptions,
 } from "@/types/user.types";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import Header from "../(components)/Header";
 import Modal from "../(components)/Modal";
@@ -17,17 +19,40 @@ import ProjectHeader from "../(components)/ProjectHeader";
 import ProjectModal from "../(components)/ProjectModal";
 import ProjectTable from "../(components)/ProjectTable";
 import SearchBar from "../(components)/molecules/SearchBar";
+import { useLazyGetProjectsQuery } from "@/store/api";
 
 type BOARD_TYPES = "BOARD" | "LIST" | "CALENDAR" | "TIMELINE" | "TABLE";
 
 const ProjectPage = () => {
+  const [fetchAllProject, { isFetching, data }] = useLazyGetProjectsQuery();
+
   const [activeTab, setActiveTab] = useState<BOARD_TYPES>("TABLE");
   const [toggle, setToggle] = useState(false);
   const [keyword, setKeyword] = useState<string>("");
   const [selectedData, setSelectedData] = useState<undefined | IProject>();
-  const [selectedTeamMember, setSelectedTeamMember] = useState<IMultiList[]>(
-    [],
-  );
+  const [selectedStatus, setSelectedStatus] = useState<IMultiList[]>([]);
+  const [selectedPriority, setSelectedPriority] = useState<
+    Priority | undefined
+  >(undefined);
+
+  useEffect(() => {
+    fetchAllProject({
+      isPaginationEnabled: true,
+      page: 1,
+      pageSize: 10,
+    });
+  }, [fetchAllProject]);
+
+  const handleSearch = () => {
+    fetchAllProject({
+      isPaginationEnabled: true,
+      page: 1,
+      pageSize: 10,
+      keyword: keyword,
+      status: selectedStatus.map((item) => item.value as ProjectStatus),
+      priority: selectedPriority,
+    });
+  };
 
   const handleToggleModal = () => {
     setSelectedData(undefined);
@@ -40,6 +65,35 @@ const ProjectPage = () => {
       value: status.value as string,
     };
   });
+
+  const handlePrevious = () => {
+    if (
+      !data?.data?.pagination?.currentPage ||
+      data?.data?.pagination?.currentPage === 1
+    )
+      return;
+
+    fetchAllProject({
+      isPaginationEnabled: true,
+      page: data?.data?.pagination?.currentPage - 1,
+      pageSize: data?.data?.pagination?.pageSize,
+      keyword: keyword,
+    });
+  };
+
+  const handleNext = () => {
+    if (!data?.data?.pagination?.currentPage) return;
+
+    fetchAllProject(
+      {
+        isPaginationEnabled: true,
+        page: data?.data?.pagination?.currentPage + 1,
+        pageSize: data?.data?.pagination?.pageSize,
+        keyword: keyword,
+      },
+      true,
+    );
+  };
 
   return (
     <div className="container mx-auto px-4 lg:px-8 lg:pt-2 xl:max-w-7xl">
@@ -64,7 +118,10 @@ const ProjectPage = () => {
       </div>
       <div className="mb-4 flex flex-wrap items-center justify-center gap-4 md:justify-end">
         <div className="relative w-[300px]">
-          <select className="block w-full appearance-none rounded border border-gray-200 bg-white px-4 py-1 pr-8 text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none">
+          <select
+            onChange={(e) => setSelectedPriority(e.target.value as Priority)}
+            className="block w-full appearance-none rounded border border-gray-200 bg-white px-4 py-1 pr-8 text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none"
+          >
             {priorityOptions.map((priority: IPriorityOptions) => (
               <option value={priority.value} key={priority.value}>
                 {priority.label}
@@ -87,13 +144,14 @@ const ProjectPage = () => {
             list={statusList}
             size={1}
             placeholder="Select status"
-            selectedList={selectedTeamMember}
-            setSelectList={setSelectedTeamMember}
+            selectedList={selectedStatus}
+            setSelectList={setSelectedStatus}
           />
         </div>
         <SearchBar setKeyword={setKeyword} keyword={keyword} />
         <button
           type="button"
+          onClick={handleSearch}
           className="rounded bg-blue-500 px-4 py-1 font-bold text-white hover:bg-blue-600"
         >
           Search
@@ -104,6 +162,10 @@ const ProjectPage = () => {
         toggle={toggle}
         setToggle={setToggle}
         keyword={keyword}
+        handleNext={handleNext}
+        handlePrevious={handlePrevious}
+        isFetching={isFetching}
+        data={data}
       />
       <Modal
         modalTitleChildren={
