@@ -17,7 +17,7 @@ const SearchBar = (props: IProps) => {
         value={keyword}
         type="text"
         placeholder="Search..."
-        className="rounded-sm border py-1 pl-10 pr-4 focus:border-gray-600 focus:outline-none focus:ring-gray-600"
+        className="rounded-sm border py-1 pl-10 pr-4 focus:border-blue-300 focus:bg-white focus:outline-none"
       />
 
       <Grid3X3 className="absolute left-3 top-2 h-4 w-4 text-gray-400" />

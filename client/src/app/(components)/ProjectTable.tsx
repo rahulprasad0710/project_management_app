@@ -1,10 +1,10 @@
-import { Filter, Share2, SquarePen, Trash } from "lucide-react";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { IProject } from "@/types/user.types";
-import Modal from "./Modal";
-import ProjectModal from "./ProjectModal";
+import PriorityTag from "./molecules/PriorityTag";
+import { ProjectStatusBadge } from "./molecules/ProjectStatusBadge";
 import ReactTable from "./ReactTable";
+import { SquarePen } from "lucide-react";
 import { createColumnHelper } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { useLazyGetProjectsQuery } from "@/store/api";
@@ -12,10 +12,13 @@ import { useRouter } from "next/navigation";
 
 type IProps = {
   keyword: string;
+  setToggle: React.Dispatch<React.SetStateAction<boolean>>;
+  setSelectedData: React.Dispatch<React.SetStateAction<IProject | undefined>>;
+  toggle: boolean;
 };
 
 function ProjectTable(props: IProps) {
-  const { keyword } = props;
+  const { keyword, setToggle, setSelectedData } = props;
   const router = useRouter();
 
   useEffect(() => {
@@ -26,8 +29,6 @@ function ProjectTable(props: IProps) {
     });
   }, []);
 
-  const [selectedData, setSelectedData] = useState<undefined | IProject>();
-  const [toggle, setToggle] = useState(false);
   const [fetchAllProject, { isFetching, data }] = useLazyGetProjectsQuery();
 
   const handleEdit = (data: IProject) => {
@@ -36,10 +37,6 @@ function ProjectTable(props: IProps) {
   };
 
   const handleNavigate = (data: IProject) => {
-    setSelectedData(data);
-    setToggle(true);
-    // Navigate to the project details page
-    // For example, using react-router:
     router.push(`/projects/${data.id}`);
   };
 
@@ -48,45 +45,38 @@ function ProjectTable(props: IProps) {
   const columns = [
     columnHelper.accessor((row) => row.name, {
       id: "name",
-      cell: (info) => <i>{info.renderValue()}</i>,
+      cell: (info) => (
+        <div className="font-semibold text-blue-950">{info.renderValue()}</div>
+      ),
       header: () => <span>Title</span>,
     }),
     columnHelper.accessor((row) => row.status, {
       id: "Status",
       cell: (info) => (
-        <div className="inline-flex rounded-full bg-green-100 px-2 text-sm font-semibold leading-5 text-green-800">
-          {info.renderValue()}
-        </div>
+        <ProjectStatusBadge status={info.renderValue() ?? "TODO"} />
       ),
       header: () => <span>Status</span>,
-    }),
-    columnHelper.accessor((row) => row.startDate, {
-      id: "startDate",
-      cell: (info) => (
-        <div className="inline-block whitespace-nowrap rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold leading-4 text-blue-800">
-          {format(info.getValue(), "dd/MM/yyyy")}
-        </div>
-      ),
-      header: () => <span>Start Date</span>,
-    }),
-    columnHelper.accessor((row) => row.endDate, {
-      id: "endDate",
-      cell: (info) => (
-        <div className="inline-block whitespace-nowrap rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold leading-4 text-blue-800">
-          {format(info.getValue(), "dd/MM/yyyy")}
-        </div>
-      ),
-      header: () => <span>End Date</span>,
     }),
 
     columnHelper.accessor((row) => row.priority, {
       id: "priority",
       cell: (info) => (
-        <div className="inline-flex rounded-full bg-green-100 px-2 text-sm font-semibold leading-5 text-green-800">
-          {info.renderValue()}
-        </div>
+        <PriorityTag
+          priority={info.renderValue() ?? "MEDIUM"}
+          withLabel={true}
+        />
       ),
       header: () => <span>Priority</span>,
+    }),
+    columnHelper.accessor((row) => row.startDate, {
+      id: "startDate",
+      cell: (info) => <div>{format(info.getValue(), "dd/MM/yyyy")}</div>,
+      header: () => <span>Start Date</span>,
+    }),
+    columnHelper.accessor((row) => row.endDate, {
+      id: "endDate",
+      cell: (info) => <div>{format(info.getValue(), "dd/MM/yyyy")}</div>,
+      header: () => <span>End Date</span>,
     }),
 
     columnHelper.accessor((row) => row.startDate, {
@@ -127,10 +117,6 @@ function ProjectTable(props: IProps) {
       header: () => <span>Action</span>,
     }),
   ];
-
-  console.log({
-    projectListResponse: data?.data,
-  });
 
   const handlePrevious = () => {
     if (
@@ -174,17 +160,6 @@ function ProjectTable(props: IProps) {
           pagination={data?.data.pagination}
         />
       </div>
-      <Modal
-        modalTitle={selectedData ? "Edit new project" : "Add new project"}
-        isOpen={toggle}
-        onClose={() => setToggle(false)}
-      >
-        <ProjectModal
-          selectedData={selectedData}
-          setSelectedData={setSelectedData}
-          onClose={() => setToggle(false)}
-        />
-      </Modal>
     </div>
   );
 }

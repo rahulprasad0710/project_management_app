@@ -1,5 +1,6 @@
 import React, { ChangeEvent, DragEvent, useRef } from "react";
 
+import { FileComment } from "./molecules/FileIcon";
 import { IUploadFile } from "@/types/user.types";
 import { X } from "lucide-react";
 
@@ -81,39 +82,34 @@ const Dropzone = ({ files, setFiles, OldFiles, setOldFiles }: FileProps) => {
       )}
 
       {files.length > 0 && (
-        <ul className="mt-4 space-y-2">
+        <ul className="mt-4 cursor-pointer flex-wrap gap-6 rounded bg-gray-100 px-4 py-2 text-sm text-gray-700">
           {files.map((file, idx) => (
-            <div
-              className="flex cursor-pointer justify-between gap-4 rounded bg-gray-100 px-4 py-2 text-sm text-gray-700"
-              key={idx}
-            >
-              <li>📎 {file.name}</li>
-              <button className="bg-gray-100 hover:bg-red-400 hover:text-black">
-                <X className="h-5 w-5 font-semibold text-gray-800" />
-              </button>
-            </div>
+            <li key={idx}>
+              <FileComment
+                showDeleteButton={true}
+                showDownloadButton={false}
+                handleClick={() => {}}
+                fileName={file.name}
+              />
+            </li>
           ))}
         </ul>
       )}
 
-      {OldFiles?.length > 0 && (
-        <ul className="mt-4 space-y-2">
-          {OldFiles?.map((file) => (
-            <div
-              className="flex cursor-pointer justify-between gap-4 rounded bg-gray-100 px-4 py-2 text-sm text-gray-700"
-              key={file.id}
-            >
-              <li>📎 {file.originalname}</li>
-              <button
-                onClick={() => handleDeleteOldFiles(file.id)}
-                className="bg-gray-100 hover:bg-red-400 hover:text-black"
-              >
-                <X className="h-5 w-5 font-semibold text-gray-800" />
-              </button>
-            </div>
+      <ul className="mt-4 cursor-pointer flex-wrap gap-6 rounded bg-gray-100 px-4 py-2 text-sm text-gray-700">
+        {OldFiles?.length > 0 &&
+          OldFiles?.map((file) => (
+            <li key={file.id}>
+              <FileComment
+                url={file.backendUrl}
+                showDeleteButton={true}
+                showDownloadButton={true}
+                handleClick={() => handleDeleteOldFiles(file.id)}
+                fileName={file.originalname}
+              />
+            </li>
           ))}
-        </ul>
-      )}
+      </ul>
     </div>
   );
 };

@@ -270,3 +270,9 @@ export type IActivityResponse = {
     assignedTo: IUser;
   };
 };
+
+export type IMultiList = {
+  label: string;
+  value: number | string;
+  icon?: string | React.ReactNode;
+};

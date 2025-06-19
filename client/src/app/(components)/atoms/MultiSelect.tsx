@@ -6,24 +6,20 @@ import React, {
   useState,
 } from "react";
 
+import { IMultiList } from "@/types/user.types";
 import { X } from "lucide-react";
 
-type IList = {
-  label: string;
-  value: number;
-  icon?: string | React.ReactNode;
-};
-
 type Props = {
-  list: IList[];
-  selectedList: IList[];
-  setSelectList: Dispatch<SetStateAction<IList[]>>;
+  list: IMultiList[];
+  selectedList: IMultiList[];
+  setSelectList: Dispatch<SetStateAction<IMultiList[]>>;
   placeholder?: string;
   required?: boolean;
+  size?: number;
 };
 
 const MultiSelect = (props: Props) => {
-  const { list, selectedList, setSelectList, placeholder } = props;
+  const { list, selectedList, setSelectList, placeholder, size } = props;
   const [openSelect, setOpenSelect] = useState<boolean>(false);
   // const [showList, setShowList] = useState<IList[]>([]);
   const multiSelectRef = useRef(null);
@@ -32,7 +28,7 @@ const MultiSelect = (props: Props) => {
     selectedList,
   });
 
-  const handleSelect = (valueSelected: number) => {
+  const handleSelect = (valueSelected: number | string) => {
     const isItemAlreadyPresent = selectedList.find(
       (item) => item.value === valueSelected,
     );
@@ -69,7 +65,7 @@ const MultiSelect = (props: Props) => {
     <div ref={multiSelectRef} className="multi-select-box relative">
       <button
         onClick={() => setOpenSelect(!openSelect)}
-        className="block w-full rounded border border-gray-200 bg-white px-4 py-2 text-left text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none"
+        className={`py-${size ?? 2} block w-full rounded border border-gray-200 bg-white px-4 text-left text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none`}
         type="button"
       >
         {selectedList?.length === 0 && (
@@ -77,8 +73,8 @@ const MultiSelect = (props: Props) => {
         )}
 
         {selectedList?.length > 0 && (
-          <div className="flex gap-1">
-            {selectedList?.map((item: IList) => (
+          <div className="flex flex-wrap gap-1">
+            {selectedList?.map((item: IMultiList) => (
               <div
                 className="mr-1 flex items-center gap-1 rounded-sm bg-gray-100 px-2 font-semibold text-gray-700"
                 key={item.value}
@@ -110,7 +106,7 @@ const MultiSelect = (props: Props) => {
       <div
         className={`${openSelect ? "block" : "hidden"} absolute top-full z-50 mt-2 max-h-72 w-full space-y-0.5 overflow-hidden overflow-y-auto rounded-lg border border-gray-200 bg-white p-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 [&::-webkit-scrollbar]:w-2`}
       >
-        {list.map((item: IList) => (
+        {list.map((item: IMultiList) => (
           <div
             onClick={() => handleSelect(item.value)}
             key={item.value}

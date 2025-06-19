@@ -2,6 +2,7 @@ import * as yup from "yup";
 
 import {
   IAddProjectPayload,
+  IMultiList,
   IPriorityOptions,
   IProject,
   IUpdateProjectPayload,
@@ -21,8 +22,10 @@ import {
 } from "@/store/api";
 
 import Dropzone from "./Dropzone";
+import { Editor } from "@tiptap/react";
 import MultiSelect from "./atoms/MultiSelect";
 import Spinner from "./Spinner";
+import TextEditor from "./TextEditor";
 import { toast } from "react-toastify";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -47,20 +50,17 @@ const ProjectModal = (props: Props) => {
   const { isFetching: isUserFetching, data: userList } = useGetUsersQuery();
   const [files, setFiles] = useState<File[]>([]);
   const [OldFiles, setOldFiles] = useState<IUploadFile[]>([]);
-
+  const [editorContent, setEditorContent] = useState("type here...");
   const [createProjectMutation] = useCreateProjectMutation();
   const [updateProjectMutation] = useUpdateProjectMutation();
   const [fetchProject] = useLazyGetProjectByIdQuery();
   const [createUploadMutation] = useCreateUploadsMutation();
-
-  type IList = {
-    label: string;
-    value: number;
-    icon?: string | React.ReactNode;
-  };
+  const [editorInstance, setEditorInstance] = useState<Editor | undefined>();
 
   // const [fetchAllProject] = useLazyGetProjectsQuery();
-  const [selectedTeamMember, setSelectedTeamMember] = useState<IList[]>([]);
+  const [selectedTeamMember, setSelectedTeamMember] = useState<IMultiList[]>(
+    [],
+  );
   const schema = yup.object().shape({
     name: yup.string().required("Project name is required"),
     description: yup.string().optional(),
@@ -201,7 +201,10 @@ const ProjectModal = (props: Props) => {
 
   return (
     <div className="w-full">
-      <form className="bg-white p-4" onSubmit={handleSubmit(onSubmit)}>
+      <form
+        className="max-h-[700px] overflow-y-auto bg-white p-4"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         <div className="mb-4">
           <label className="mb-2 block text-sm font-bold text-gray-700">
             Project title
@@ -222,12 +225,17 @@ const ProjectModal = (props: Props) => {
           <label className="mb-2 block text-sm font-bold text-gray-700">
             Description
           </label>
-          <textarea
-            {...register("description")}
-            className="focus:shadow-outline w-full resize-y rounded-md border border-gray-200 p-2 text-gray-700 focus:border-blue-300 focus:outline-none"
-          ></textarea>
+
+          <TextEditor
+            setEditorInstance={setEditorInstance}
+            setEditorContent={setEditorContent}
+            editorContent={editorContent}
+          />
         </div>
         <div className="mb-4">
+          <label className="mb-2 block text-sm font-bold text-gray-700">
+            Attachments
+          </label>
           <Dropzone
             setFiles={setFiles}
             files={files}
@@ -341,22 +349,22 @@ const ProjectModal = (props: Props) => {
             />
           </div>
         </div>
-        <div className="flex items-center justify-end gap-4">
-          <button
-            onClick={onClose}
-            className="focus:shadow-outline rounded bg-gray-100 px-4 py-2 font-bold text-gray-500 hover:text-gray-800"
-          >
-            Cancel
-          </button>
-          <button
-            disabled={isSubmitting}
-            className={` ${isSubmitting ? "opacity-50" : ""} focus:shadow-outline rounded bg-blue-500 px-8 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none`}
-          >
-            {!!isSubmitting && <Spinner />}
-            <span> {selectedData ? "Update" : "Submit"}</span>
-          </button>
-        </div>
       </form>
+      <div className="mt-4 flex items-center justify-end gap-4">
+        <button
+          onClick={onClose}
+          className="focus:shadow-outline rounded bg-gray-100 px-4 py-2 font-bold text-gray-500 hover:text-gray-800"
+        >
+          Cancel
+        </button>
+        <button
+          disabled={isSubmitting}
+          className={` ${isSubmitting ? "opacity-50" : ""} focus:shadow-outline rounded bg-blue-500 px-8 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none`}
+        >
+          {!!isSubmitting && <Spinner />}
+          <span> {selectedData ? "Update" : "Submit"}</span>
+        </button>
+      </div>
     </div>
   );
 };
