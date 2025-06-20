@@ -1,7 +1,9 @@
+import { Priority, ProjectStatus } from "../enums/Priority";
 import { Request, Response } from "express";
 
 import { IPagination } from "../types/express";
 import ProjectService from "../services/projects.service";
+import normalizeToString from "../utils/sanatizeQueryParams";
 
 const projectService = new ProjectService();
 
@@ -75,11 +77,38 @@ const getAll = async (req: Request, res: Response) => {
             isPaginationEnabled,
         });
 
+        const rawStatus = normalizeToString(req.query.status);
+
+        const isValidStatus = (val: string): val is ProjectStatus => {
+            return Object.values(ProjectStatus).includes(val as ProjectStatus);
+        };
+
+        let statusArray: ProjectStatus[] | undefined = undefined;
+
+        if (Array.isArray(rawStatus)) {
+            const filtered = rawStatus.filter(isValidStatus);
+            statusArray = filtered.length ? filtered : undefined;
+        } else if (typeof rawStatus === "string" && isValidStatus(rawStatus)) {
+            statusArray = [rawStatus];
+        }
+
+        const rawPriority = normalizeToString(req.query.priority);
+
+        const isValidPriority = (val: string): val is Priority => {
+            return Object.values(Priority).includes(val as Priority);
+        };
+
+        const priorityQuery: Priority | undefined = isValidPriority(rawPriority)
+            ? (rawPriority as Priority)
+            : undefined;
+
         const users = await projectService.getAll({
             skip,
             take,
             keyword,
             isPaginationEnabled,
+            status: statusArray,
+            priority: priorityQuery,
         });
         res.status(200).json({
             success: true,

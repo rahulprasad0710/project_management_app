@@ -1,4 +1,9 @@
-import { IProject, IUpdateProjectPayload } from "../types/payload";
+import {
+    IProject,
+    IProjectPagination,
+    IUpdateProjectPayload,
+} from "../types/payload";
+import { In, Like } from "typeorm";
 import UploadService, { IUploadFileURL } from "./upload.service";
 
 import { IPagination } from "../types/express";
@@ -47,8 +52,9 @@ export class ProjectService {
         return newProjectResult;
     }
 
-    async getAll(query: IPagination) {
-        const { skip, take, isPaginationEnabled } = query;
+    async getAll(query: IProjectPagination) {
+        const { skip, take, isPaginationEnabled, priority, status, keyword } =
+            query;
 
         const result = await this.projectRepository.find({
             select: [
@@ -65,6 +71,11 @@ export class ProjectService {
             take: take,
             order: {
                 id: "DESC",
+            },
+            where: {
+                ...(status ? { status: In(status) } : {}),
+                ...(priority ? { priority } : {}),
+                ...(keyword ? { name: Like(`%${keyword}%`) } : {}),
             },
         });
         const totalCount = await this.projectRepository.count();

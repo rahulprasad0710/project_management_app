@@ -1,5 +1,6 @@
 import { Priority, ProjectStatus, TaskStatus } from "../enums/Priority";
 
+import { IPagination } from "./express";
 import { Label } from "../db/entity/taskLabel";
 import { Project } from "./../db/entity/project";
 import { User } from "../db/entity/User";
@@ -37,4 +38,9 @@ export interface ITask {
 
 export interface IUpdateTaskPayload extends ITask {
     updatedTaskUploads: string[];
+}
+
+export interface IProjectPagination extends IPagination {
+    status?: ProjectStatus[] | undefined;
+    priority?: Priority | undefined;
 }
