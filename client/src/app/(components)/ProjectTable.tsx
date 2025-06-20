@@ -9,7 +9,6 @@ import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 
 type IProps = {
-  keyword: string;
   setToggle: React.Dispatch<React.SetStateAction<boolean>>;
   setSelectedData: React.Dispatch<React.SetStateAction<IProject | undefined>>;
   toggle: boolean;
@@ -20,7 +19,14 @@ type IProps = {
 };
 
 function ProjectTable(props: IProps) {
-  const { keyword, setToggle, setSelectedData, data, isFetching } = props;
+  const {
+    setToggle,
+    setSelectedData,
+    data,
+    isFetching,
+    handleNext,
+    handlePrevious,
+  } = props;
   const router = useRouter();
 
   const handleEdit = (data: IProject) => {
@@ -109,35 +115,6 @@ function ProjectTable(props: IProps) {
       header: () => <span>Action</span>,
     }),
   ];
-
-  const handlePrevious = () => {
-    if (
-      !data?.data?.pagination?.currentPage ||
-      data?.data?.pagination?.currentPage === 1
-    )
-      return;
-
-    fetchAllProject({
-      isPaginationEnabled: true,
-      page: data?.data?.pagination?.currentPage - 1,
-      pageSize: data?.data?.pagination?.pageSize,
-      keyword: keyword,
-    });
-  };
-
-  const handleNext = () => {
-    if (!data?.data?.pagination?.currentPage) return;
-
-    fetchAllProject(
-      {
-        isPaginationEnabled: true,
-        page: data?.data?.pagination?.currentPage + 1,
-        pageSize: data?.data?.pagination?.pageSize,
-        keyword: keyword,
-      },
-      true,
-    );
-  };
 
   return (
     <div>

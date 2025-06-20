@@ -14,14 +14,12 @@ type IProps<T> = {
   handlePrevious: () => void;
   handleNext: () => void;
   isFetching: boolean;
-  pagination:
-    | {
-        currentPage: number;
-        pageSize: number;
-        totalCount: number;
-        totalPages: number;
-      }
-    | undefined;
+  pagination: {
+    currentPage: number;
+    pageSize: number;
+    totalCount: number;
+    totalPages: number;
+  };
 };
 
 const ReactTable = <T extends object>({
@@ -43,12 +41,31 @@ const ReactTable = <T extends object>({
     return <div>Error: Missing columns or data</div>;
   }
 
+  const lastIndex = () => {
+    let lastCount = 0;
+    let hasNextPage = true;
+
+    const lastIndex =
+      (pagination?.currentPage - 1) * pagination?.pageSize +
+      pagination?.pageSize;
+    const totalCount = pagination?.totalCount;
+    if (lastIndex > totalCount) {
+      lastCount = totalCount;
+      hasNextPage = false;
+      return { lastCount, hasNextPage };
+    } else {
+      lastCount = lastIndex;
+      hasNextPage = true;
+      return { lastCount, hasNextPage };
+    }
+  };
+
   const btnClass =
     "inline-flex  items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm font-semibold leading-5 text-neutral-800 hover:border-neutral-300 hover:text-neutral-950 active:border-neutral-200";
 
   return (
     <div className="min-w-full overflow-x-auto rounded-lg border border-neutral-200">
-      <div className="max-h-[700px] min-h-[700px] overflow-y-auto overflow-x-hidden">
+      <div className="max-h-[700px] min-h-[500px] overflow-y-auto overflow-x-hidden">
         <table className="min-w-full table-fixed align-middle text-sm">
           <thead className="sticky top-0 z-10 bg-white">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -114,14 +131,25 @@ const ReactTable = <T extends object>({
       {showPagination && (
         <div className="flex items-center justify-between border-t border-neutral-200 bg-white">
           <div className="flex items-center justify-between px-4 py-4">
-            <p className="mr-4">Total : {table.getRowModel().rows.length}</p>
+            <p className="mr-4 text-sm text-gray-700">
+              Total pages :
+              <span className="mx-1 px-1 font-medium">
+                {pagination?.totalPages}{" "}
+              </span>
+            </p>
             <p className="text-sm text-gray-700">
               Showing
-              <span className="mx-1 px-1 font-medium">1</span>
+              <span className="mx-1 px-1 font-medium">
+                {pagination?.pageSize * (pagination?.currentPage - 1) + 1}
+              </span>
               to
-              <span className="mx-1 px-1 font-medium">10</span>
+              <span className="mx-1 px-1 font-medium">
+                {lastIndex().lastCount}
+              </span>
               of
-              <span className="mx-1 px-1 font-medium">97</span>
+              <span className="mx-1 px-1 font-medium">
+                {pagination?.totalCount}
+              </span>
               results
             </p>
           </div>
@@ -137,7 +165,15 @@ const ReactTable = <T extends object>({
             >
               <span>Previous</span>
             </button>
-            <button className={btnClass} onClick={() => handleNext()}>
+            <button
+              disabled={!lastIndex().hasNextPage}
+              className={
+                !lastIndex().hasNextPage
+                  ? `${btnClass} cursor-not-allowed bg-neutral-100 text-neutral-500 opacity-60`
+                  : `${btnClass} cursor-pointer`
+              }
+              onClick={() => handleNext()}
+            >
               <span>Next</span>
             </button>
           </nav>

@@ -35,6 +35,10 @@ const ProjectPage = () => {
     Priority | undefined
   >(undefined);
 
+  console.log({
+    selectedPriority,
+  });
+
   useEffect(() => {
     fetchAllProject({
       isPaginationEnabled: true,
@@ -116,12 +120,13 @@ const ProjectPage = () => {
           </button>
         </div>
       </div>
-      <div className="mb-4 flex flex-wrap items-center justify-center gap-4 md:justify-end">
+      <div className="my-6 flex flex-wrap items-center justify-center gap-4 md:justify-end">
         <div className="relative w-[300px]">
           <select
             onChange={(e) => setSelectedPriority(e.target.value as Priority)}
-            className="block w-full appearance-none rounded border border-gray-200 bg-white px-4 py-1 pr-8 text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none"
+            className="block w-full appearance-none rounded border border-gray-200 bg-white px-4 py-1 pr-8 text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           >
+            <option value={undefined}>All</option>
             {priorityOptions.map((priority: IPriorityOptions) => (
               <option value={priority.value} key={priority.value}>
                 {priority.label}
@@ -161,7 +166,6 @@ const ProjectPage = () => {
         setSelectedData={setSelectedData}
         toggle={toggle}
         setToggle={setToggle}
-        keyword={keyword}
         handleNext={handleNext}
         handlePrevious={handlePrevious}
         isFetching={isFetching}
