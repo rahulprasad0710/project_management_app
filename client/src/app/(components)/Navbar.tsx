@@ -71,14 +71,6 @@ const Navbar = () => {
               {/* <BellIcon className="h-6 w-6" aria-hidden="true" /> */}
             </button>
 
-            {isNotificationsOpen && (
-              <div className="absolute right-0 z-10 mt-2 w-80 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
-                <div className="px-4 py-2 text-sm text-gray-700">
-                  No new notifications
-                </div>
-              </div>
-            )}
-
             {/* Profile dropdown */}
             <div className="relative ml-4 flex gap-4">
               <div className="relative">
@@ -90,7 +82,7 @@ const Navbar = () => {
                   aria-haspopup="true"
                 >
                   <div className="absolute -end-2 -top-2">
-                    <span className="rounded-full bg-neutral-800 px-1.5 py-0.5 text-xs font-semibold text-white">
+                    <span className="rounded-full bg-green-700 px-1.5 py-0.5 text-xs font-semibold text-white">
                       3
                     </span>
                   </div>

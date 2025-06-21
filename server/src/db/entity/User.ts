@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+
+import { Notification } from "./Notification";
 
 @Entity()
 export class User {
@@ -13,6 +15,9 @@ export class User {
 
     @Column()
     username: string;
+
+    @OneToMany(() => Notification, (notification) => notification.recipient)
+    notifications: Notification[];
 
     // @Column({ unique: true })
     // email: string;

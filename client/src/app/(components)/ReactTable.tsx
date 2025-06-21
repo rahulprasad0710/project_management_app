@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   ColumnDef,
   flexRender,
@@ -163,6 +164,8 @@ const ReactTable = <T extends object>({
                   : `${btnClass} cursor-pointer`
               }
             >
+              <ChevronLeft className="h-5 w-5" />
+
               <span>Previous</span>
             </button>
             <button
@@ -175,6 +178,7 @@ const ReactTable = <T extends object>({
               onClick={() => handleNext()}
             >
               <span>Next</span>
+              <ChevronRight className="h-5 w-5" />
             </button>
           </nav>
         </div>

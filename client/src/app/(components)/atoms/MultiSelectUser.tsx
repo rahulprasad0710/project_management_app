@@ -1,3 +1,4 @@
+import { ChevronDown, User, X } from "lucide-react";
 import React, {
   Dispatch,
   SetStateAction,
@@ -8,7 +9,6 @@ import React, {
 
 import { IMultiList } from "@/types/user.types";
 import Image from "next/image";
-import { X } from "lucide-react";
 
 type Props = {
   list: IMultiList[];
@@ -19,7 +19,7 @@ type Props = {
   size?: number;
 };
 
-const MultiSelect = (props: Props) => {
+const MultiSelectUser = (props: Props) => {
   const { list, selectedList, setSelectList, placeholder, size } = props;
   const [openSelect, setOpenSelect] = useState<boolean>(false);
   // const [showList, setShowList] = useState<IList[]>([]);
@@ -60,54 +60,68 @@ const MultiSelect = (props: Props) => {
 
   return (
     <div ref={multiSelectRef} className="multi-select-box relative">
-      <button
+      <div
         onClick={() => setOpenSelect(!openSelect)}
-        className={`py-${size ?? 2} block w-full rounded border border-gray-200 bg-white px-4 text-left text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none`}
-        type="button"
+        className={`flex min-w-[200px] ${selectedList?.length > 0 ? "justify-end" : "justify-end"} gap-4 rounded bg-white p-1`}
       >
-        {selectedList?.length === 0 && (
-          <span>{placeholder ? placeholder : "Please select"}</span>
-        )}
-
         {selectedList?.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {selectedList?.map((item: IMultiList) => (
-              <div
-                className="mr-1 flex items-center gap-1 rounded-sm bg-gray-100 px-2 font-semibold text-gray-700"
-                key={item.value}
-              >
-                <span>{item.label}</span>
-                <span>
-                  <X
+              <div className="" key={item.value}>
+                {item?.icon ? (
+                  <button
+                    className="rounded-full bg-gray-200 p-1 font-semibold text-gray-700 shadow-[0_0_0_1px_#60a5fa] hover:text-red-500 hover:shadow-[0_0_0_1px_#16a34a,0_0_0_4px_white,0_0_0_6px_#16a34a]"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleSelect(item.value);
                     }}
-                    className="ml-1 h-5 w-5 font-semibold text-gray-700 hover:bg-gray-200 hover:text-red-500"
-                  />
-                </span>
+                  >
+                    <Image
+                      src={item?.icon}
+                      alt={item?.label}
+                      title={item?.label}
+                      width={20}
+                      height={20}
+                      className="flex items-center justify-center rounded-full bg-gray-200"
+                    />
+                  </button>
+                ) : (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSelect(item.value);
+                    }}
+                    title={item?.label}
+                    className="rounded-full bg-gray-200 p-1 font-semibold text-gray-700 shadow-[0_0_0_1px_#60a5fa] hover:text-red-500 hover:shadow-[0_0_0_1px_#16a34a,0_0_0_4px_white,0_0_0_6px_#16a34a]"
+                  >
+                    <User className="h-5 w-5 text-gray-500" />
+                  </button>
+                )}
               </div>
             ))}
           </div>
         )}
-      </button>
-      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-        <svg
-          className="h-4 w-4 fill-current"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 20 20"
-        >
-          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-        </svg>
+        <div className="flex items-center justify-end gap-2">
+          <div className="bg-grey-100 cursor-pointer rounded border border-gray-600 p-1 text-sm font-semibold text-gray-800">
+            {selectedList?.length}/{list?.length}
+          </div>
+          {/* <button
+            onClick={() => setOpenSelect(!openSelect)}
+            className="text-gray-700 hover:text-gray-800 focus:border-blue-300 focus:bg-white focus:outline-none"
+          >
+            <ChevronDown className="h-5 w-5" />
+          </button> */}
+        </div>
       </div>
+
       <div
-        className={`${openSelect ? "block" : "hidden"} absolute top-full z-50 mt-2 max-h-72 w-full space-y-0.5 overflow-hidden overflow-y-auto rounded-lg border border-gray-200 bg-white p-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 [&::-webkit-scrollbar]:w-2`}
+        className={`${openSelect ? "block" : "hidden"} absolute top-full z-50 mt-2 max-h-72 w-full min-w-[200px] space-y-0.5 overflow-hidden overflow-y-auto rounded-lg border border-gray-200 bg-white p-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 [&::-webkit-scrollbar]:w-2`}
       >
         {list.map((item: IMultiList) => (
           <div
             onClick={() => handleSelect(item.value)}
             key={item.value}
-            className="selected focus:outline-hidden w-full cursor-pointer rounded-lg px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 focus:bg-gray-100"
+            className="selected focus:outline-hidden w-full min-w-[200px] cursor-pointer rounded-lg px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 focus:bg-gray-100"
           >
             <div className="flex items-center">
               {item.icon && (
@@ -157,4 +171,4 @@ const MultiSelect = (props: Props) => {
   );
 };
 
-export default MultiSelect;
+export default MultiSelectUser;

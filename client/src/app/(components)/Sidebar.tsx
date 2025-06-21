@@ -3,6 +3,7 @@
 import {
   Brush,
   CalendarCog,
+  Folder,
   Home,
   LucideIcon,
   Projector,
@@ -79,7 +80,7 @@ const Sidebar = () => {
 
         <nav className="z-10 w-full">
           <SidebarLink href="/" icon={Home} title="Dashboard" />
-          <SidebarLink href="/projects" icon={Projector} title="Project" />
+          <SidebarLink href="/projects" icon={Folder} title="Project" />
           <SidebarLink href="/employees" icon={Users} title="Employees" />
           <SidebarLink href="/sprints" icon={CalendarCog} title="Sprint" />
           <SidebarLink href="/labels" icon={Brush} title="Labels" />

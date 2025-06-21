@@ -1,4 +1,3 @@
-import { ActivityAction, IActivityResponse, IUser } from "@/types/user.types";
 import React, { useEffect } from "react";
 
 import CreatePost from "./molecules/CreatePost";
@@ -13,7 +12,7 @@ const ActivityBox = () => {
   }, []);
 
   return (
-    <div className="mt-4 max-h-[300px] overflow-y-auto rounded-sm border border-gray-200 p-4">
+    <div className="max-h-[300px] overflow-y-auto rounded-sm border border-gray-200 p-4">
       {data?.data.map((item) => {
         return (
           <div

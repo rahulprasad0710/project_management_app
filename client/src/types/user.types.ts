@@ -136,7 +136,8 @@ export type ProjectStatus =
   | "STARTED"
   | "IN_PROGRESS"
   | "COMPLETED"
-  | "UNDER_REVIEW";
+  | "UNDER_REVIEW"
+  | "BACKLOG";
 
 export type Priority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL" | "BACKLOG";
 
@@ -176,6 +177,7 @@ export const projectStatusOptions: IProjectStatusOptions[] = [
   { value: "IN_PROGRESS", label: "In Progress" },
   { value: "UNDER_REVIEW", label: "Under Review" },
   { value: "COMPLETED", label: "Completed" },
+  { value: "BACKLOG", label: "Backlog" },
 ];
 
 export interface ISprintPayload {
@@ -279,5 +281,5 @@ export type IActivityResponse = {
 export type IMultiList = {
   label: string;
   value: number | string;
-  icon?: string | React.ReactNode;
+  icon?: string | undefined;
 };

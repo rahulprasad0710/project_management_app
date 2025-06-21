@@ -19,7 +19,7 @@ type Props = {
   size?: number;
 };
 
-const MultiSelect = (props: Props) => {
+const MultiSelect2 = (props: Props) => {
   const { list, selectedList, setSelectList, placeholder, size } = props;
   const [openSelect, setOpenSelect] = useState<boolean>(false);
   // const [showList, setShowList] = useState<IList[]>([]);
@@ -62,33 +62,17 @@ const MultiSelect = (props: Props) => {
     <div ref={multiSelectRef} className="multi-select-box relative">
       <button
         onClick={() => setOpenSelect(!openSelect)}
-        className={`py-${size ?? 2} block w-full rounded border border-gray-200 bg-white px-4 text-left text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none`}
+        className={`py-${size ?? 2} flex w-full justify-between gap-4 rounded border border-gray-200 bg-white px-4 text-left text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none`}
         type="button"
       >
-        {selectedList?.length === 0 && (
-          <span>{placeholder ? placeholder : "Please select"}</span>
-        )}
+        <span className="font-semibold">
+          {placeholder ? placeholder : "Please select"}
+        </span>
 
         {selectedList?.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {selectedList?.map((item: IMultiList) => (
-              <div
-                className="mr-1 flex items-center gap-1 rounded-sm bg-gray-100 px-2 font-semibold text-gray-700"
-                key={item.value}
-              >
-                <span>{item.label}</span>
-                <span>
-                  <X
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleSelect(item.value);
-                    }}
-                    className="ml-1 h-5 w-5 font-semibold text-gray-700 hover:bg-gray-200 hover:text-red-500"
-                  />
-                </span>
-              </div>
-            ))}
-          </div>
+          <span className="mr-4 bg-slate-600 px-2 font-semibold text-white">
+            {selectedList?.length}
+          </span>
         )}
       </button>
       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
@@ -157,4 +141,4 @@ const MultiSelect = (props: Props) => {
   );
 };
 
-export default MultiSelect;
+export default MultiSelect2;

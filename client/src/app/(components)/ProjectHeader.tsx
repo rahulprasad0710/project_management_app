@@ -1,17 +1,5 @@
-import {
-  Clock,
-  Filter,
-  Grid3X3,
-  List,
-  Share,
-  Share2,
-  Table,
-} from "lucide-react";
-import React, { Dispatch, SetStateAction, useState } from "react";
-
-import DarkSemiRoundedButtonWithIcon from "./ButtonWithIcon";
-import Header from "../(components)/Header";
-import Modal from "./Modal";
+import { Clock, Table } from "lucide-react";
+import React, { Dispatch, SetStateAction } from "react";
 
 type BOARD_TYPES = "BOARD" | "LIST" | "CALENDAR" | "TIMELINE" | "TABLE";
 

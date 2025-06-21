@@ -20,12 +20,13 @@ import ProjectModal from "../(components)/ProjectModal";
 import ProjectTable from "../(components)/ProjectTable";
 import SearchBar from "../(components)/molecules/SearchBar";
 import { useLazyGetProjectsQuery } from "@/store/api";
+import { useRouter } from "next/navigation";
 
 type BOARD_TYPES = "BOARD" | "LIST" | "CALENDAR" | "TIMELINE" | "TABLE";
 
 const ProjectPage = () => {
   const [fetchAllProject, { isFetching, data }] = useLazyGetProjectsQuery();
-
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<BOARD_TYPES>("TABLE");
   const [toggle, setToggle] = useState(false);
   const [keyword, setKeyword] = useState<string>("");
@@ -56,11 +57,6 @@ const ProjectPage = () => {
       status: selectedStatus.map((item) => item.value as ProjectStatus),
       priority: selectedPriority,
     });
-  };
-
-  const handleToggleModal = () => {
-    setSelectedData(undefined);
-    setToggle(!toggle);
   };
 
   const statusList: IMultiList[] = statusOptions.map((status) => {
@@ -99,6 +95,23 @@ const ProjectPage = () => {
     );
   };
 
+  const handleClearFilter = () => {
+    if (!data?.data?.pagination?.currentPage) return;
+
+    setKeyword("");
+    setSelectedPriority(undefined);
+    setSelectedStatus([]);
+    fetchAllProject({
+      isPaginationEnabled: true,
+      page: 1,
+      pageSize: 10,
+    });
+  };
+
+  const handleNavigate = () => {
+    router.push("/projects/add");
+  };
+
   return (
     <div className="container mx-auto px-4 lg:px-8 lg:pt-2 xl:max-w-7xl">
       <div className="my-4 flex items-center justify-between">
@@ -110,7 +123,7 @@ const ProjectPage = () => {
           </div>
 
           <button
-            onClick={handleToggleModal}
+            onClick={() => handleNavigate()}
             className="flex min-w-[200px] items-center rounded bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700"
           >
             <span>
@@ -120,7 +133,15 @@ const ProjectPage = () => {
           </button>
         </div>
       </div>
-      <div className="my-6 flex flex-wrap items-center justify-center gap-4 md:justify-end">
+
+      <div className="my-6 flex flex-wrap items-center justify-between gap-4 md:justify-between">
+        <button
+          type="button"
+          onClick={handleClearFilter}
+          className="focus:shadow-outline justify-start rounded bg-gray-100 px-4 py-1 font-bold text-gray-500 hover:text-gray-800"
+        >
+          Clear filter
+        </button>
         <div className="relative w-[300px]">
           <select
             onChange={(e) => setSelectedPriority(e.target.value as Priority)}
