@@ -1,8 +1,10 @@
+import { GoogleUserInfo, getGoogleUserInfo } from "../services/auth.service";
 import { NextFunction, Request, Response } from "express";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 import APP_CONSTANT from "../constants/AppConfig";
+import { User } from "../db/entity/User";
 import UserService from "../services/users.service";
-import { getGoogleUserInfo } from "../services/auth.service";
 
 const userService = new UserService();
 
@@ -19,7 +21,7 @@ const verifyToken = async (
 ): Promise<void> => {
     try {
         const authHeader = req.headers.authorization;
-        console.log("LOG: ~ authHeader:", authHeader);
+        const provider = req.headers["x-provider"];
 
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
             res.status(401).json({ success: false, message: "Unauthorized" });
@@ -37,15 +39,64 @@ const verifyToken = async (
             return;
         }
 
-        const googleUser = await getGoogleUserInfo(token);
+        let user: User | null = null;
+        if (provider !== "google") {
+            user = await verifyFromCredentials(token);
+        } else {
+            user = await verifyFromGoogle(token);
+        }
 
-        if (!googleUser) {
+        if (!user) {
             res.status(401).json({
                 success: false,
                 error: "Invalid Token",
                 data: null,
             });
             return;
+        }
+
+        req.verifiedUserId = user?.id;
+        req.verifiedUser = user;
+        next();
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: "Something Went Wrong.",
+            data: null,
+        });
+    }
+};
+
+const verifyFromCredentials = async (token: string): Promise<User | null> => {
+    try {
+        const decoded = jwt.decode(token);
+
+        if (decoded && typeof decoded === "object" && "id" in decoded) {
+            const userId = (decoded as JwtPayload & { id: string }).id;
+            console.log("User ID:", userId);
+        } else {
+            throw new Error("Invalid token payload");
+        }
+
+        const userFromDB = await userService.getById(Number(decoded.id));
+        console.log("LOG: ~ verifyFromCredentials ~ userFromDB:", userFromDB);
+
+        if (!userFromDB) {
+            return null;
+        } else {
+            return userFromDB;
+        }
+    } catch (error) {
+        throw new Error("Invalid Token");
+    }
+};
+
+const verifyFromGoogle = async (token: string): Promise<User | null> => {
+    try {
+        const googleUser = await getGoogleUserInfo(token);
+
+        if (!googleUser) {
+            return null;
         }
 
         const {
@@ -71,24 +122,12 @@ const verifyToken = async (
                 loginType: "google",
                 emailVerified: email_verified,
             });
-            console.log("LOG: ~ newUser:", newUser);
-
-            req.verifiedUserId = newUser.id;
-            req.verifiedUser = newUser;
-            next();
+            return newUser;
         } else {
-            // Attach user ID to request
-            req.verifiedUserId = verifiedUser.id;
-            req.verifiedUser = verifiedUser;
-            next();
+            return verifiedUser;
         }
     } catch (error) {
-        console.log("LOG: ~ error:", error);
-        res.status(500).json({
-            success: false,
-            error: "Something Went Wrong.",
-            data: null,
-        });
+        throw new Error("Invalid Token");
     }
 };
 

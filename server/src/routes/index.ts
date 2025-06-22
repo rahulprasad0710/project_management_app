@@ -1,10 +1,10 @@
 import { Router as ExpressRouter } from "express";
+import authRoute from "./auth.route";
 import labelRoute from "./label.route";
 import projectRoute from "./projects.route";
 import sprintRoute from "./sprint.route";
 import taskRoute from "./tasks.route";
 import uploadRoute from "./uploads.route";
-// import routes
 import usersRoute from "./users.route";
 
 export type Route = {
@@ -15,6 +15,10 @@ export type Route = {
 const router: ExpressRouter = ExpressRouter();
 
 const routes = [
+    {
+        path: "/auth",
+        route: authRoute,
+    },
     {
         path: "/users",
         route: usersRoute,

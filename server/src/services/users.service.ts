@@ -37,7 +37,14 @@ export class UserService {
 
     async getByEmail(email: string) {
         const response = await this.userRepository.findOne({
-            where: { cognitoId: email },
+            where: { email: email },
+        });
+        return response;
+    }
+
+    async getById(id: number) {
+        const response = await this.userRepository.findOne({
+            where: { id: id },
         });
         return response;
     }
