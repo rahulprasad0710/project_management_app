@@ -6,8 +6,8 @@ import React, { useEffect } from "react";
 import StoreProvider, { useAppSelector } from "@/store/StoreProvider";
 import { ToastContainer, toast } from "react-toastify";
 
-import AuthProvider from "./AuthProvider";
 import Navbar from "./(components)/Navbar";
+import { SessionProvider } from "next-auth/react";
 import Sidebar from "./(components)/Sidebar";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
@@ -40,11 +40,11 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
 const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
-    <StoreProvider>
-      <AuthProvider>
+    <SessionProvider>
+      <StoreProvider>
         <DashboardLayout>{children}</DashboardLayout>
-      </AuthProvider>
-    </StoreProvider>
+      </StoreProvider>
+    </SessionProvider>
   );
 };
 

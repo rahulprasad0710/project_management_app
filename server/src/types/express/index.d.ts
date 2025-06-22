@@ -2,6 +2,8 @@ declare global {
     namespace Express {
         interface Request {
             pagination: IPagination;
+            verifiedUserId: number;
+            verifiedUser: IUser;
         }
     }
 }

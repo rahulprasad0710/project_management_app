@@ -71,3 +71,49 @@ Audit Logs: Track user activity for compliance.
 Role-based Access Control: Fine-grained permissions.
 
 Data Backup: Auto-backup and restore options.
+
+                    ┌──────────────────────┐
+                    │    Google OAuth 2.0  │
+                    └────────┬─────────────┘
+                             │
+                             ▼
+                     [OAuth Authorization]
+                             │
+                             ▼
+                 ┌────────────────────────────┐
+                 │     Next.js Frontend App   │
+                 │   (App Router + NextAuth)  │
+                 └────────────┬───────────────┘
+                              │
+          ┌───────────────────┼────────────────────┐
+          │                   │                    │
+     Sign In UI         NextAuth API       Session Middleware
+
+(`signIn("google")`) /api/auth/[...nextauth] (`useSession()`)
+│
+Google Token + User Info
+▼
+Session stored via NextAuth (JWT or cookies)
+│
+[ Authenticated User in Browser ]
+▼
+┌──────────────────────────────┐
+│ Fetch API Call │
+│ fetch("http://localhost:5000/") │
+│ headers: { Authorization / x-user-email } │
+└──────────────────────────────┘
+│
+▼
+┌──────────────────┐
+│ Express Backend │
+└──────┬───────────┘
+▼
+┌────────────────────────────────┐
+│ JWT or user-email is validated │
+│ DB lookup or token verify │
+└──────────────┬─────────────────┘
+▼
+┌──────────────┐
+│ PostgreSQL │
+│ (or MySQL DB)│
+└──────────────┘

@@ -14,6 +14,8 @@ const APP_CONSTANT = {
     COOKIE_SECRET: process.env.COOKIE_SECRET,
     CLIENT_BASE_URL: process.env.CLIENT_BASE_URL,
     NODE_ENV: "development",
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
 };
 
 export default APP_CONSTANT;

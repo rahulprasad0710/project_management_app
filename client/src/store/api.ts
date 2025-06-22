@@ -18,7 +18,6 @@ import {
   IUploadFile,
   IUser,
   LabelPagination,
-  Pagination,
   Response,
   ResponseWithPagination,
   SprintPagination,
@@ -26,13 +25,24 @@ import {
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 import dotenv from "dotenv";
+import { getSession, } from "next-auth/react";
 
 dotenv.config();
 
 // /* REDUX API */
 
 export const api = createApi({
-  baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+    prepareHeaders: async (headers) => {
+      const session = await getSession();
+      console.log("LOG: ~ prepareHeaders: ~ session:", session);
+      if (session?.accessToken) {
+        headers.set("Authorization", `Bearer ${session.accessToken}`);
+      }
+      return headers;
+    },
+  }),
   reducerPath: "api",
   tagTypes: [
     "Users",

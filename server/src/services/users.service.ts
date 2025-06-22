@@ -25,6 +25,13 @@ export class UserService {
     async getAll() {
         return await this.userRepository.find();
     }
+
+    async getByEmail(email: string) {
+        const response = await this.userRepository.findOne({
+            where: { cognitoId: email },
+        });
+        return response;
+    }
 }
 
 export default UserService;

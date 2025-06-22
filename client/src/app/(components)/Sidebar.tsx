@@ -84,6 +84,7 @@ const Sidebar = () => {
           <SidebarLink href="/employees" icon={Users} title="Employees" />
           <SidebarLink href="/sprints" icon={CalendarCog} title="Sprint" />
           <SidebarLink href="/labels" icon={Brush} title="Labels" />
+          <SidebarLink href="/login" icon={Brush} title="Login" />
         </nav>
       </div>
     </div>

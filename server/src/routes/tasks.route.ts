@@ -2,6 +2,8 @@ import { Router as ExpressRouter } from "express";
 import applyPagination from "../middlewares/applyPagination";
 import commentController from "../controllers/comments.controller";
 import taskController from "../controllers/task.controller";
+import verifyToken from "../middlewares/authentication";
+
 const router = ExpressRouter();
 
 router.post("", taskController.create);
@@ -9,7 +11,7 @@ router.get("", applyPagination, taskController.getAll);
 router.get("/:taskId/activities", taskController.getActivityByTaskId);
 
 router.put("/status/:taskId", taskController.updateStatus);
-router.get("/:id", taskController.getById);
+router.get("/:id", verifyToken, taskController.getById);
 // COMMENTS
 router.post("/:taskId/comments", commentController.addComment);
 router.get(
