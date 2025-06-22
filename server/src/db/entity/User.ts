@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 import { Notification } from "./Notification";
+import bcrypt from "bcryptjs";
 
 @Entity()
 export class User {
@@ -44,4 +45,7 @@ export class User {
 
     @Column({ nullable: true })
     profilePictureUrl: string;
+
+    @Column({ nullable: true })
+    password: string;
 }

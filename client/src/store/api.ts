@@ -39,6 +39,7 @@ export const api = createApi({
       console.log("LOG: ~ prepareHeaders: ~ session:", session);
       if (session?.accessToken) {
         headers.set("Authorization", `Bearer ${session.accessToken}`);
+        headers.set("x-provider", session.provider);
       }
       return headers;
     },

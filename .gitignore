@@ -6,3 +6,5 @@ client/.env
 server/.env
 client/.next/
 server/testData/
+config.bat
+node_modules
