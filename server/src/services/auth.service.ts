@@ -1,5 +1,9 @@
 // src/services/googleAuth.service.ts
 
+import UserService from "./users.service";
+
+const userService = new UserService();
+
 export interface GoogleUserInfo {
     sub: string; // Google user ID
     name: string;
@@ -13,9 +17,6 @@ export interface GoogleUserInfo {
 export const getGoogleUserInfo = async (
     accessToken: string
 ): Promise<GoogleUserInfo | null | undefined> => {
-    console.log({
-        accessToken,
-    });
     try {
         const res = await fetch(
             "https://www.googleapis.com/oauth2/v3/userinfo",
@@ -28,8 +29,6 @@ export const getGoogleUserInfo = async (
 
         const data = await res.json();
 
-        console.log("LOG: ~ data:", data);
-
         if (!data.email) {
             return null;
         }
@@ -40,3 +39,32 @@ export const getGoogleUserInfo = async (
         return null;
     }
 };
+
+export const loginWithCredentials = async (email: string, password: string) => {
+    try {
+        const userFromDB = await userService.getByEmail(email);
+
+        // if (!userFromDB) {
+        //     return null;
+        // }
+
+        // const isPasswordCorrect = await userFromDB.checkPassword(password);
+
+        // if (!isPasswordCorrect) {
+        //     return null;
+        // }
+
+        return userFromDB;
+    } catch (error) {
+        console.log("LOG: ~ error:", error);
+        return null;
+    }
+};
+
+// async checkPassword(enteredPassword: string) {
+//     const isPasswordCorrect = await bcrypt.compare(
+//         enteredPassword,
+//         this.password
+//     );
+//     return isPasswordCorrect;
+// }

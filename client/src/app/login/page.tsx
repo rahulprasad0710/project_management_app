@@ -1,70 +1,63 @@
 "use client";
 
+import * as yup from "yup";
+
+import { SubmitHandler, useForm } from "react-hook-form";
 import { signIn, useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+
+import Spinner from "../(components)/Spinner";
+import { toast } from "react-toastify";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+interface IFormInput {
+  email: string;
+  password: string;
+}
+
+interface ILoginPayload {
+  email: string;
+  password: string;
+}
 
 export default function LoginPage() {
   const { data: session, status } = useSession();
-  console.log("LOG: ~ LoginPage ~ session:", session);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
-  const syncUserWithBackend = async () => {
-    if (status !== "authenticated" || !session?.user?.email) return;
-    try {
-      // 1. Check if user exists
-      const checkRes = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/check`,
-        {
-          method: "GET",
-          headers: {
-            "x-user-email": session.user.email,
-          },
-        },
-      );
+  const schema = yup.object().shape({
+    email: yup.string().required("Email is required"),
+    password: yup.string().required("Password is required"),
+  });
 
-      if (checkRes.status === 404) {
-        // 2. If not found, create the user
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/users`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              name: session.user.name,
-              email: session.user.email,
-              profilePicture: session.user.image,
-            }),
-          },
-        );
-
-        console.log("✅ User created on backend");
-      } else {
-        console.log("✅ User already exists");
-      }
-    } catch (error) {
-      console.error("Error syncing user with backend", error);
-    }
+  const defaultValues: IFormInput = {
+    email: "",
+    password: "",
   };
 
-  useEffect(() => {
-    syncUserWithBackend();
-  }, [session, status]);
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<IFormInput>({
+    defaultValues: defaultValues,
+    resolver: yupResolver(schema),
+  });
 
-  const handleEmailLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleEmailLogin: SubmitHandler<IFormInput> = async (data) => {
+    console.log(data);
 
-    const res = await fetch("http://localhost:5000/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+    // const payload: ILoginPayload = {
+    //   email: data.email,
+    //   password: data.password,
+    // };
+
+    const result = await signIn("credentials", {
+      redirect: false,
+      email: data.email,
+      password: data.password,
     });
 
-    const data = await res.json();
-    console.log("Login response:", data);
-    // Save token or redirect as needed
+    console.log({
+      result,
+    });
   };
 
   const handleSigninWithGoogle = async (e: React.FormEvent) => {
@@ -98,13 +91,12 @@ export default function LoginPage() {
             <span className="mx-2 text-sm">OR</span>
             <hr className="flex-1 border-gray-200" />
           </div>
-          <form onSubmit={handleEmailLogin} className="space-y-4">
+          <form onSubmit={handleSubmit(handleEmailLogin)} className="space-y-4">
             <input
               type="email"
               placeholder="Email"
               className="w-full rounded border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              {...register("email", { required: true })}
               required
             />
 
@@ -112,15 +104,14 @@ export default function LoginPage() {
               type="password"
               placeholder="Password"
               className="w-full rounded border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              {...register("password", { required: true })}
               required
             />
-
             <button
-              type="submit"
-              className="w-full rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+              disabled={isSubmitting}
+              className={` ${isSubmitting ? "opacity-50" : ""} focus:shadow-outline w-full rounded bg-blue-500 bg-blue-600 px-4 px-8 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none`}
             >
+              {!!isSubmitting && <Spinner />}
               Sign in with Email
             </button>
           </form>
