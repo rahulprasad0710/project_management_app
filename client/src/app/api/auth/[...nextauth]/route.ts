@@ -12,17 +12,19 @@ const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
 
   callbacks: {
-    async jwt({ token, account, profile }) {
+    async jwt({ token, account, trigger }) {
       if (account) {
         token.accessToken = account.access_token;
-        token.id_token = account.id_token;
+        // token.id_token = account.id_token;
+        token.LoginType = "google";
+        token.trigger = trigger;
       }
       return token;
     },
     async session({ session, token }) {
       session.user = token;
       session.accessToken = token.accessToken;
-      session.user.id = token.id;
+      // session.id_token = token.id_token;
       return session;
     },
   },

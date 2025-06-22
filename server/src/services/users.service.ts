@@ -6,6 +6,10 @@ interface IUser {
     lastName: string;
     username: string;
     cognitoId: string;
+    email: string;
+    loginType: string;
+    emailVerified: boolean;
+    profilePictureUrl: string;
 }
 
 export class UserService {
@@ -19,6 +23,11 @@ export class UserService {
         userObj.lastName = user.lastName;
         userObj.username = user.username;
         userObj.cognitoId = user.cognitoId;
+        userObj.email = user.email;
+        userObj.loginType = user.loginType;
+        userObj.emailVerified = user.emailVerified;
+        userObj.profilePictureUrl = user.profilePictureUrl;
+
         return await this.userRepository.save(userObj);
     }
 

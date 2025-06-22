@@ -4,8 +4,19 @@ import { Notification } from "./Notification";
 
 @Entity()
 export class User {
+    constructor() {
+        this.createdAt = new Date();
+        this.isActive = true;
+    }
+
     @PrimaryGeneratedColumn()
     id: number;
+
+    @Column({ unique: true })
+    email: string;
+
+    @Column()
+    cognitoId: string;
 
     @Column()
     firstName: string;
@@ -19,14 +30,18 @@ export class User {
     @OneToMany(() => Notification, (notification) => notification.recipient)
     notifications: Notification[];
 
-    // @Column({ unique: true })
-    // email: string;
-
-    @Column({
-        default: null,
-    })
-    profilePictureUrl: string;
+    @Column()
+    loginType: string;
 
     @Column()
-    cognitoId: string;
+    emailVerified: boolean;
+
+    @Column()
+    isActive: boolean;
+
+    @Column()
+    createdAt: Date;
+
+    @Column({ nullable: true })
+    profilePictureUrl: string;
 }
