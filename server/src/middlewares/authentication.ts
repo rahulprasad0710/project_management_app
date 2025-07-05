@@ -94,6 +94,7 @@ const verifyFromCredentials = async (token: string): Promise<User | null> => {
 const verifyFromGoogle = async (token: string): Promise<User | null> => {
     try {
         const googleUser = await getGoogleUserInfo(token);
+        console.log("LOG: ~ verifyFromGoogle ~ googleUser:", googleUser)
 
         if (!googleUser) {
             return null;

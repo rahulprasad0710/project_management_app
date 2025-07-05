@@ -211,7 +211,7 @@ const ProjectModal = (props: Props) => {
   };
 
   return (
-    <div className="container mx-auto mt-4 px-4 pt-4 shadow-sm lg:px-8 lg:pt-2 xl:max-w-7xl">
+    <div className="container mx-auto my-4 bg-white px-4 pt-4 shadow-sm lg:px-8 lg:pt-2 xl:max-w-7xl">
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center">
           {selectedData?.id ? (

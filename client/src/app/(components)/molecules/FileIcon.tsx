@@ -19,6 +19,7 @@ interface Props {
   showDownloadButton?: boolean;
   showDeleteButton?: boolean;
   url?: string;
+  index: number;
 }
 
 const getFileIcon = (extension: string) => {
@@ -61,6 +62,7 @@ export const FileComment: React.FC<Props> = ({
   showDownloadButton,
   showDeleteButton,
   url,
+  index,
 }) => {
   const extension = fileName.split(".").pop()?.toLowerCase() || "";
 
@@ -79,6 +81,9 @@ export const FileComment: React.FC<Props> = ({
   return (
     <div className="mb-1 flex items-center justify-between gap-4 rounded-md border border-gray-200 bg-gray-50 p-2 text-sm text-gray-700">
       <div className="gpa-2 flex items-center">
+        <span className="mr-2 bg-slate-100 px-2 font-semibold text-slate-800">
+          {index}
+        </span>
         {showDownloadButton && (
           <button
             title="Download"

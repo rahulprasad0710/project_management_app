@@ -6,6 +6,7 @@ import React, { useEffect } from "react";
 import StoreProvider, { useAppSelector } from "@/store/StoreProvider";
 import { ToastContainer, toast } from "react-toastify";
 
+import MainNavbar from "./(components)/MainNavbar";
 import Navbar from "./(components)/Navbar";
 import { SessionProvider } from "next-auth/react";
 import Sidebar from "./(components)/Sidebar";
@@ -31,7 +32,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       <main
         className={`flex w-full flex-col bg-gray-50 ${isSidebarCollapsed ? "" : "md:pl-64"}`}
       >
-        <Navbar />
+        {/* <Navbar /> */}
+        <MainNavbar />
         <div>{children}</div>
       </main>
     </div>

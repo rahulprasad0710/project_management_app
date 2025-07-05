@@ -36,6 +36,11 @@ const Dropzone = ({ files, setFiles, OldFiles, setOldFiles }: FileProps) => {
     setOldFiles(temp);
   };
 
+  const handleDeleteFile = (index: number) => {
+    const updatedFiles = files.filter((_, idx) => idx !== index);
+    setFiles(updatedFiles);
+  };
+
   return (
     <div>
       {files.length === 0 && (
@@ -45,7 +50,7 @@ const Dropzone = ({ files, setFiles, OldFiles, setOldFiles }: FileProps) => {
           onClick={() => inputRef.current?.click()}
           className="flex w-full items-center justify-center bg-white"
         >
-          <label className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100">
+          <label className="flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100">
             <div className="flex flex-col items-center justify-center pb-6 pt-5">
               <svg
                 className="mb-3 h-10 w-10 text-gray-400"
@@ -81,35 +86,41 @@ const Dropzone = ({ files, setFiles, OldFiles, setOldFiles }: FileProps) => {
         </div>
       )}
 
-      {files.length > 0 && (
-        <ul className="mt-4 cursor-pointer flex-wrap gap-6 rounded bg-gray-100 px-4 py-2 text-sm text-gray-700">
-          {files.map((file, idx) => (
-            <li key={idx}>
-              <FileComment
-                showDeleteButton={true}
-                showDownloadButton={false}
-                handleClick={() => {}}
-                fileName={file.name}
-              />
-            </li>
-          ))}
-        </ul>
-      )}
+      <div>
+        {files.length > 0 && (
+          <ul className="grid-col-1 grid cursor-pointer gap-2 rounded bg-gray-100 px-4 py-2 text-sm text-gray-700 md:grid-cols-2">
+            {files.map((file, idx) => (
+              <li key={idx}>
+                <FileComment
+                  index={idx + 1}
+                  showDeleteButton={true}
+                  showDownloadButton={false}
+                  handleClick={() => handleDeleteFile(idx)}
+                  fileName={file.name}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
 
-      <ul className="mt-4 cursor-pointer flex-wrap gap-6 rounded bg-gray-100 px-4 py-2 text-sm text-gray-700">
-        {OldFiles?.length > 0 &&
-          OldFiles?.map((file) => (
-            <li key={file.id}>
-              <FileComment
-                url={file.backendUrl}
-                showDeleteButton={true}
-                showDownloadButton={true}
-                handleClick={() => handleDeleteOldFiles(file.id)}
-                fileName={file.originalname}
-              />
-            </li>
-          ))}
-      </ul>
+        {OldFiles?.length > 0 && (
+          <ul className="grid-col-1 grid cursor-pointer gap-2 rounded bg-gray-100 px-4 py-2 text-sm text-gray-700 md:grid-cols-2">
+            {OldFiles?.length > 0 &&
+              OldFiles?.map((file, index: number) => (
+                <li key={file.id}>
+                  <FileComment
+                    index={index + 1}
+                    url={file.backendUrl}
+                    showDeleteButton={true}
+                    showDownloadButton={true}
+                    handleClick={() => handleDeleteOldFiles(file.id)}
+                    fileName={file.originalname}
+                  />
+                </li>
+              ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };

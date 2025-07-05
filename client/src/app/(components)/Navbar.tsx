@@ -9,7 +9,7 @@ import { setIsSidebarCollapsed } from "@/store";
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   const [isNotificationsOpen, setNotificationsOpen] = useState(false);
   const [isUserMenuOpen, setUserMenuOpen] = useState(false);
@@ -18,11 +18,16 @@ const Navbar = () => {
     (state) => state.global.isSidebarCollapsed,
   );
 
+  console.log({
+    session,
+  });
+
   return (
     <header className="bg-white shadow-sm">
       <nav className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8" aria-label="Top">
         <div className="flex h-16 items-center justify-between">
           {/* Left section: Logo + Nav */}
+          {status}
           <div className="flex items-center">
             <div className="flex-shrink-0">LOGO</div>
             <div className="hidden lg:ml-10 lg:flex lg:space-x-8">
