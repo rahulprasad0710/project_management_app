@@ -17,7 +17,7 @@ const Dropzone = ({ files, setFiles, OldFiles, setOldFiles }: FileProps) => {
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const droppedFiles = Array.from(e.dataTransfer.files);
-    setFiles(droppedFiles);
+    setFiles((prevFiles) => [...prevFiles, ...droppedFiles]);
   };
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
@@ -42,15 +42,19 @@ const Dropzone = ({ files, setFiles, OldFiles, setOldFiles }: FileProps) => {
   };
 
   return (
-    <div>
-      {files.length === 0 && (
+    <div
+      className={
+        files.length === 0 ? "grid grid-cols-1 gap-4" : "grid grid-cols-1 gap-4"
+      }
+    >
+      <div>
         <div
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onClick={() => inputRef.current?.click()}
           className="flex w-full items-center justify-center bg-white"
         >
-          <label className="flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100">
+          <label className="flex h-48 min-h-48 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100">
             <div className="flex flex-col items-center justify-center pb-6 pt-5">
               <svg
                 className="mb-3 h-10 w-10 text-gray-400"
@@ -84,7 +88,7 @@ const Dropzone = ({ files, setFiles, OldFiles, setOldFiles }: FileProps) => {
             />
           </label>
         </div>
-      )}
+      </div>
 
       <div>
         {files.length > 0 && (

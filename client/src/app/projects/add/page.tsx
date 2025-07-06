@@ -30,6 +30,7 @@ import Dropzone from "../../(components)/Dropzone";
 import { Editor } from "@tiptap/react";
 import GoBackButton from "@/app/(components)/molecules/BackButton";
 import MultiSelect from "../../(components)/atoms/MultiSelect";
+import MultiSelectUser from "@/app/(components)/atoms/MultiSelectUser";
 import Spinner from "../../(components)/Spinner";
 import TextEditor from "../../(components)/TextEditor";
 import { toast } from "react-toastify";
