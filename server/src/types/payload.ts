@@ -42,5 +42,5 @@ export interface IUpdateTaskPayload extends ITask {
 
 export interface IProjectPagination extends IPagination {
     status?: ProjectStatus[] | undefined;
-    priority?: Priority | undefined;
+    priority?: Priority[] | undefined;
 }

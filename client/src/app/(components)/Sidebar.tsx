@@ -62,7 +62,7 @@ const Sidebar = () => {
     (state) => state.global.isSidebarCollapsed,
   );
 
-  const sidebarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-xl border-y-[1.5px] border-y-[1.5px] border-gray-100
+  const sidebarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-md  border-x-[1.5px] border-gray-100
     transition-all duration-300 h-full z-40  overflow-y-auto bg-white
     ${isSidebarCollapsed ? "w-0  " : "w-64"}
   `;

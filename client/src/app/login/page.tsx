@@ -5,6 +5,7 @@ import * as yup from "yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { signIn, useSession } from "next-auth/react";
 
+import Google from "../(components)/icons/Google";
 import Spinner from "../(components)/Spinner";
 import { toast } from "react-toastify";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -72,7 +73,7 @@ export default function LoginPage() {
 
   return (
     <div>
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-100 to-white px-4">
+      <div className="flex h-[calc(100vh-60px)] items-center justify-center bg-gradient-to-br from-blue-100 to-white px-4">
         <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-xl">
           <h1 className="mb-6 text-center text-2xl font-bold text-gray-800">
             Sign In to Your Account
@@ -80,10 +81,13 @@ export default function LoginPage() {
 
           <button
             onClick={(e) => handleSigninWithGoogle(e)}
-            className="flex w-full items-center justify-center gap-2 rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+            className="text-md flex w-full items-center justify-start gap-16 rounded border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 hover:bg-gray-100"
           >
-            {/* <FcGoogle size={20} /> */}
-            Sign in with Google
+            <span className="text-center">
+              <Google size={30} />
+            </span>
+
+            <span className="">Sign in with Google</span>
           </button>
 
           <div className="my-6 flex items-center justify-center text-gray-500">

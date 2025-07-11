@@ -28,13 +28,12 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="test-gray-900 flex min-h-screen bg-gray-100">
       <ToastContainer />
-      <Sidebar />
-      <main
-        className={`flex w-full flex-col bg-gray-50 ${isSidebarCollapsed ? "" : "md:pl-64"}`}
-      >
-        {/* <Navbar /> */}
+      <main className={`flex w-full flex-col bg-gray-50`}>
         <MainNavbar />
-        <div>{children}</div>
+        <div className="relative mt-[60px]">
+          <Sidebar />
+          <div>{children}</div>
+        </div>
       </main>
     </div>
   );

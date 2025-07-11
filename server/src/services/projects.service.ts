@@ -1,9 +1,9 @@
+import { ILike, In, Like } from "typeorm";
 import {
     IProject,
     IProjectPagination,
     IUpdateProjectPayload,
 } from "../types/payload";
-import { In, Like } from "typeorm";
 import UploadService, { IUploadFileURL } from "./upload.service";
 
 import { IPagination } from "../types/express";
@@ -74,8 +74,8 @@ export class ProjectService {
             },
             where: {
                 ...(status ? { status: In(status) } : {}),
-                ...(priority ? { priority } : {}),
-                ...(keyword ? { name: Like(`%${keyword}%`) } : {}),
+                ...(priority ? { status: In(priority) } : {}),
+                ...(keyword ? { name: ILike(`%${keyword}%`) } : {}),
             },
         });
         const totalCount = await this.projectRepository.count();

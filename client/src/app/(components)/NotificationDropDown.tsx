@@ -4,7 +4,7 @@ const NotificationDropDown = () => {
   return (
     <div
       aria-labelledby="dropdown-notifications"
-      className="absolute -end-20 z-10 mt-2 w-64 rounded-lg shadow-xl lg:w-80 ltr:origin-top-right rtl:origin-top-left"
+      className="absolute -end-20 z-10 mt-2 w-[24rem] rounded-lg shadow-xl lg:w-80 ltr:origin-top-right rtl:origin-top-left"
     >
       <div className="rounded-lg bg-white py-2.5 ring-1 ring-black/5">
         <a

@@ -70,13 +70,6 @@ const getAll = async (req: Request, res: Response) => {
         const { skip, take, keyword, isPaginationEnabled }: IPagination =
             req.pagination;
 
-        console.log({
-            skip,
-            take,
-            keyword,
-            isPaginationEnabled,
-        });
-
         const rawStatus = normalizeToString(req.query.status);
 
         const isValidStatus = (val: string): val is ProjectStatus => {
@@ -98,9 +91,17 @@ const getAll = async (req: Request, res: Response) => {
             return Object.values(Priority).includes(val as Priority);
         };
 
-        const priorityQuery: Priority | undefined = isValidPriority(rawPriority)
-            ? (rawPriority as Priority)
-            : undefined;
+        let priorityArray: Priority[] | undefined = undefined;
+
+        if (Array.isArray(rawPriority)) {
+            const filtered = rawPriority.filter(isValidPriority);
+            priorityArray = filtered.length ? filtered : undefined;
+        } else if (
+            typeof rawPriority === "string" &&
+            isValidPriority(rawPriority)
+        ) {
+            priorityArray = [rawPriority];
+        }
 
         const users = await projectService.getAll({
             skip,
@@ -108,7 +109,7 @@ const getAll = async (req: Request, res: Response) => {
             keyword,
             isPaginationEnabled,
             status: statusArray,
-            priority: priorityQuery,
+            priority: priorityArray,
         });
         res.status(200).json({
             success: true,
