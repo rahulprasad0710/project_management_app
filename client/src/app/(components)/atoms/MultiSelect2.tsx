@@ -8,10 +8,11 @@ import React, {
 
 import { IMultiList } from "@/types/user.types";
 import Image from "next/image";
-import { X } from "lucide-react";
 
 type Props = {
   list: IMultiList[];
+  selectedIds: string[];
+  setSelectIds: Dispatch<SetStateAction<string[]>>;
   selectedList: IMultiList[];
   setSelectList: Dispatch<SetStateAction<IMultiList[]>>;
   placeholder?: string;
@@ -20,7 +21,15 @@ type Props = {
 };
 
 const MultiSelect2 = (props: Props) => {
-  const { list, selectedList, setSelectList, placeholder, size } = props;
+  const {
+    list,
+    selectedList,
+    setSelectList,
+    placeholder,
+    size,
+    selectedIds,
+    setSelectIds,
+  } = props;
   const [openSelect, setOpenSelect] = useState<boolean>(false);
   // const [showList, setShowList] = useState<IList[]>([]);
   const multiSelectRef = useRef(null);
@@ -32,10 +41,13 @@ const MultiSelect2 = (props: Props) => {
 
     if (isItemAlreadyPresent) {
       const temp = selectedList.filter((item) => item.value !== valueSelected);
+      const tempIds = selectedIds.filter((item) => item !== valueSelected);
+      setSelectIds(tempIds);
       setSelectList(temp);
     } else {
       const temp = list.find((item) => item.value === valueSelected);
-
+      const tempIds = [...selectedIds, String(valueSelected)];
+      setSelectIds(tempIds);
       if (temp) {
         setSelectList([...selectedList, temp]);
       }

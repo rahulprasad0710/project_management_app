@@ -3,21 +3,22 @@
 // PAGE_TASK_LIST
 import { Edit, SquarePlus } from "lucide-react";
 import {
+  ILabelResponse,
   IMultiList,
   IPriorityOptions,
   Priority,
   priorityOptions,
   statusOptions,
 } from "@/types/user.types";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useGetLabelsQuery,
   useGetProjectByIdQuery,
   useGetUsersQuery,
 } from "@/store/api";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import BoardView from "@/app/(components)/BoardView";
-import DateRange from "@/app/(components)/atoms/DateRangeComponent";
 import Header from "@/app/(components)/Header";
 import Modal from "@/app/(components)/Modal";
 import MultiSelect2 from "@/app/(components)/atoms/MultiSelect2";
@@ -27,18 +28,23 @@ import SearchBar from "@/app/(components)/molecules/SearchBar";
 import TableView from "@/app/(components)/TableView";
 import TaskModal from "@/app/(components)/modals/TaskModal";
 import TimelineView from "@/app/(components)/TimelineView";
+import { useGetQueryParams } from "@/app/utils/urlSearchParamsFn";
 import { useParams } from "next/navigation";
 
 type BOARD_TYPES = "BOARD" | "LIST" | "CALENDAR" | "TIMELINE" | "TABLE";
 
 const ProjectDetails = () => {
   const { id } = useParams();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<BOARD_TYPES>("BOARD");
   const [keyword, setKeyword] = useState<string>("");
-  const [selectedStatus, setSelectedStatus] = useState<IMultiList[]>([]);
+  const [selectedLabels, setSelectedLabels] = useState<IMultiList[]>([]);
+  const [selectedLabelsIds, setSelectedLabelsIds] = useState<string[]>([]);
+  const [selectedPriorityIds, setSelectedPriorityIds] = useState<string[]>([]);
   const [selectedPriority, setSelectedPriority] = useState<IMultiList[]>([]);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState<boolean>(false);
-  const { data: labelList } = useGetLabelsQuery({
+
+  const { data: labelList, isFetching: isLabelFetching } = useGetLabelsQuery({
     isPaginationEnabled: false,
     page: 1,
     pageSize: 10,
@@ -47,14 +53,12 @@ const ProjectDetails = () => {
   const { data: projectResponse, isLoading } = useGetProjectByIdQuery({
     projectId: Number(id),
   });
-
   const { isFetching: isUserFetching, data: userList } = useGetUsersQuery();
-
   const [selectedTeamMember, setSelectedTeamMember] = useState<IMultiList[]>(
     [],
   );
 
-  const statusList: IMultiList[] = labelList?.data?.result?.map((status) => {
+  const statusList = labelList?.data?.result?.map((status) => {
     return {
       label: status.name as string,
       value: String(status.id) as string,
@@ -71,15 +75,8 @@ const ProjectDetails = () => {
   const handleClearFilter = () => {
     setKeyword("");
     setSelectedPriority([]);
-    setSelectedStatus([]);
-    // fetchAllProject({
-    //   isPaginationEnabled: true,
-    //   page: 1,
-    //   pageSize: 10,
-    //   keyword: keyword,
-    //   status: selectedStatus.map((item) => item.value as ProjectStatus),
-    //   priority: selectedPriority,
-    // });
+    setSelectedLabels([]);
+    setSelectedTeamMember([]);
   };
 
   const handleSearch = () => {
@@ -96,6 +93,28 @@ const ProjectDetails = () => {
   const handleToggleProjectModal = () => {
     setIsTaskModalOpen(!isTaskModalOpen);
   };
+
+  const isLabelUrlValueSet = useGetQueryParams<ILabelResponse>({
+    urlDataName: "labels",
+    dataToFetchDataFrom: labelList?.data?.result,
+    setSelectedIds: setSelectedLabelsIds,
+    selectedIds: selectedLabelsIds,
+    setMultiSelectList: setSelectedLabels,
+    labelKey: "name",
+    isDataLoading: isLabelFetching,
+    router,
+  });
+
+  const isPriorityUrlValueSet = useGetQueryParams<IPriorityOptions>({
+    urlDataName: "priority",
+    dataToFetchDataFrom: priorityOptions,
+    setSelectedIds: setSelectedPriorityIds,
+    selectedIds: selectedPriorityIds,
+    setMultiSelectList: setSelectedPriority,
+    labelKey: "label",
+    isDataLoading: isLabelFetching,
+    router,
+  });
 
   if (isLoading)
     return (
@@ -155,17 +174,21 @@ const ProjectDetails = () => {
           </div>
           <div className="relative w-[200px]">
             <MultiSelect2
-              list={statusList}
+              list={statusList || []}
               size={1}
+              setSelectIds={setSelectedLabelsIds}
+              selectedIds={selectedLabelsIds}
               placeholder="Labels"
-              selectedList={selectedStatus}
-              setSelectList={setSelectedStatus}
+              selectedList={selectedLabels}
+              setSelectList={setSelectedLabels}
             />
           </div>
           <div className="relative w-[200px]">
             <MultiSelect2
               list={priorityList}
               size={1}
+              setSelectIds={setSelectedPriorityIds}
+              selectedIds={selectedPriorityIds}
               placeholder="Priority"
               selectedList={selectedPriority}
               setSelectList={setSelectedPriority}

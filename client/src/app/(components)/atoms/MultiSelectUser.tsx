@@ -13,6 +13,7 @@ import Image from "next/image";
 type Props = {
   list: IMultiList[];
   selectedList: IMultiList[];
+
   setSelectList: Dispatch<SetStateAction<IMultiList[]>>;
   placeholder?: string;
   required?: boolean;

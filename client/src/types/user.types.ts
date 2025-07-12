@@ -144,13 +144,14 @@ export type Priority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL" | "BACKLOG";
 export interface IPriorityOptions {
   value: Priority;
   label: string;
+  id: string;
 }
 export const priorityOptions: IPriorityOptions[] = [
-  { value: "LOW", label: "Low" },
-  { value: "MEDIUM", label: "Medium" },
-  { value: "HIGH", label: "High" },
-  { value: "CRITICAL", label: "Critical" },
-  { value: "BACKLOG", label: "Backlog" },
+  { id: "LOW", value: "LOW", label: "Low" },
+  { id: "MEDIUM", value: "MEDIUM", label: "Medium" },
+  { id: "HIGH", value: "HIGH", label: "High" },
+  { id: "CRITICAL", value: "CRITICAL", label: "Critical" },
+  { id: "BACKLOG", value: "BACKLOG", label: "Backlog" },
 ];
 
 export interface IStatusOptions {
