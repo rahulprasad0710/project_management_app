@@ -25,6 +25,7 @@ import MultiSelectUser from "@/app/(components)/atoms/MultiSelectUser";
 import ProjectHeader from "@/app/(components)/ProjectHeader";
 import SearchBar from "@/app/(components)/molecules/SearchBar";
 import TableView from "@/app/(components)/TableView";
+import TaskDetailModal from "@/app/(components)/modals/TaskDetailModal";
 import TaskModal from "@/app/(components)/modals/TaskModal";
 import TimelineView from "@/app/(components)/TimelineView";
 import { setRefetchProjectTaskList } from "@/store";
@@ -274,6 +275,7 @@ const ProjectDetails = () => {
       >
         <TaskModal onClose={() => setIsTaskModalOpen(false)} />
       </Modal>
+      <TaskDetailModal />
     </div>
   );
 };

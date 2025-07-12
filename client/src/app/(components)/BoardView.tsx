@@ -5,15 +5,13 @@ import {
   useDrag,
   useDrop,
 } from "react-dnd";
-import { Edit, EllipsisVertical, TicketCheck } from "lucide-react";
-import React, { useState } from "react";
+import { EllipsisVertical, TicketCheck } from "lucide-react";
 import { ResponseWithPagination, TaskStatus } from "@/types/user.types";
+import { setIsTaskDetailsModalOpen, setTaskDetailsData } from "@/store";
 
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { ITask } from "@/types/user.types";
-import Modal from "./Modal";
 import PriorityTag from "./molecules/PriorityTag";
-import TaskDetails from "./TaskDetails";
 import UserAvatar from "./molecules/UserAvatar";
 import { setRefetchProjectTaskList } from "@/store";
 import { toast } from "react-toastify";
@@ -38,7 +36,6 @@ const taskStatus: TaskStatus[] = [
 
 const BoardView = (props: IProps) => {
   const dispatch = useAppDispatch();
-
   const { projectTasks, setIsTaskModalOpen, isTaskModalOpen } = props;
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
   const tasksList = projectTasks?.data?.result || [];
@@ -145,14 +142,7 @@ const TaskColumn = (props: TaskColumnProps) => {
         {tasks
           .filter((task) => task.status === status)
           .map((task: ITask) => {
-            return (
-              <TaskItem
-                setIsTaskModalOpen={setIsTaskModalOpen}
-                isTaskModalOpen={isTaskModalOpen}
-                key={task.id}
-                task={task}
-              />
-            );
+            return <TaskItem key={task.id} task={task} />;
           })}
       </div>
     </div>
@@ -161,16 +151,11 @@ const TaskColumn = (props: TaskColumnProps) => {
 
 type TaskItemProps = {
   task: ITask;
-  isTaskModalOpen: boolean;
-  setIsTaskModalOpen: (isOpen: boolean) => void;
 };
 
 const TaskItem = (props: TaskItemProps) => {
-  const { task, setIsTaskModalOpen } = props;
-
-  const [toggle, setToggle] = useState<boolean>(false);
-  const [selectedData, setSelectedData] = useState<undefined | ITask>();
-
+  const dispatch = useAppDispatch();
+  const { task } = props;
   const [{ isDragging }, dragRef] = useDrag(() => ({
     type: "task",
     item: { id: task.id },
@@ -180,14 +165,8 @@ const TaskItem = (props: TaskItemProps) => {
   }));
 
   const handleOpenTaskDetails = (data: ITask) => {
-    setSelectedData(data);
-    setToggle(true);
-  };
-
-  const handleEdit = (data: ITask) => {
-    setSelectedData(data);
-    setToggle(false);
-    setIsTaskModalOpen(true);
+    dispatch(setTaskDetailsData(data));
+    dispatch(setIsTaskDetailsModalOpen(true));
   };
 
   return (
@@ -220,31 +199,6 @@ const TaskItem = (props: TaskItemProps) => {
           </div>
         </div>
       </div>
-      <Modal
-        isOpen={toggle}
-        onClose={() => setToggle(false)}
-        modalTitleChildren={
-          <div className="flex items-center gap-4">
-            {/* <TicketCheck className="text-blue-600" /> */}
-
-            <h2 className="ml-2 text-xl font-semibold text-gray-800">
-              {task.taskNumber}
-            </h2>
-            <button
-              type="button"
-              onClick={() => handleEdit(task)}
-              className="flex h-6 w-6 items-center justify-center rounded bg-gray-100"
-            >
-              <Edit className="h-4 w-4 text-blue-500 hover:text-blue-600" />
-            </button>
-          </div>
-        }
-      >
-        <TaskDetails
-          setSelectedData={setSelectedData}
-          selectedData={selectedData}
-        />
-      </Modal>
     </div>
   );
 };
