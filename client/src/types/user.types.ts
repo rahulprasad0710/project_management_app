@@ -30,6 +30,13 @@ export interface IProjectPagination extends Pagination {
   priority?: Priority | undefined;
 }
 
+export interface IProjectTaskPagination extends Pagination {
+  priority?: string[] | undefined;
+  labels?: string[] | undefined;
+  assignedTo?: string[] | undefined;
+  projectId: number;
+}
+
 export interface SprintPagination extends Pagination {
   isActive: boolean;
 }

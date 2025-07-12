@@ -9,6 +9,7 @@ import {
   ILabelUpdatePayload,
   IProject,
   IProjectPagination,
+  IProjectTaskPagination,
   ISprintPayload,
   ISprintResponse,
   ISprintUpdatePayload,
@@ -53,6 +54,7 @@ export const api = createApi({
     "Labels",
     "Comments",
     "Activity",
+    "ProjectTasks",
   ],
   endpoints: (build) => ({
     getUsers: build.query<Response<IUser[]>, void>({
@@ -108,6 +110,40 @@ export const api = createApi({
         url: `projects/${projectId}?withTask=true`,
         method: "GET",
       }),
+    }),
+    getProjectTaskByProjectId: build.query<
+      ResponseWithPagination<ITask[]>,
+      IProjectTaskPagination
+    >({
+      query: ({
+        isPaginationEnabled = false,
+        page = 1,
+        pageSize = 10,
+        keyword,
+        labels,
+        priority,
+        projectId,
+        assignedTo,
+      }) => ({
+        url: `projects/tasks/${projectId}`,
+        method: "GET",
+        params: {
+          isPaginationEnabled,
+          page,
+          pageSize,
+          keyword: keyword ? keyword : undefined,
+          labels,
+          priority,
+          assignedTo,
+        },
+      }),
+      providesTags: (result) =>
+        result?.data
+          ? result.data.result?.map(({ id }) => ({
+              type: "ProjectTasks" as const,
+              id,
+            }))
+          : [{ type: "ProjectTasks" as const }],
     }),
     createProject: build.mutation<Response<IProject>, IAddProjectPayload>({
       query: (payload) => ({
@@ -166,14 +202,7 @@ export const api = createApi({
         method: "PUT",
         body: { status },
       }),
-      invalidatesTags: (result, error, { id }) => {
-        console.log({
-          result,
-          error,
-          id,
-        });
-        return [{ type: "Tasks", id }];
-      },
+      invalidatesTags: [{ type: "ProjectTasks", id: "LIST" }],
     }),
     createUploads: build.mutation<Response<IUploadFile>, { files: File[] }>({
       query: (body) => {
@@ -428,6 +457,10 @@ export const api = createApi({
 export const {
   useGetUsersQuery,
   useCreateUsersMutation,
+  // PROJECTS
+  useGetProjectTaskByProjectIdQuery,
+  useLazyGetProjectTaskByProjectIdQuery,
+
   useGetProjectByIdQuery,
   //TASKS
   useUpdateTaskStatusMutation,

@@ -82,7 +82,7 @@ const MultiSelect2 = (props: Props) => {
         </span>
 
         {selectedList?.length > 0 && (
-          <span className="mr-4 bg-slate-800 px-2 font-semibold text-white">
+          <span className="mr-4 bg-blue-200 px-2 font-medium text-slate-800">
             {selectedList?.length}
           </span>
         )}

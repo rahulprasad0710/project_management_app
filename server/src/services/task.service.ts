@@ -1,4 +1,9 @@
-import { ITask, IUpdateTaskPayload } from "../types/payload";
+import { ILike, In } from "typeorm";
+import {
+    IProjectTaskPagination,
+    ITask,
+    IUpdateTaskPayload,
+} from "../types/payload";
 import { Priority, TaskStatus } from "../enums/Priority";
 
 import { IPagination } from "../types/express";
@@ -7,6 +12,7 @@ import { Project } from "../db/entity/project";
 import { Task } from "../db/entity/task";
 import { UploadFile } from "../db/entity/uploads";
 import { User } from "../db/entity/User";
+import createPagination from "../utils/createPagination";
 import dataSource from "../db/data-source";
 
 export class TaskService {
@@ -47,11 +53,52 @@ export class TaskService {
         return await this.taskRepository.save(taskObj);
     }
 
-    async getAll({ skip, take }: IPagination) {
-        return await this.taskRepository.find({
+    async getAll(query: IProjectTaskPagination) {
+        const {
+            skip,
+            take,
+            isPaginationEnabled,
+            priority,
+            labels,
+            assignedTo,
+            keyword,
+            projectId,
+        } = query;
+
+        const result = await this.taskRepository.find({
             skip: skip,
             take: take,
+            order: {
+                id: "DESC",
+            },
+            relations: ["assignedTo", "taskLabel"],
+            where: {
+                project: { id: projectId },
+                ...(keyword ? { taskNumber: ILike(`%${keyword}%`) } : {}),
+                ...(priority ? { priority: In(priority) } : {}),
+                ...(labels ? { taskLabel: In(labels) } : {}),
+                ...(assignedTo ? { assignedTo: In(assignedTo) } : {}),
+            },
         });
+
+        const totalCount = await this.taskRepository.find({
+            where: {
+                project: { id: projectId },
+                ...(keyword ? { taskNumber: ILike(`%${keyword}%`) } : {}),
+                ...(priority ? { priority: In(priority) } : {}),
+                ...(labels ? { taskLabel: In(labels) } : {}),
+                ...(assignedTo ? { assignedTo: In(assignedTo) } : {}),
+            },
+        });
+        return {
+            result,
+            pagination: createPagination(
+                skip,
+                take,
+                totalCount.length,
+                isPaginationEnabled
+            ),
+        };
     }
 
     async update2(id: number, task: ITask) {

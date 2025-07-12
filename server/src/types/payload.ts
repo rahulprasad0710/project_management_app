@@ -44,3 +44,10 @@ export interface IProjectPagination extends IPagination {
     status?: ProjectStatus[] | undefined;
     priority?: Priority[] | undefined;
 }
+
+export interface IProjectTaskPagination extends IPagination {
+    priority?: string[] | undefined;
+    labels?: number[] | undefined;
+    assignedTo?: number[] | undefined;
+    projectId: number;
+}

@@ -2,7 +2,9 @@ import { Request, Response } from "express";
 
 import ActivityService from "../services/activity.service";
 import { IPagination } from "../types/express";
+import { Priority } from "../enums/Priority";
 import TaskService from "../services/task.service";
+import normalizeToString from "../utils/sanatizeQueryParams";
 
 const taskService = new TaskService();
 const activityService = new ActivityService();
@@ -38,17 +40,36 @@ const create = async (req: Request, res: Response): Promise<void> => {
 
 const getAll = async (req: Request, res: Response): Promise<void> => {
     try {
+        const { projectId } = req.params;
         const { skip, take, keyword, isPaginationEnabled }: IPagination =
             req.pagination;
-        const users = await taskService.getAll({
+
+        const rawLabels = normalizeToString(req.query.labels);
+        const labelArray = rawLabels
+            ? rawLabels.split(",").map((item) => Number(item))
+            : undefined;
+
+        const rawAssignedTo = normalizeToString(req.query.assignedTo);
+        const assignedToArray = rawAssignedTo
+            ? rawAssignedTo.split(",").map((item) => Number(item))
+            : undefined;
+
+        const rawPriority = normalizeToString(req.query.priority);
+        const priorityArray = rawPriority ? rawPriority.split(",") : undefined;
+
+        const result = await taskService.getAll({
+            projectId: Number(projectId),
             skip,
             take,
             keyword,
             isPaginationEnabled,
+            labels: labelArray,
+            assignedTo: assignedToArray,
+            priority: priorityArray,
         });
         res.status(200).json({
             success: true,
-            data: users,
+            data: result,
             message: "Task fetched successfully",
         });
     } catch (error) {

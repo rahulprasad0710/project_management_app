@@ -1,4 +1,3 @@
-import { ChevronDown, User, X } from "lucide-react";
 import React, {
   Dispatch,
   SetStateAction,
@@ -9,11 +8,13 @@ import React, {
 
 import { IMultiList } from "@/types/user.types";
 import Image from "next/image";
+import { User } from "lucide-react";
 
 type Props = {
   list: IMultiList[];
   selectedList: IMultiList[];
-
+  selectedIds: string[];
+  setSelectedIds: Dispatch<SetStateAction<string[]>>;
   setSelectList: Dispatch<SetStateAction<IMultiList[]>>;
   placeholder?: string;
   required?: boolean;
@@ -21,7 +22,11 @@ type Props = {
 };
 
 const MultiSelectUser = (props: Props) => {
-  const { list, selectedList, setSelectList, placeholder, size } = props;
+  const { list, selectedList, setSelectList, selectedIds, setSelectedIds } =
+    props;
+  console.log("LOG: ~ MultiSelectUser ~ list:", list);
+  console.log("LOG: ~ selectedList ~ list:", selectedList);
+
   const [openSelect, setOpenSelect] = useState<boolean>(false);
   // const [showList, setShowList] = useState<IList[]>([]);
   const multiSelectRef = useRef(null);
@@ -33,10 +38,14 @@ const MultiSelectUser = (props: Props) => {
 
     if (isItemAlreadyPresent) {
       const temp = selectedList.filter((item) => item.value !== valueSelected);
+
+      const tempIds = selectedIds.filter((item) => item !== valueSelected);
+      setSelectedIds(tempIds);
       setSelectList(temp);
     } else {
       const temp = list.find((item) => item.value === valueSelected);
-
+      const tempIds = [...selectedIds, String(valueSelected)];
+      setSelectedIds(tempIds);
       if (temp) {
         setSelectList([...selectedList, temp]);
       }
@@ -63,15 +72,18 @@ const MultiSelectUser = (props: Props) => {
     <div ref={multiSelectRef} className="multi-select-box relative">
       <div
         onClick={() => setOpenSelect(!openSelect)}
-        className={`flex min-w-[200px] ${selectedList?.length > 0 ? "justify-end" : "justify-end"} gap-4 rounded bg-white p-1`}
+        className={`flex min-w-[200px] ${selectedList?.length > 0 ? "justify-end" : "justify-end"} gap-1 rounded bg-white p-1`}
       >
-        {selectedList?.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {selectedList?.map((item: IMultiList) => (
-              <div className="" key={item.value}>
+        <div className="flex flex-wrap gap-1">
+          {list?.slice(0, 5).map((item: IMultiList) => {
+            const isItemAlreadyPresent = selectedList.find(
+              (item2) => item2.value === item.value,
+            );
+            return (
+              <div key={item.value}>
                 {item?.icon ? (
                   <button
-                    className="rounded-full bg-gray-200 p-1 font-semibold text-gray-700 shadow-[0_0_0_1px_#60a5fa] hover:text-red-500 hover:shadow-[0_0_0_1px_#16a34a,0_0_0_4px_white,0_0_0_6px_#16a34a]"
+                    className={`rounded-full bg-gray-200 p-1 font-semibold text-gray-700 ${isItemAlreadyPresent ? "border border-gray-200 ring-2 ring-green-300" : "border border-gray-200"}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleSelect(item.value);
@@ -93,17 +105,17 @@ const MultiSelectUser = (props: Props) => {
                       handleSelect(item.value);
                     }}
                     title={item?.label}
-                    className="rounded-full bg-gray-200 p-1 font-semibold text-gray-700 shadow-[0_0_0_1px_#60a5fa] hover:text-red-500 hover:shadow-[0_0_0_1px_#16a34a,0_0_0_4px_white,0_0_0_6px_#16a34a]"
+                    className={`rounded-full bg-gray-200 p-1 font-semibold text-gray-700 ${isItemAlreadyPresent ? "border border-gray-200 ring-2 ring-green-300" : "border border-gray-200"}`}
                   >
                     <User className="h-5 w-5 text-gray-500" />
                   </button>
                 )}
               </div>
-            ))}
-          </div>
-        )}
-        <div className="flex items-center justify-end gap-2">
-          <div className="bg-grey-100 cursor-pointer rounded border border-gray-600 p-1 text-sm font-semibold text-gray-800">
+            );
+          })}
+        </div>
+        <div className="flex items-center justify-end gap-2 rounded-full">
+          <div className="bg-grey-100 cursor-pointer rounded-full border border-gray-600 p-1 text-sm font-semibold text-gray-800">
             {selectedList?.length}/{list?.length}
           </div>
           {/* <button

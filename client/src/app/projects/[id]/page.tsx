@@ -6,6 +6,7 @@ import {
   ILabelResponse,
   IMultiList,
   IPriorityOptions,
+  IUser,
   Priority,
   priorityOptions,
   statusOptions,
@@ -15,6 +16,7 @@ import {
   useGetLabelsQuery,
   useGetProjectByIdQuery,
   useGetUsersQuery,
+  useLazyGetProjectTaskByProjectIdQuery,
 } from "@/store/api";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -36,13 +38,6 @@ type BOARD_TYPES = "BOARD" | "LIST" | "CALENDAR" | "TIMELINE" | "TABLE";
 const ProjectDetails = () => {
   const { id } = useParams();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<BOARD_TYPES>("BOARD");
-  const [keyword, setKeyword] = useState<string>("");
-  const [selectedLabels, setSelectedLabels] = useState<IMultiList[]>([]);
-  const [selectedLabelsIds, setSelectedLabelsIds] = useState<string[]>([]);
-  const [selectedPriorityIds, setSelectedPriorityIds] = useState<string[]>([]);
-  const [selectedPriority, setSelectedPriority] = useState<IMultiList[]>([]);
-  const [isTaskModalOpen, setIsTaskModalOpen] = useState<boolean>(false);
 
   const { data: labelList, isFetching: isLabelFetching } = useGetLabelsQuery({
     isPaginationEnabled: false,
@@ -50,13 +45,22 @@ const ProjectDetails = () => {
     pageSize: 10,
     isActive: true,
   });
-  const { data: projectResponse, isLoading } = useGetProjectByIdQuery({
-    projectId: Number(id),
-  });
+
   const { isFetching: isUserFetching, data: userList } = useGetUsersQuery();
+
+  const [activeTab, setActiveTab] = useState<BOARD_TYPES>("BOARD");
+  const [keyword, setKeyword] = useState<string>("");
+  const [selectedLabels, setSelectedLabels] = useState<IMultiList[]>([]);
+  const [selectedLabelsIds, setSelectedLabelsIds] = useState<string[]>([]);
+  const [selectedPriorityIds, setSelectedPriorityIds] = useState<string[]>([]);
+  const [selectedPriority, setSelectedPriority] = useState<IMultiList[]>([]);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState<boolean>(false);
+  const [selectedAssigneeIds, setSelectedAssigneeIds] = useState<string[]>([]);
   const [selectedTeamMember, setSelectedTeamMember] = useState<IMultiList[]>(
     [],
   );
+
+  const [refetchList, setRefetchList] = useState<boolean>(false);
 
   const statusList = labelList?.data?.result?.map((status) => {
     return {
@@ -71,28 +75,6 @@ const ProjectDetails = () => {
       value: option.value as string,
     };
   });
-
-  const handleClearFilter = () => {
-    setKeyword("");
-    setSelectedPriority([]);
-    setSelectedLabels([]);
-    setSelectedTeamMember([]);
-  };
-
-  const handleSearch = () => {
-    // fetchAllProject({
-    //   isPaginationEnabled: true,
-    //   page: 1,
-    //   pageSize: 10,
-    //   keyword: keyword,
-    //   status: selectedStatus.map((item) => item.value as ProjectStatus),
-    //   priority: selectedPriority,
-    // });
-  };
-
-  const handleToggleProjectModal = () => {
-    setIsTaskModalOpen(!isTaskModalOpen);
-  };
 
   const isLabelUrlValueSet = useGetQueryParams<ILabelResponse>({
     urlDataName: "labels",
@@ -116,12 +98,77 @@ const ProjectDetails = () => {
     router,
   });
 
-  if (isLoading)
-    return (
-      <div>
-        <p>Loading...</p>
-      </div>
-    );
+  const isAssigneeUrlValueSet = useGetQueryParams<IUser>({
+    urlDataName: "assignee",
+    dataToFetchDataFrom: userList?.data,
+    setSelectedIds: setSelectedAssigneeIds,
+    selectedIds: selectedAssigneeIds,
+    setMultiSelectList: setSelectedTeamMember,
+    labelKey: "firstName",
+    isDataLoading: isLabelFetching,
+    router,
+  });
+
+  console.log({
+    selectedAssigneeIds,
+  });
+
+  const [fetchProjectTasksByProjectId, { data: projectTasks }] =
+    useLazyGetProjectTaskByProjectIdQuery();
+
+  const handleFetchData = () => {
+    fetchProjectTasksByProjectId({
+      projectId: Number(id),
+      isPaginationEnabled: false,
+      page: 1,
+      pageSize: 10,
+      keyword: keyword,
+      labels: selectedLabelsIds,
+      priority: selectedPriorityIds,
+      assignedTo: selectedAssigneeIds,
+    });
+  };
+
+  useEffect(() => {
+    if (isLabelUrlValueSet && isPriorityUrlValueSet && isAssigneeUrlValueSet) {
+      handleFetchData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLabelUrlValueSet, isPriorityUrlValueSet, isAssigneeUrlValueSet, id]);
+
+  useEffect(() => {
+    console.log({
+      refetchList,
+    });
+    if (refetchList) {
+      handleFetchData();
+      setRefetchList(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refetchList]);
+
+  const handleClearFilter = () => {
+    setKeyword("");
+    setSelectedPriority([]);
+    setSelectedLabels([]);
+    setSelectedTeamMember([]);
+  };
+
+  const handleSearch = () => {
+    handleFetchData();
+  };
+
+  const handleToggleProjectModal = () => {
+    setIsTaskModalOpen(!isTaskModalOpen);
+  };
+
+  useEffect(() => {
+    if (isLabelUrlValueSet && isPriorityUrlValueSet && isAssigneeUrlValueSet) {
+      handleFetchData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedLabelsIds, selectedPriorityIds, selectedAssigneeIds]);
+
   return (
     <div className="px-4 xl:px-6">
       <div className="flex items-center justify-between pb-4 pt-4 lg:pb-4">
@@ -149,20 +196,22 @@ const ProjectDetails = () => {
           <button
             type="button"
             onClick={handleClearFilter}
-            className="focus:shadow-outline justify-start rounded bg-gray-100 px-4 py-1 font-bold text-gray-500 hover:text-gray-800"
+            className="focus:shadow-outline justify-start rounded bg-transparent px-4 py-1 font-bold text-gray-500 hover:bg-gray-100 hover:text-gray-800"
           >
             Clear filter
           </button>
 
           <div>
             <MultiSelectUser
+              selectedIds={selectedAssigneeIds}
+              setSelectedIds={setSelectedAssigneeIds}
               placeholder="Assignee"
               list={
                 !isUserFetching && userList?.data && userList?.data?.length > 0
                   ? userList?.data.map((item) => {
                       return {
                         label: `${item.firstName} ${item.lastName}`,
-                        value: item.id,
+                        value: String(item.id),
                         icon: item.profilePictureUrl as string,
                       };
                     })
@@ -205,16 +254,17 @@ const ProjectDetails = () => {
           </button>
         </div>
       </div>
-      {activeTab === "TABLE" && <TableView projectResponse={projectResponse} />}
+      {activeTab === "TABLE" && <TableView projectResponse={projectTasks} />}
       {activeTab === "BOARD" && (
         <BoardView
           setIsTaskModalOpen={setIsTaskModalOpen}
           isTaskModalOpen={isTaskModalOpen}
-          projectResponse={projectResponse}
+          projectTasks={projectTasks}
+          setRefetchList={setRefetchList}
         />
       )}
       {activeTab === "TIMELINE" && (
-        <TimelineView projectResponse={projectResponse} />
+        <TimelineView projectResponse={projectTasks} />
       )}
       <Modal
         modalTitle="Add new task"
