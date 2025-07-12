@@ -15,7 +15,9 @@ import PriorityTag from "./molecules/PriorityTag";
 import Spinner from "./Spinner";
 import TaskComments from "./TaskComments";
 import { format } from "date-fns";
+import { setRefetchProjectTaskList } from "@/store";
 import { toast } from "react-toastify";
+import { useAppDispatch } from "@/store/StoreProvider";
 
 type Props = {
   selectedData: ITask | undefined;
@@ -25,6 +27,8 @@ type Props = {
 type TAB_TYPES = "ACTIVITY" | "COMMENTS";
 
 const TaskDetails = ({ selectedData }: Props) => {
+  const dispatch = useAppDispatch();
+
   const [activeTab, setActiveTab] = useState<TAB_TYPES>("COMMENTS");
   const [updateTaskStatus, { isLoading: isTaskUpdateLoading }] =
     useUpdateTaskStatusMutation();
@@ -46,7 +50,10 @@ const TaskDetails = ({ selectedData }: Props) => {
 
     if (response?.data?.success) {
       toast.success("Task status updated successfully");
-      if (selectedData?.id) fetchTaskByTaskId({ taskId: selectedData?.id });
+      if (selectedData?.id) {
+        fetchTaskByTaskId({ taskId: selectedData?.id });
+        dispatch(setRefetchProjectTaskList(true));
+      }
     }
   };
 

@@ -10,6 +10,7 @@ import {
   priorityOptions,
 } from "@/types/user.types";
 import React, { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/store/StoreProvider";
 import {
   useGetLabelsQuery,
   useGetUsersQuery,
@@ -26,6 +27,7 @@ import SearchBar from "@/app/(components)/molecules/SearchBar";
 import TableView from "@/app/(components)/TableView";
 import TaskModal from "@/app/(components)/modals/TaskModal";
 import TimelineView from "@/app/(components)/TimelineView";
+import { setRefetchProjectTaskList } from "@/store";
 import { useGetQueryParams } from "@/app/utils/urlSearchParamsFn";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -35,7 +37,10 @@ type BOARD_TYPES = "BOARD" | "LIST" | "CALENDAR" | "TIMELINE" | "TABLE";
 const ProjectDetails = () => {
   const { id } = useParams();
   const router = useRouter();
-
+  const dispatch = useAppDispatch();
+  const isDataRefetchList = useAppSelector(
+    (state) => state.global.isDataRefetchList,
+  );
   const { data: labelList, isFetching: isLabelFetching } = useGetLabelsQuery({
     isPaginationEnabled: false,
     page: 1,
@@ -57,7 +62,7 @@ const ProjectDetails = () => {
     [],
   );
 
-  const [refetchList, setRefetchList] = useState<boolean>(false);
+  // const [refetchList, setRefetchList] = useState<boolean>(false);
 
   const statusList = labelList?.data?.result?.map((status) => {
     return {
@@ -135,14 +140,14 @@ const ProjectDetails = () => {
 
   useEffect(() => {
     console.log({
-      refetchList,
+      isDataRefetchList,
     });
-    if (refetchList) {
+    if (isDataRefetchList) {
       handleFetchData();
-      setRefetchList(false);
+      dispatch(setRefetchProjectTaskList(false));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refetchList]);
+  }, [isDataRefetchList]);
 
   const handleClearFilter = () => {
     setKeyword("");
@@ -257,7 +262,6 @@ const ProjectDetails = () => {
           setIsTaskModalOpen={setIsTaskModalOpen}
           isTaskModalOpen={isTaskModalOpen}
           projectTasks={projectTasks}
-          setRefetchProjectTaskList={setRefetchList}
         />
       )}
       {activeTab === "TIMELINE" && (

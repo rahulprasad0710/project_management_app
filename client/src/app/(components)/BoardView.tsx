@@ -15,7 +15,9 @@ import Modal from "./Modal";
 import PriorityTag from "./molecules/PriorityTag";
 import TaskDetails from "./TaskDetails";
 import UserAvatar from "./molecules/UserAvatar";
+import { setRefetchProjectTaskList } from "@/store";
 import { toast } from "react-toastify";
+import { useAppDispatch } from "@/store/StoreProvider";
 import { useUpdateTaskStatusMutation } from "@/store/api";
 
 // import { format } from "date-fns";
@@ -24,7 +26,6 @@ type IProps = {
   isTaskModalOpen: boolean;
   setIsTaskModalOpen: (isOpen: boolean) => void;
   projectTasks: ResponseWithPagination<ITask[]> | undefined;
-  setRefetchProjectTaskList: (isOpen: boolean) => void;
 };
 
 const taskStatus: TaskStatus[] = [
@@ -36,12 +37,9 @@ const taskStatus: TaskStatus[] = [
 ];
 
 const BoardView = (props: IProps) => {
-  const {
-    projectTasks,
-    setIsTaskModalOpen,
-    isTaskModalOpen,
-    setRefetchProjectTaskList,
-  } = props;
+  const dispatch = useAppDispatch();
+
+  const { projectTasks, setIsTaskModalOpen, isTaskModalOpen } = props;
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
   const tasksList = projectTasks?.data?.result || [];
 
@@ -52,7 +50,7 @@ const BoardView = (props: IProps) => {
         status,
       });
       if (response?.data?.success) {
-        setRefetchProjectTaskList(true);
+        dispatch(setRefetchProjectTaskList(true));
       }
     } catch (error) {
       toast.error("Something Went Wrong");
