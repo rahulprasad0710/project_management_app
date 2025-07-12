@@ -7,18 +7,14 @@ import {
   IMultiList,
   IPriorityOptions,
   IUser,
-  Priority,
   priorityOptions,
-  statusOptions,
 } from "@/types/user.types";
 import React, { useEffect, useState } from "react";
 import {
   useGetLabelsQuery,
-  useGetProjectByIdQuery,
   useGetUsersQuery,
   useLazyGetProjectTaskByProjectIdQuery,
 } from "@/store/api";
-import { useRouter, useSearchParams } from "next/navigation";
 
 import BoardView from "@/app/(components)/BoardView";
 import Header from "@/app/(components)/Header";
@@ -32,6 +28,7 @@ import TaskModal from "@/app/(components)/modals/TaskModal";
 import TimelineView from "@/app/(components)/TimelineView";
 import { useGetQueryParams } from "@/app/utils/urlSearchParamsFn";
 import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 type BOARD_TYPES = "BOARD" | "LIST" | "CALENDAR" | "TIMELINE" | "TABLE";
 
@@ -260,7 +257,7 @@ const ProjectDetails = () => {
           setIsTaskModalOpen={setIsTaskModalOpen}
           isTaskModalOpen={isTaskModalOpen}
           projectTasks={projectTasks}
-          setRefetchList={setRefetchList}
+          setRefetchProjectTaskList={setRefetchList}
         />
       )}
       {activeTab === "TIMELINE" && (

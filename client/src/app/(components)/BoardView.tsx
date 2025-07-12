@@ -6,24 +6,17 @@ import {
   useDrop,
 } from "react-dnd";
 import { Edit, EllipsisVertical, TicketCheck } from "lucide-react";
-import { IProject, ITask } from "@/types/user.types";
 import React, { useState } from "react";
-import {
-  Response,
-  ResponseWithPagination,
-  TaskStatus,
-} from "@/types/user.types";
-import {
-  useLazyGetProjectByIdQuery,
-  useUpdateTaskStatusMutation,
-} from "@/store/api";
+import { ResponseWithPagination, TaskStatus } from "@/types/user.types";
 
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { ITask } from "@/types/user.types";
 import Modal from "./Modal";
 import PriorityTag from "./molecules/PriorityTag";
 import TaskDetails from "./TaskDetails";
 import UserAvatar from "./molecules/UserAvatar";
 import { toast } from "react-toastify";
+import { useUpdateTaskStatusMutation } from "@/store/api";
 
 // import { format } from "date-fns";
 
@@ -31,7 +24,7 @@ type IProps = {
   isTaskModalOpen: boolean;
   setIsTaskModalOpen: (isOpen: boolean) => void;
   projectTasks: ResponseWithPagination<ITask[]> | undefined;
-  setRefetchList: (isOpen: boolean) => void;
+  setRefetchProjectTaskList: (isOpen: boolean) => void;
 };
 
 const taskStatus: TaskStatus[] = [
@@ -43,9 +36,12 @@ const taskStatus: TaskStatus[] = [
 ];
 
 const BoardView = (props: IProps) => {
-  const { projectTasks, setIsTaskModalOpen, isTaskModalOpen, setRefetchList } =
-    props;
-  const [fetchProject] = useLazyGetProjectByIdQuery();
+  const {
+    projectTasks,
+    setIsTaskModalOpen,
+    isTaskModalOpen,
+    setRefetchProjectTaskList,
+  } = props;
   const [updateTaskStatus] = useUpdateTaskStatusMutation();
   const tasksList = projectTasks?.data?.result || [];
 
@@ -56,7 +52,7 @@ const BoardView = (props: IProps) => {
         status,
       });
       if (response?.data?.success) {
-        setRefetchList(true);
+        setRefetchProjectTaskList(true);
       }
     } catch (error) {
       toast.error("Something Went Wrong");

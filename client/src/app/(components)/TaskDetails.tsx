@@ -12,6 +12,7 @@ import {
 
 import ActivityBox from "./ActivityBox";
 import PriorityTag from "./molecules/PriorityTag";
+import Spinner from "./Spinner";
 import TaskComments from "./TaskComments";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
@@ -25,7 +26,8 @@ type TAB_TYPES = "ACTIVITY" | "COMMENTS";
 
 const TaskDetails = ({ selectedData }: Props) => {
   const [activeTab, setActiveTab] = useState<TAB_TYPES>("COMMENTS");
-  const [updateTaskStatus] = useUpdateTaskStatusMutation();
+  const [updateTaskStatus, { isLoading: isTaskUpdateLoading }] =
+    useUpdateTaskStatusMutation();
 
   const [fetchTaskByTaskId, { data, isLoading, error }] =
     useLazyGetTasksByTaskIdQuery();
@@ -42,8 +44,9 @@ const TaskDetails = ({ selectedData }: Props) => {
       status,
     });
 
-    if (response?.data?.id) {
+    if (response?.data?.success) {
       toast.success("Task status updated successfully");
+      if (selectedData?.id) fetchTaskByTaskId({ taskId: selectedData?.id });
     }
   };
 
@@ -118,15 +121,21 @@ const TaskDetails = ({ selectedData }: Props) => {
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg
-                className="h-4 w-4 fill-current"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-              >
-                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-              </svg>
-            </div>
+            {isTaskUpdateLoading ? (
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                <Spinner />
+              </div>
+            ) : (
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                <svg
+                  className="h-4 w-4 fill-current"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                </svg>
+              </div>
+            )}
           </div>
         </div>
 
@@ -188,14 +197,3 @@ const TaskDetails = ({ selectedData }: Props) => {
 };
 
 export default TaskDetails;
-
-// {
-//   "id": 38,
-//   "title": "Quia iusto asperiore",
-//   "taskNumber": "JT-0029",
-//   "description": "<p>Dolor voluptates in .</p>",
-//   "addedDate": "2025-06-15T08:34:57.014Z",
-//   "status": "IN_PROGRESS",
-//   "priority": "HIGH",
-//   "taskUploads": []
-// }
