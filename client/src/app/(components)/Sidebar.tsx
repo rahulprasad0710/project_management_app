@@ -7,6 +7,7 @@ import {
   Home,
   LucideIcon,
   Projector,
+  UserCog,
   Users,
   X,
 } from "lucide-react";
@@ -64,7 +65,7 @@ const Sidebar = () => {
 
   const sidebarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-md  border-x-[1.5px] border-gray-100
     transition-all duration-300 h-full z-40  overflow-y-auto bg-white
-    ${isSidebarCollapsed ? "w-0  " : "w-64"}
+    ${isSidebarCollapsed ? "w-0" : "w-64"}
   `;
   return (
     <div className={sidebarClassNames}>
@@ -81,10 +82,9 @@ const Sidebar = () => {
         <nav className="z-10 w-full">
           <SidebarLink href="/" icon={Home} title="Dashboard" />
           <SidebarLink href="/projects" icon={Folder} title="Project" />
-          <SidebarLink href="/employees" icon={Users} title="Employees" />
+          <SidebarLink href="/employees" icon={UserCog} title="Employees" />
           <SidebarLink href="/sprints" icon={CalendarCog} title="Sprint" />
           <SidebarLink href="/labels" icon={Brush} title="Labels" />
-          <SidebarLink href="/login" icon={Brush} title="Login" />
         </nav>
       </div>
     </div>

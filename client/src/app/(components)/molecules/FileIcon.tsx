@@ -96,9 +96,9 @@ export const FileComment: React.FC<Props> = ({
         )}
         <div className="gpa-2 flex items-center border-l border-gray-200 pl-2">
           {getFileIcon(extension)}
-          <span className="ml-2 text-sm font-medium text-gray-700">
+          <p className="ml-2 line-clamp-[calc(var(--characters)/100)] text-sm font-medium text-gray-700">
             {fileName}
-          </span>
+          </p>
         </div>
       </div>
 

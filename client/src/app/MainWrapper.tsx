@@ -30,9 +30,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       <ToastContainer />
       <main className={`flex w-full flex-col bg-gray-50`}>
         <MainNavbar />
-        <div className="relative mt-[60px]">
+        <div className="relative mx-auto mt-[60px] min-w-full bg-gray-50">
           <Sidebar />
-          <div>{children}</div>
+          {children}
         </div>
       </main>
     </div>

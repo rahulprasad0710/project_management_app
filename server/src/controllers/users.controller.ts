@@ -1,14 +1,16 @@
-import UserService from "../services/users.service";
-const userService = new UserService();
 import { Request, Response } from "express";
+
+import UserService from "../services/users.service";
+
+const userService = new UserService();
 
 const create = async (req: Request, res: Response) => {
     try {
-        const { user } = req.body;
-        const data = await userService.create(user);
+        const data = req.body;
+        const response = await userService.create(data);
         res.status(201).json({
             success: true,
-            data: data,
+            data: response,
             message: "User created successfully",
         });
     } catch (error) {

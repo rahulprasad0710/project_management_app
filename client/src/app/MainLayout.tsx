@@ -35,8 +35,10 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
         <MainNavbar />
 
         <div className={`mt-[60px]`}>
-          <Sidebar />
-          {children}
+          <div className="main-container flex w-full flex-row">
+            {/* <Sidebar /> */}
+            <div className="children-container">{children}</div>
+          </div>
         </div>
       </main>
     </div>

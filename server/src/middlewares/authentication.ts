@@ -42,8 +42,6 @@ const verifyToken = async (
         let user: User | null = null;
         if (provider !== "google") {
             user = await verifyFromCredentials(token);
-        } else {
-            user = await verifyFromGoogle(token);
         }
 
         if (!user) {
@@ -91,45 +89,41 @@ const verifyFromCredentials = async (token: string): Promise<User | null> => {
     }
 };
 
-const verifyFromGoogle = async (token: string): Promise<User | null> => {
-    try {
-        const googleUser = await getGoogleUserInfo(token);
-        console.log("LOG: ~ verifyFromGoogle ~ googleUser:", googleUser)
+// const verifyFromGoogle = async (token: string): Promise<User | null> => {
+//     try {
+//         const googleUser = await getGoogleUserInfo(token);
+//         console.log("LOG: ~ verifyFromGoogle ~ googleUser:", googleUser)
 
-        if (!googleUser) {
-            return null;
-        }
+//         if (!googleUser) {
+//             return null;
+//         }
 
-        const {
-            email,
-            name,
-            picture,
-            email_verified,
-            family_name,
-            given_name,
-            sub,
-        } = googleUser;
+//         const {
+//             email,
+//             name,
+//             picture,
+//             email_verified,
+//             family_name,
+//             given_name,
+//             sub,
+//         } = googleUser;
 
-        const verifiedUser = await userService.getByEmail(email);
+//         const verifiedUser = await userService.getByEmail(email);
 
-        if (!verifiedUser) {
-            const newUser = await userService.create({
-                firstName: given_name,
-                lastName: family_name,
-                username: name,
-                cognitoId: sub,
-                email: email,
-                profilePictureUrl: picture,
-                loginType: "google",
-                emailVerified: email_verified,
-            });
-            return newUser;
-        } else {
-            return verifiedUser;
-        }
-    } catch (error) {
-        throw new Error("Invalid Token");
-    }
-};
+//         if (!verifiedUser) {
+//             const newUser = await userService.create({
+//                 firstName: given_name,
+//                 lastName: family_name,
+//                 email: email,
+//                 emailVerified: email_verified,
+//             });
+//             return newUser;
+//         } else {
+//             return verifiedUser;
+//         }
+//     } catch (error) {
+//         throw new Error("Invalid Token");
+//     }
+// };
 
 export default verifyToken;

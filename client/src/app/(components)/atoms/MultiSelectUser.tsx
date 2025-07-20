@@ -83,7 +83,7 @@ const MultiSelectUser = (props: Props) => {
               <div key={item.value}>
                 {item?.icon ? (
                   <button
-                    className={`rounded-full bg-gray-200 p-1 font-semibold text-gray-700 ${isItemAlreadyPresent ? "border border-gray-200 ring-2 ring-green-300" : "border border-gray-200"}`}
+                    className={`rounded-full bg-gray-200 p-1 font-semibold text-gray-700 ${isItemAlreadyPresent ? "border border-gray-200 ring-2 ring-green-300" : "border border-gray-200 hover:ring-2 hover:ring-blue-300"}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleSelect(item.value);
@@ -105,7 +105,7 @@ const MultiSelectUser = (props: Props) => {
                       handleSelect(item.value);
                     }}
                     title={item?.label}
-                    className={`rounded-full bg-gray-200 p-1 font-semibold text-gray-700 ${isItemAlreadyPresent ? "border border-gray-200 ring-2 ring-green-300" : "border border-gray-200"}`}
+                    className={`rounded-full bg-gray-200 p-1 font-semibold text-gray-700 ${isItemAlreadyPresent ? "border border-gray-200 ring-2 ring-green-300" : "border border-gray-200 hover:ring-2 hover:ring-blue-300"}`}
                   >
                     <User className="h-5 w-5 text-gray-500" />
                   </button>

@@ -23,3 +23,8 @@ export enum Priority {
     CRITICAL = "CRITICAL",
     BACKLOG = "BACKLOG",
 }
+
+export enum TableForActivityLog {
+    DEPARTMENT = "DEPARTMENT",
+    ROLE = "ROLE",
+}

@@ -73,7 +73,7 @@ export default function LoginPage() {
 
   return (
     <div>
-      <div className="flex h-[calc(100vh-60px)] items-center justify-center bg-gradient-to-br from-blue-100 to-white px-4">
+      <div className="flex h-[calc(100vh-60px)] items-center justify-center bg-gray-50 px-4">
         <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-xl">
           <h1 className="mb-6 text-center text-2xl font-bold text-gray-800">
             Sign In to Your Account
