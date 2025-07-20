@@ -120,6 +120,13 @@ export class UserService {
         });
         return response;
     }
+
+    async updateRefreshToken(userId: number, refreshToken?: string) {
+        const response = await this.userRepository.update(userId, {
+            refreshToken: refreshToken ? refreshToken : () => "NULL",
+        });
+        return response;
+    }
 }
 
 export default UserService;

@@ -1,8 +1,12 @@
+import jwt, { JwtPayload } from "jsonwebtoken";
+
+import APP_CONSTANT from "../constants/AppConfig";
 import AppError from "../utils/AppError";
 import { ErrorType } from "../enums/Eums";
 import UserService from "./users.service";
 // src/services/googleAuth.service.ts
 import bcrypt from "bcryptjs";
+import generateToken from "../utils/generateToken";
 
 const userService = new UserService();
 
@@ -67,7 +71,36 @@ const loginWithCredentials = async (email: string, password: string) => {
         throw new AppError("Email not verified", 401, ErrorType.AUTH_ERROR);
     }
 
-    return userFromDB;
+    if (!userFromDB.isActive) {
+        throw new AppError("User not active", 401, ErrorType.AUTH_ERROR);
+    }
+
+    const accessToken = generateToken.accessToken({
+        userId: userFromDB?.id,
+        userType: "credentials",
+        loginType: "credentials",
+    });
+
+    const refreshToken = generateToken.refreshToken({
+        userId: userFromDB?.id,
+        userType: "credentials",
+        loginType: "credentials",
+    });
+
+    await userService.updateRefreshToken(userFromDB.id, refreshToken);
+
+    return { user: userFromDB, accessToken, refreshToken };
+};
+
+const logout = async (userId: number) => {
+    const user = await userService.getById(userId);
+    if (!user) {
+        throw new AppError("User not found", 401, ErrorType.NOT_FOUND_ERROR);
+    }
+
+    await userService.updateRefreshToken(userId, undefined);
+
+    return { user, accessToken: null, refreshToken: null };
 };
 
 const checkPassword = async (enteredPassword: string, realPassword: string) => {
@@ -123,7 +156,7 @@ const verifyEmailAndSetPassword = async ({
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const response = await userService.confirmUser({
+    await userService.confirmUser({
         userId: id,
         password: hashedPassword,
     });
@@ -132,7 +165,49 @@ const verifyEmailAndSetPassword = async ({
     };
 };
 
+const refreshUser = async (refreshToken: string) => {
+    const decoded = jwt.verify(
+        refreshToken as string,
+        APP_CONSTANT.JWT_REFRESH_SECRET as string
+    );
+    if (!decoded) {
+        throw new AppError("Invalid token", 401, ErrorType.INVALID_TOKEN_ERROR);
+    }
+
+    if (typeof decoded === "object" && "id" in decoded) {
+        const userFromDB = await userService.getById(Number(decoded.id));
+
+        if (!userFromDB) {
+            throw new AppError(
+                "User not found",
+                401,
+                ErrorType.NOT_FOUND_ERROR
+            );
+        }
+
+        const accessToken = generateToken.accessToken({
+            userId: userFromDB?.id,
+            userType: "credentials",
+            loginType: "credentials",
+        });
+
+        const refreshToken = generateToken.refreshToken({
+            userId: userFromDB?.id,
+            userType: "credentials",
+            loginType: "credentials",
+        });
+
+        await userService.updateRefreshToken(userFromDB.id, refreshToken);
+
+        return { user: userFromDB, accessToken, refreshToken };
+    } else {
+        throw new AppError("Invalid token", 401, ErrorType.INVALID_TOKEN_ERROR);
+    }
+};
+
 export default {
     loginWithCredentials,
     verifyEmailAndSetPassword,
+    logout,
+    refreshUser,
 };
