@@ -14,7 +14,6 @@ const asyncTryCatchFn =
         try {
             await controller(req, res, next);
         } catch (error) {
-            console.log("AppError TryCatch", error instanceof AppError, error);
             next(error);
         }
     };

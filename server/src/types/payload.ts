@@ -45,6 +45,10 @@ export interface IProjectPagination extends IPagination {
     priority?: Priority[] | undefined;
 }
 
+export interface IEmployeePagination extends IPagination {
+    isActive?: boolean | undefined;
+}
+
 export interface IProjectTaskPagination extends IPagination {
     priority?: string[] | undefined;
     labels?: number[] | undefined;

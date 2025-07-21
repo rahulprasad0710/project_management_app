@@ -1,7 +1,10 @@
 import APP_CONSTANT from "../constants/AppConfig";
+import { IEmployeePagination } from "../types/payload";
+import { ILike } from "typeorm";
 import { TEmail } from "../types/types";
 import { User } from "../db/entity/User";
 import { addEmailToQueue } from "../jobs/emailQueue";
+import createPagination from "../utils/createPagination";
 import crypto from "crypto";
 import dataSource from "../db/data-source";
 interface IUser {
@@ -74,8 +77,56 @@ export class UserService {
         return response;
     }
 
-    async getAll() {
-        return await this.userRepository.find();
+    async getAll(query: IEmployeePagination) {
+        const { skip, take, isPaginationEnabled, isActive, keyword } = query;
+
+        console.log({
+            skip,
+            take,
+            isPaginationEnabled,
+            isActive,
+            keyword,
+        });
+
+        let whereClause: any = { isActive: isActive ? isActive : true };
+        if (keyword) {
+            whereClause = [
+                { ...whereClause, firstName: ILike(`%${keyword}%`) },
+                { ...whereClause, lastName: ILike(`%${keyword}%`) },
+                { ...whereClause, employeeId: ILike(`%${keyword}%`) },
+                { ...whereClause, mobileNumber: ILike(`%${keyword}%`) },
+            ];
+        }
+
+        const result = await this.userRepository.find({
+            select: [
+                "id",
+                "firstName",
+                "lastName",
+                "employeeId",
+                "profilePictureUrl",
+                "isActive",
+                "emailVerified",
+                "role",
+                "mobileNumber",
+            ],
+            skip: skip,
+            take: take,
+            order: {
+                id: "DESC",
+            },
+            where: whereClause,
+        });
+        const totalCount = await this.userRepository.count();
+        return {
+            result,
+            pagination: createPagination(
+                skip,
+                take,
+                totalCount,
+                isPaginationEnabled
+            ),
+        };
     }
 
     async getByEmail(email: string) {
