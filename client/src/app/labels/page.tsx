@@ -10,7 +10,6 @@ import ReactTable from "../(components)/ReactTable";
 import SearchBar from "@/app/(components)/molecules/SearchBar";
 import SprintModal from "@/app/(components)/modals/SprintModal";
 import { createColumnHelper } from "@tanstack/react-table";
-import { format } from "date-fns";
 import { useLazyGetLabelsQuery } from "@/store/api";
 
 const LabelList = () => {

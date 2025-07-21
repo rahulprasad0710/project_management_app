@@ -4,16 +4,13 @@
 import { FolderPen, FolderPlus, SquarePlus } from "lucide-react";
 import {
   IMultiList,
-  IPriorityOptions,
   IProject,
-  Priority,
   ProjectStatus,
   priorityOptions,
   statusOptions,
 } from "@/types/user.types";
 import React, { useEffect, useState } from "react";
 
-import DateRangeComponent from "../(components)/atoms/DateRangeComponent";
 import Header from "../(components)/Header";
 import Modal from "../(components)/Modal";
 import MultiSelect2 from "../(components)/atoms/MultiSelect2";
@@ -43,6 +40,13 @@ const ProjectPage = () => {
   });
   const [selectedPriority, setSelectedPriority] = useState<IMultiList[]>([]);
 
+  const statusList: IMultiList[] = statusOptions.map((status) => {
+    return {
+      label: status.label as string,
+      value: status.value as string,
+    };
+  });
+
   useEffect(() => {
     fetchAllProject({
       isPaginationEnabled: true,
@@ -61,13 +65,6 @@ const ProjectPage = () => {
       priority: selectedPriority,
     });
   };
-
-  const statusList: IMultiList[] = statusOptions.map((status) => {
-    return {
-      label: status.label as string,
-      value: status.value as string,
-    };
-  });
 
   const handlePrevious = () => {
     if (

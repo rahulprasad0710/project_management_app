@@ -126,7 +126,14 @@ function ProjectTable(props: IProps) {
           handleNext={handleNext}
           handlePrevious={handlePrevious}
           data={data?.data.result ?? []}
-          pagination={data?.data.pagination}
+          pagination={
+            data?.data?.pagination ?? {
+              currentPage: 1,
+              pageSize: 10,
+              totalCount: 10,
+              totalPages: 1,
+            }
+          }
         />
       </div>
     </div>

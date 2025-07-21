@@ -32,6 +32,9 @@ const ReactTable = <T extends object>({
   isFetching,
   pagination,
 }: IProps<T>) => {
+  console.log({
+    pagination,
+  });
   const table = useReactTable({
     data,
     columns,

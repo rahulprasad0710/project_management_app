@@ -1,9 +1,12 @@
 import {
+  EmployeePagination,
   IActivityResponse,
   IAddProjectPayload,
   IComment,
   ICommentPayload,
   ICommentUpdatePayload,
+  IEmployeePayload,
+  IEmployeeResponse,
   ILabelPayload,
   ILabelResponse,
   ILabelUpdatePayload,
@@ -55,6 +58,7 @@ export const api = createApi({
     "Comments",
     "Activity",
     "ProjectTasks",
+    "Employees",
   ],
   endpoints: (build) => ({
     getUsers: build.query<Response<IUser[]>, void>({
@@ -451,6 +455,62 @@ export const api = createApi({
             ]
           : [{ type: "Activity", id: `TASK_${taskId}` }],
     }),
+
+    // ! EMPLOYEES-STARTS
+    getEmployees: build.query<
+      ResponseWithPagination<IEmployeeResponse[]>,
+      EmployeePagination
+    >({
+      query: ({
+        isPaginationEnabled = true,
+        page = 1,
+        pageSize = 10,
+        keyword,
+        isActive,
+      }) => ({
+        url: "users",
+        method: "GET",
+        params: {
+          isPaginationEnabled,
+          page,
+          pageSize,
+          keyword: keyword ? keyword : undefined,
+          isActive,
+        },
+      }),
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.data.result.map((employee) => ({
+                type: "Employees" as const,
+                id: employee.id,
+              })),
+              { type: "Employees" as const, id: "LIST" },
+            ]
+          : [{ type: "Employees" as const, id: "LIST" }],
+    }),
+
+    getEmployeeById: build.query<
+      Response<IEmployeeResponse>,
+      { employeeId: number }
+    >({
+      query: ({ employeeId }) => ({
+        url: `users/${employeeId}`,
+        method: "GET",
+      }),
+    }),
+
+    createEmployee: build.mutation<
+      Response<IEmployeeResponse>,
+      IEmployeePayload
+    >({
+      query: (payload) => ({
+        url: "users",
+        method: "POST",
+        body: payload,
+      }),
+      invalidatesTags: [{ type: "Employees", id: "LIST" }],
+    }),
   }),
 });
 
@@ -491,4 +551,9 @@ export const {
   useDeleteCommentMutation,
   // ACTIVITY
   useLazyGetActivityByTaskIdQuery,
+  // EMPLOYEES
+  useGetEmployeesQuery,
+  useCreateEmployeeMutation,
+  useGetEmployeeByIdQuery,
+  useLazyGetEmployeesQuery,
 } = api;

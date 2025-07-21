@@ -4,7 +4,7 @@ import React from "react";
 import { User } from "lucide-react";
 
 type Props = {
-  user?: IUser;
+  user: Partial<IUser>;
   size?: "sm" | "md";
 };
 

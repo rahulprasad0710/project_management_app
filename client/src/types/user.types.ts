@@ -41,6 +41,10 @@ export interface SprintPagination extends Pagination {
   isActive: boolean;
 }
 
+export interface EmployeePagination extends Pagination {
+  isActive: boolean;
+}
+
 export interface IUser {
   id: number;
   firstName: string;
@@ -161,6 +165,16 @@ export const priorityOptions: IPriorityOptions[] = [
   { id: "BACKLOG", value: "BACKLOG", label: "Backlog" },
 ];
 
+export interface IRoleOptions {
+  value: string;
+  label: string;
+  id: string;
+}
+export const roleOptions: IRoleOptions[] = [
+  { id: "EMPLOYEE", value: "EMPLOYEE", label: "Employee" },
+  { id: "ADMIN", value: "ADMIN", label: "Admin" },
+];
+
 export interface IStatusOptions {
   value: TaskStatus;
   label: string;
@@ -193,6 +207,32 @@ export interface ISprintPayload {
   goal?: string;
   startDate: string;
   endDate: string;
+}
+
+export interface IEmployeePayload {
+  firstName: string;
+  lastName: string;
+  email: string;
+  mobileNumber: string;
+  role: string;
+}
+
+export interface IEmployeeUpdatePayload extends IEmployeePayload {
+  id: number;
+}
+
+export interface IEmployeeResponse {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  emailVerified: boolean;
+  mobileNumber: string;
+  role: string;
+  employeeId: string;
+  department: string | null;
+  createdAt: string;
+  profilePictureUrl: string | null;
 }
 
 export interface ISprintResponse extends ISprintPayload {
