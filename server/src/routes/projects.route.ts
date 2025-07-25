@@ -7,7 +7,7 @@ import verifyToken from "../middlewares/authentication";
 const router = ExpressRouter();
 
 router.post("", projectController.create);
-router.get("", verifyToken, applyPagination, projectController.getAll);
+router.get("", applyPagination, projectController.getAll);
 router.get("/tasks/:projectId", applyPagination, taskController.getAll);
 
 router.post("/team-members", projectController.addTeamMember);

@@ -9,7 +9,7 @@ import {
   IUser,
   priorityOptions,
 } from "@/types/user.types";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/StoreProvider";
 import {
   useGetLabelsQuery,
@@ -29,6 +29,7 @@ import TaskDetailModal from "@/app/(components)/modals/TaskDetailModal";
 import TaskModal from "@/app/(components)/modals/TaskModal";
 import TimelineView from "@/app/(components)/TimelineView";
 import { setRefetchProjectTaskList } from "@/store";
+import { toast } from "react-toastify";
 import { useGetQueryParams } from "@/app/utils/urlSearchParamsFn";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -116,7 +117,7 @@ const ProjectDetails = () => {
     selectedAssigneeIds,
   });
 
-  const [fetchProjectTasksByProjectId, { data: projectTasks }] =
+  const [fetchProjectTasksByProjectId, { data: projectTasks, isError }] =
     useLazyGetProjectTaskByProjectIdQuery();
 
   const handleFetchData = () => {
@@ -131,6 +132,12 @@ const ProjectDetails = () => {
       assignedTo: selectedAssigneeIds,
     });
   };
+
+  useEffect(() => {
+    if (isError) {
+      toast.error("Something Went Wrong!");
+    }
+  }, [isError]);
 
   useEffect(() => {
     if (isLabelUrlValueSet && isPriorityUrlValueSet && isAssigneeUrlValueSet) {

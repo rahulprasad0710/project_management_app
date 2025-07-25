@@ -1,6 +1,13 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Column,
+    Entity,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from "typeorm";
 
 import { Notification } from "./Notification";
+import { Role } from "./role";
 
 @Entity()
 export class User {
@@ -24,8 +31,8 @@ export class User {
     @Column({ type: "varchar", default: "PMA-0001" })
     employeeId: string;
 
-    @Column({ type: "varchar", default: "EMPLOYEE" })
-    role: string;
+    @ManyToOne(() => Role, (role) => role.users)
+    role: Role;
 
     @Column({ nullable: true })
     department: string;

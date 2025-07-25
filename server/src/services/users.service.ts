@@ -1,6 +1,7 @@
 import APP_CONSTANT from "../constants/AppConfig";
 import { IEmployeePagination } from "../types/payload";
 import { ILike } from "typeorm";
+import { Role } from "../db/entity/role";
 import { TEmail } from "../types/types";
 import { User } from "../db/entity/User";
 import { addEmailToQueue } from "../jobs/emailQueue";
@@ -10,7 +11,7 @@ import dataSource from "../db/data-source";
 interface IUser {
     firstName: string;
     lastName: string;
-    role: string;
+    role: Role;
     email: string;
     mobileNumber: string;
 }
@@ -58,7 +59,7 @@ export class UserService {
         );
 
         return {
-            employee: response,
+            ...response,
             verifyLink: emailResponse,
         };
     }
@@ -163,6 +164,11 @@ export class UserService {
         password: string;
         userId: number;
     }) {
+        console.log({
+            password,
+            userId,
+        });
+
         const response = await this.userRepository.update(userId, {
             password: password,
             verifyEmailToken: () => "NULL",

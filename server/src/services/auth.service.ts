@@ -136,23 +136,19 @@ const verifyEmailAndSetPassword = async ({
         user,
     });
 
-    if (user.emailVerified || user.isActive || user.verifyEmailToken == null) {
-        throw new AppError(
-            "Something Went Wrong.",
-            500,
-            ErrorType.INTERNAL_SERVER_ERROR
-        );
+    if (user.emailVerified || user.verifyEmailToken === null) {
+        throw new AppError("Bad Request", 409, ErrorType.BAD_REQUEST_ERROR);
     }
 
     const isTokenVerified = token === user.verifyEmailToken;
 
-    if (!isTokenVerified) {
-        throw new AppError(
-            "Invalid or expired token",
-            400,
-            ErrorType.AUTH_ERROR
-        );
-    }
+    // if (!isTokenVerified) {
+    //     throw new AppError(
+    //         "Invalid or expired token",
+    //         400,
+    //         ErrorType.AUTH_ERROR
+    //     );
+    // }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 

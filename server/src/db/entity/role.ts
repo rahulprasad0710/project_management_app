@@ -1,6 +1,15 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Column,
+    Entity,
+    JoinTable,
+    ManyToMany,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from "typeorm";
 
 import { BaseEntityWithAudit } from "./Audit";
+import { Permission } from "./Permission";
 import { User } from "./User";
 
 @Entity()
@@ -8,18 +17,16 @@ export class Role extends BaseEntityWithAudit {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    name: string;
-
-    @Column({ type: "text", nullable: true })
-    description: string;
-
     @Column({ default: true })
     isActive: boolean;
 
-    @Column()
-    addedAt: Date;
+    @Column({ unique: true })
+    name: string;
 
-    @ManyToOne(() => User, (user) => user.id)
-    addedBy: User;
+    @OneToMany(() => User, (user) => user.role)
+    users: User[];
+
+    @ManyToMany(() => Permission, { cascade: true })
+    @JoinTable()
+    permissions: Permission[];
 }

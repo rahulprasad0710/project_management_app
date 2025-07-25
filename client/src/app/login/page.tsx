@@ -5,6 +5,7 @@ import * as yup from "yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { signIn, useSession } from "next-auth/react";
 
+import CompanyIcon from "../(components)/atoms/CompanyIcon";
 import Google from "../(components)/icons/Google";
 import Spinner from "../(components)/Spinner";
 import { toast } from "react-toastify";
@@ -75,9 +76,12 @@ export default function LoginPage() {
     <div>
       <div className="flex h-[calc(100vh-60px)] items-center justify-center bg-gray-50 px-4">
         <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-xl">
-          <h1 className="mb-6 text-center text-2xl font-bold text-gray-800">
-            Sign In to Your Account
-          </h1>
+          <div className="mb-6 flex flex-col items-center justify-center gap-4">
+            <CompanyIcon />
+            <h1 className="mb-2 text-center text-2xl font-bold text-gray-800">
+              Sign In to Your Account
+            </h1>
+          </div>
 
           <button
             onClick={(e) => handleSigninWithGoogle(e)}

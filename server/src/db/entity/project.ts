@@ -4,10 +4,12 @@ import {
     JoinTable,
     ManyToMany,
     ManyToOne,
+    OneToMany,
     PrimaryGeneratedColumn,
 } from "typeorm";
 import { Priority, ProjectStatus } from "../../enums/Priority";
 
+import { ProjectTaskStatus } from "./ProjectTaskStatus";
 import { UploadFile } from "./uploads";
 import { User } from "./User";
 
@@ -67,7 +69,7 @@ export class Project {
 
     @ManyToMany(() => UploadFile, (upload) => upload.id, {
         cascade: true,
-        eager: true,
+        lazy: true,
     })
     @JoinTable({
         name: "project_uploads",
@@ -81,4 +83,10 @@ export class Project {
         },
     })
     projectUploads: UploadFile[];
+
+    @OneToMany(() => ProjectTaskStatus, (pts) => pts.project, {
+        cascade: true,
+        eager: true,
+    })
+    projectTaskStatus: ProjectTaskStatus[];
 }

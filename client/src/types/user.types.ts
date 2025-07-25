@@ -221,6 +221,12 @@ export interface IEmployeeUpdatePayload extends IEmployeePayload {
   id: number;
 }
 
+export interface IVerifyPayload {
+  password: string;
+  token: string;
+  id: number;
+}
+
 export interface IEmployeeResponse {
   id: number;
   firstName: string;

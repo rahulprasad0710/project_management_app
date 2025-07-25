@@ -21,6 +21,7 @@ import {
   IUpdateProjectPayload,
   IUploadFile,
   IUser,
+  IVerifyPayload,
   LabelPagination,
   Response,
   ResponseWithPagination,
@@ -511,6 +512,16 @@ export const api = createApi({
       }),
       invalidatesTags: [{ type: "Employees", id: "LIST" }],
     }),
+    createVerifyEmail: build.mutation<
+      Response<IEmployeeResponse>,
+      IVerifyPayload
+    >({
+      query: (payload) => ({
+        url: "auth/verify-email",
+        method: "POST",
+        body: payload,
+      }),
+    }),
   }),
 });
 
@@ -556,4 +567,6 @@ export const {
   useCreateEmployeeMutation,
   useGetEmployeeByIdQuery,
   useLazyGetEmployeesQuery,
+  //AUTH
+  useCreateVerifyEmailMutation,
 } = api;
