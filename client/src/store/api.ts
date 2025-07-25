@@ -7,6 +7,9 @@ import {
   ICommentUpdatePayload,
   IEmployeePayload,
   IEmployeeResponse,
+  IInternalCompanyPayload,
+  IInternalCompanyResponse,
+  IInternalCompanyUpdatePayload,
   ILabelPayload,
   ILabelResponse,
   ILabelUpdatePayload,
@@ -31,6 +34,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 import dotenv from "dotenv";
 import { getSession } from "next-auth/react";
+import { use } from "react";
 
 dotenv.config();
 
@@ -60,6 +64,7 @@ export const api = createApi({
     "Activity",
     "ProjectTasks",
     "Employees",
+    "InternalCompany",
   ],
   endpoints: (build) => ({
     getUsers: build.query<Response<IUser[]>, void>({
@@ -305,6 +310,7 @@ export const api = createApi({
       ],
     }),
     // ! SPRINTS-ENDS
+    // ! LABELS-STARTS
     getLabels: build.query<
       ResponseWithPagination<ILabelResponse[]>,
       LabelPagination
@@ -522,6 +528,93 @@ export const api = createApi({
         body: payload,
       }),
     }),
+    // ! INTERNAL COMPANY-STARTS
+    getInternalCompanies: build.query<
+      Response<IInternalCompanyResponse[]>,
+      LabelPagination
+    >({
+      query: ({
+        isPaginationEnabled = true,
+        page = 1,
+        pageSize = 10,
+        keyword,
+        isActive,
+      }) => ({
+        url: "internal-companies",
+        method: "GET",
+        params: {
+          isPaginationEnabled,
+          page,
+          pageSize,
+          keyword: keyword ? keyword : undefined,
+          isActive,
+        },
+      }),
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.data.map((internalCompany) => ({
+                type: "InternalCompany" as const,
+                id: internalCompany.id,
+              })),
+              { type: "InternalCompany" as const, id: "LIST" },
+            ]
+          : [{ type: "InternalCompany" as const, id: "LIST" }],
+    }),
+
+    getInternalCompanyById: build.query<
+      Response<IInternalCompanyResponse>,
+      { internalCompanyId: number }
+    >({
+      query: ({ internalCompanyId }) => ({
+        url: `internal-companies/${internalCompanyId}`,
+        method: "GET",
+      }),
+    }),
+
+    createInternalCompany: build.mutation<
+      Response<IInternalCompanyResponse>,
+      ILabelPayload
+    >({
+      query: (payload) => ({
+        url: "internal-companies",
+        method: "POST",
+        body: payload,
+      }),
+      invalidatesTags: [{ type: "InternalCompany", id: "LIST" }],
+    }),
+
+    updateInternalCompany: build.mutation<
+      Response<IInternalCompanyResponse>,
+      IInternalCompanyUpdatePayload
+    >({
+      query: ({ id, ...payload }) => ({
+        url: `internal-companies/${id}`,
+        method: "PUT",
+        body: payload,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "InternalCompany", id },
+        { type: "InternalCompany", id: "LIST" },
+      ],
+    }),
+
+    updateInternalCompanyStatus: build.mutation<
+      Response<IInternalCompanyResponse>,
+      { internalCompanyId: number; isActive: boolean }
+    >({
+      query: ({ internalCompanyId, isActive }) => ({
+        url: `internal-companies/${internalCompanyId}/status`,
+        method: "PUT",
+        body: { isActive },
+      }),
+      invalidatesTags: (result, error, { internalCompanyId }) => [
+        { type: "InternalCompany", id: internalCompanyId },
+        { type: "InternalCompany", id: "LIST" },
+      ],
+    }),
+
+    // ! LABELS-ENDS
   }),
 });
 
@@ -569,4 +662,11 @@ export const {
   useLazyGetEmployeesQuery,
   //AUTH
   useCreateVerifyEmailMutation,
+  // INTERNAL COMPANY
+  useLazyGetInternalCompaniesQuery,
+  useGetInternalCompaniesQuery,
+  useGetInternalCompanyByIdQuery,
+  useCreateInternalCompanyMutation,
+  useUpdateInternalCompanyMutation,
+  useUpdateInternalCompanyStatusMutation,
 } = api;

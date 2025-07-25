@@ -1,5 +1,6 @@
 import { Router as ExpressRouter } from "express";
 import authRoute from "./auth.route";
+import internalCompanyRoute from "./internalCompany.route";
 import labelRoute from "./label.route";
 import projectRoute from "./projects.route";
 import sprintRoute from "./sprint.route";
@@ -42,6 +43,10 @@ const routes = [
     {
         path: "/labels",
         route: labelRoute,
+    },
+    {
+        path: "/internal-companies",
+        route: internalCompanyRoute,
     },
 ];
 

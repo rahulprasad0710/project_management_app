@@ -337,3 +337,31 @@ export type IMultiList = {
   value: number | string;
   icon?: string | undefined;
 };
+
+export interface IInternalCompanyResponse {
+  id: number;
+  name: string;
+  slug: string;
+  logoUrl: string;
+  address: string;
+  contactEmail: string;
+  contactPhone: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  projects?: IProject[];
+}
+
+export interface IInternalCompanyPayload {
+  name: string;
+  slug: string;
+  logoUrl?: string;
+  address: string;
+  contactEmail: string;
+  contactPhone: string;
+  isActive?: boolean;
+}
+
+export interface IInternalCompanyUpdatePayload extends IInternalCompanyPayload {
+  id: number;
+}

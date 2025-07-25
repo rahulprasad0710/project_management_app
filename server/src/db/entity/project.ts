@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { Priority, ProjectStatus } from "../../enums/Priority";
 
+import { InternalCompany } from "./InternalCompany";
 import { ProjectTaskStatus } from "./ProjectTaskStatus";
 import { UploadFile } from "./uploads";
 import { User } from "./User";
@@ -46,6 +47,12 @@ export class Project {
 
     @Column()
     endDate: Date;
+
+    @ManyToOne(() => InternalCompany, (company) => company.projects, {
+        onDelete: "SET NULL",
+        nullable: true,
+    })
+    internalCompany: InternalCompany;
 
     @ManyToOne(() => User, (user) => user.id)
     admin: User;

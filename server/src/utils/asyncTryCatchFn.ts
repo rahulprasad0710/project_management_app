@@ -1,7 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 
-import AppError from "./AppError";
-
 const asyncTryCatchFn =
     (
         controller: (

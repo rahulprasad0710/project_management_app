@@ -2,6 +2,7 @@ import { Activity } from "./activity";
 import { BaseEntityWithAudit } from "./Audit";
 import { Comment } from "./comment";
 import { Department } from "./department";
+import { InternalCompany } from "./InternalCompany";
 import { Label } from "./taskLabel";
 import { Notification } from "./Notification";
 import { Permission } from "./Permission";
@@ -30,4 +31,5 @@ export default [
     BaseEntityWithAudit,
     TaskStatus,
     ProjectTaskStatus,
+    InternalCompany,
 ];

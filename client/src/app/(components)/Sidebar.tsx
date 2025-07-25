@@ -2,6 +2,7 @@
 
 import {
   Brush,
+  Building2,
   CalendarCog,
   Folder,
   Home,
@@ -85,6 +86,11 @@ const Sidebar = () => {
           <SidebarLink href="/employees" icon={UserCog} title="Employees" />
           <SidebarLink href="/sprints" icon={CalendarCog} title="Sprint" />
           <SidebarLink href="/labels" icon={Brush} title="Labels" />
+          <SidebarLink
+            href="/internal-company"
+            icon={Building2}
+            title="Internal Company"
+          />
         </nav>
       </div>
     </div>
