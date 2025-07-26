@@ -8,11 +8,10 @@ import {
     persistReducer,
     persistStore,
 } from "redux-persist";
-import { Provider, useDispatch, useSelector } from "react-redux";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 
 import { PersistGate } from "redux-persist/integration/react";
-import type { TypedUseSelectorHook } from "react-redux";
+import { Provider } from "react-redux";
 import { api } from "./api";
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 import globalReducer from "./index";
@@ -25,10 +24,10 @@ const createNoopStorage = () => {
         getItem(_key: unknown) {
             return Promise.resolve(null);
         },
-        setItem(_key: any, value: any) {
+        setItem(_key: unknown, value: unknown) {
             return Promise.resolve(value);
         },
-        removeItem(_key: any) {
+        removeItem(_key: unknown) {
             return Promise.resolve();
         },
     };
@@ -51,6 +50,7 @@ const rootReducer = combineReducers({
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 /* REDUX STORE */
+// eslint-disable-next-line react-refresh/only-export-components
 export const makeStore = () => {
     return configureStore({
         reducer: persistedReducer,
@@ -72,12 +72,8 @@ export const makeStore = () => {
 
 /* REDUX TYPES */
 export type AppStore = ReturnType<typeof makeStore>;
-export type RootState = ReturnType<AppStore["getState"]>;
-export type AppDispatch = AppStore["dispatch"];
 
 /* REDUX HOOKS */
-export const useAppDispatch = () => useDispatch<AppDispatch>();
-export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 /* PROVIDER */
 export default function StoreProvider({
