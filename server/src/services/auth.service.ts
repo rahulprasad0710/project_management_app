@@ -89,7 +89,7 @@ const loginWithCredentials = async (email: string, password: string) => {
 
     await userService.updateRefreshToken(userFromDB.id, refreshToken);
 
-    return { user: userFromDB, accessToken, refreshToken };
+    return { user: userFromDB, accessToken, refreshToken, authenticated: true };
 };
 
 const logout = async (userId: number) => {
@@ -129,7 +129,7 @@ const verifyEmailAndSetPassword = async ({
 
     const user = await userService.getById(id);
     if (!user) {
-        throw new AppError("User not found", 401, ErrorType.NOT_FOUND_ERROR);
+        throw new AppError("Invalid User", 401, ErrorType.NOT_FOUND_ERROR);
     }
 
     console.log({

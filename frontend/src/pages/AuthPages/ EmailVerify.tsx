@@ -1,13 +1,13 @@
 import AuthLayout from "./AuthPageLayout";
+import EmailVerifyForm from "@components/auth/EmailVerifyForm";
 import PageMeta from "../../components/common/PageMeta";
-import SignUpForm from "../../components/auth/SignUpForm";
 
-export default function SignUp() {
+export default function EmailVerify() {
     return (
         <>
             <PageMeta title='PMA | Signup' description='user login page' />
             <AuthLayout>
-                <SignUpForm />
+                <EmailVerifyForm />
             </AuthLayout>
         </>
     );

@@ -1,14 +1,18 @@
 import * as yup from "yup";
 
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../icons";
-import type { InputValidationRules, SubmitHandler, use } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
 
 import Button from "../ui/button/Button";
 import Checkbox from "../form/input/Checkbox";
-import Input from "../form/input/InputField";
 import Label from "../form/Label";
-import { Link } from "react-router";
+import type { SubmitHandler } from "react-hook-form";
+import { getCustomerError } from "@/utils/customError";
 import { inputFieldClass } from "@/utils/style";
+import { setAuthenticateEmployeeDetailsData } from "@/store";
+import { toast } from "react-toastify";
+import { useAppDispatch } from "@/store/reduxHook";
+import { useCreateLoginEmployeeMutation } from "@/store/api";
 // import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
@@ -19,12 +23,11 @@ interface IFormInput {
     password: string;
 }
 
-interface ILoginPayload {
-    email: string;
-    password: string;
-}
-
 export default function SignInForm() {
+    const [createMutation] = useCreateLoginEmployeeMutation();
+    const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+
     const [showPassword, setShowPassword] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const schema = yup.object().shape({
@@ -49,10 +52,24 @@ export default function SignInForm() {
     const handleSubmitForm: SubmitHandler<IFormInput> = async (data) => {
         console.log(data);
 
-        const payload: ILoginPayload = {
-            email: data.email,
-            password: data.password,
-        };
+        try {
+            const response = await createMutation({
+                email: data.email,
+                password: data.password,
+            }).unwrap();
+            console.log("response", response);
+
+            if (response?.success) {
+                toast.success("Login successfully");
+                dispatch(setAuthenticateEmployeeDetailsData(response.data));
+                localStorage.setItem("accessToken", response.data.accessToken);
+                navigate("/admin/dashboard");
+            }
+        } catch (err) {
+            console.log(err);
+            const error = getCustomerError(err);
+            toast.error(error.message);
+        }
     };
 
     return (

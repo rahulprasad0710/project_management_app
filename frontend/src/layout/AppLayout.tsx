@@ -3,6 +3,9 @@ import AppSidebar from "./AppSidebar";
 import Backdrop from "./Backdrop";
 import { Outlet } from "react-router";
 import { SidebarProvider } from "../context/SidebarContext";
+import { useAppSelector } from "@/store/reduxHook";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import useSidebar from "@/context/useSidebar";
 
 const LayoutContent: React.FC = () => {
@@ -29,6 +32,19 @@ const LayoutContent: React.FC = () => {
 };
 
 const AppLayout: React.FC = () => {
+    const navigate = useNavigate();
+    const authenticateEmployee = useAppSelector(
+        (state) => state.global.authenticateEmployee
+    );
+
+    useEffect(() => {
+        if (authenticateEmployee?.id) {
+            navigate("/admin/dashboard");
+        } else {
+            navigate("/auth/login");
+        }
+    }, [authenticateEmployee, navigate]);
+
     return (
         <SidebarProvider>
             <LayoutContent />

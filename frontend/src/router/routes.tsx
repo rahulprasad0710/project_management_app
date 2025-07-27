@@ -1,7 +1,8 @@
 import AppLayout from "@/layout/AppLayout";
+import Dashboard from "@/pages/Dashboard";
+import EmailVerify from "@/pages/AuthPages/ EmailVerify";
 import HomePage from "@/pages/HomePage";
 import SignIn from "@/pages/AuthPages/SignIn";
-import SignUp from "@/pages/AuthPages/SignUp";
 import { createBrowserRouter } from "react-router-dom";
 
 const router = createBrowserRouter([
@@ -13,6 +14,12 @@ const router = createBrowserRouter([
     {
         path: "admin",
         element: <AppLayout />,
+        children: [
+            {
+                path: "dashboard",
+                element: <Dashboard />,
+            },
+        ],
     },
 
     {
@@ -21,8 +28,8 @@ const router = createBrowserRouter([
     },
 
     {
-        path: "/auth/signup",
-        element: <SignUp />,
+        path: "/auth/verify-email/:id",
+        element: <EmailVerify />,
     },
 ]);
 

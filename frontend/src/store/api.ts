@@ -2,6 +2,8 @@ import type {
     EmployeePagination,
     IActivityResponse,
     IAddProjectPayload,
+    IAuthEmployeePayload,
+    IAuthEmployeeResponse,
     IComment,
     ICommentPayload,
     ICommentUpdatePayload,
@@ -34,11 +36,20 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // /* REDUX API */
 
+async function getAuthToken(): Promise<{ accessToken: string }> {
+    // Example: get token from localStorage or cookies
+    const accessToken = localStorage.getItem("accessToken") || "";
+    return { accessToken };
+}
+
 export const api = createApi({
     baseQuery: fetchBaseQuery({
         baseUrl: "http://localhost:8000/api/",
+        credentials: "include",
         prepareHeaders: async (headers) => {
-            console.log("LOG: ~ prepareHeaders: ~ session:", "123");
+            const { accessToken } = await getAuthToken();
+            console.log("LOG: ~ prepareHeaders: ~ accessToken:", accessToken);
+            headers.set("Authorization", `Bearer ${accessToken}`);
             return headers;
         },
     }),
@@ -56,15 +67,12 @@ export const api = createApi({
         "InternalCompany",
     ],
     endpoints: (build) => ({
-        getUsers: build.query<Response<IUser[]>, void>({
-            query: () => ({
-                url: "users",
-                method: "GET",
-            }),
-        }),
-        createUsers: build.mutation<IUser, Partial<IUser>>({
+        createLoginEmployee: build.mutation<
+            Response<IAuthEmployeeResponse>,
+            IAuthEmployeePayload
+        >({
             query: (payload) => ({
-                url: "users",
+                url: "auth/login",
                 method: "POST",
                 body: payload,
             }),
@@ -633,8 +641,7 @@ export const api = createApi({
 });
 
 export const {
-    useGetUsersQuery,
-    useCreateUsersMutation,
+    useCreateLoginEmployeeMutation,
     // PROJECTS
     useGetProjectTaskByProjectIdQuery,
     useLazyGetProjectTaskByProjectIdQuery,
