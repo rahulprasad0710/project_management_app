@@ -1,5 +1,6 @@
 import "./App.css";
 
+import Navbar from "@components/Navbar";
 import { useEffect } from "react";
 import { useLazyGetProjectsQuery } from "./store/api";
 
@@ -16,7 +17,8 @@ function App() {
 
     return (
         <div>
-            <h2>This World</h2>
+            <Navbar />
+            <h2 className='text-3xl font-bold'>This World</h2>
             {data?.data?.result?.map((project) => {
                 return (
                     <div key={project.id}>
