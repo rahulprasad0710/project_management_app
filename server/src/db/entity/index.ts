@@ -2,6 +2,8 @@ import { Activity } from "./activity";
 import { BaseEntityWithAudit } from "./Audit";
 import { Comment } from "./comment";
 import { Department } from "./department";
+import { Feature } from "./Feature";
+import { FeatureUpload } from "./FeatureUpload";
 import { InternalCompany } from "./InternalCompany";
 import { Label } from "./taskLabel";
 import { Notification } from "./Notification";
@@ -32,4 +34,6 @@ export default [
     TaskStatus,
     ProjectTaskStatus,
     InternalCompany,
+    Feature,
+    FeatureUpload,
 ];
