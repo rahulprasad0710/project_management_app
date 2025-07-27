@@ -25,9 +25,14 @@
         "baseUrl": ".",
         "paths": {
             "@/*": ["src/*"],
+            "@pages/*": ["src/pages/*"],
+            "@layout/*": ["src/layout/*"],
             "@components/*": ["src/components/*"],
             "@molecules/*": ["src/components/molecules/*"],
-
+            "@context/*": ["src/context/*"],
+            "@hooks/*": ["src/hooks/*"],
+            "@utils/*": ["src/utils/*"],
+            "@icons/*": ["src/icons/*"],
             "@store/*": ["src/store/*"]
         }
     },
