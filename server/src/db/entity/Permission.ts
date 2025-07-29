@@ -1,15 +1,24 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
-import { BaseEntityWithAudit } from "./Audit";
+import { PermissionGroup } from "./PermissionGroup";
 
 @Entity()
-export class Permission extends BaseEntityWithAudit {
+export class Permission {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ unique: true })
-    name: string;
+    @Column()
+    displayName: string;
+
+    @Column()
+    enumName: string;
+
+    @ManyToOne(() => PermissionGroup, (permission) => permission.id)
+    permissionGroup: PermissionGroup;
+
+    @Column({ default: true })
+    isActive: boolean;
 
     @Column({ unique: true })
-    enumName: string;
+    description: string;
 }

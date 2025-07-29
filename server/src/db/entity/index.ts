@@ -1,4 +1,5 @@
 import { Activity } from "./activity";
+import { AdminAudit } from "./AdminAudit";
 import { BaseEntityWithAudit } from "./Audit";
 import { Comment } from "./comment";
 import { Department } from "./department";
@@ -8,6 +9,7 @@ import { InternalCompany } from "./InternalCompany";
 import { Label } from "./taskLabel";
 import { Notification } from "./Notification";
 import { Permission } from "./Permission";
+import { PermissionGroup } from "./PermissionGroup";
 import { Project } from "./project";
 import { ProjectTaskStatus } from "./ProjectTaskStatus";
 import { Role } from "./role";
@@ -29,6 +31,7 @@ export default [
     Notification,
     Department,
     Role,
+    PermissionGroup,
     Permission,
     BaseEntityWithAudit,
     TaskStatus,
@@ -36,4 +39,5 @@ export default [
     InternalCompany,
     Feature,
     FeatureUpload,
+    AdminAudit,
 ];

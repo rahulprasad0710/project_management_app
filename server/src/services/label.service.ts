@@ -25,14 +25,10 @@ export class LabelService {
     }
 
     async getAll(isActive: boolean) {
-        try {
-            const response = await this.labelRepository.find({
-                where: { isActive: isActive },
-            });
-            return response;
-        } catch (error) {
-            console.log(error);
-        }
+        const response = await this.labelRepository.find({
+            where: { isActive: isActive },
+        });
+        return response;
     }
 
     async getById(id: number) {

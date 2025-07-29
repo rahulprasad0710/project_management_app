@@ -4,7 +4,7 @@ import { BaseEntityWithAudit } from "./Audit";
 import { User } from "./User";
 
 @Entity()
-export class Department extends BaseEntityWithAudit {
+export class Department {
     @PrimaryGeneratedColumn()
     id: number;
 

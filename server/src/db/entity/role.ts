@@ -3,17 +3,15 @@ import {
     Entity,
     JoinTable,
     ManyToMany,
-    ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
 } from "typeorm";
 
-import { BaseEntityWithAudit } from "./Audit";
 import { Permission } from "./Permission";
 import { User } from "./User";
 
 @Entity()
-export class Role extends BaseEntityWithAudit {
+export class Role {
     @PrimaryGeneratedColumn()
     id: number;
 
