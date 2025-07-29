@@ -1,9 +1,12 @@
+import { Outlet, createBrowserRouter } from "react-router-dom";
+
 import AppLayout from "@/layout/AppLayout";
 import Dashboard from "@/pages/Dashboard";
 import EmailVerify from "@/pages/AuthPages/ EmailVerify";
 import HomePage from "@/pages/HomePage";
+import Permission from "@/pages/RolesAndPermission/Permission";
+import Roles from "@/pages/RolesAndPermission/Role";
 import SignIn from "@/pages/AuthPages/SignIn";
-import { createBrowserRouter } from "react-router-dom";
 
 const router = createBrowserRouter([
     {
@@ -18,6 +21,20 @@ const router = createBrowserRouter([
             {
                 path: "dashboard",
                 element: <Dashboard />,
+            },
+            {
+                path: "auth-settings",
+                element: <Outlet />,
+                children: [
+                    {
+                        path: "permissions",
+                        element: <Permission />,
+                    },
+                    {
+                        path: "roles",
+                        element: <Roles />,
+                    },
+                ],
             },
         ],
     },

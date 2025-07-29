@@ -25,6 +25,10 @@ export interface Pagination {
     keyword?: string;
 }
 
+export interface IPaginationWithActive extends Pagination {
+    isActive: boolean;
+}
+
 export interface IProjectPagination extends Pagination {
     status?: ProjectStatus[] | undefined;
     priority?: Priority | undefined;
@@ -378,4 +382,20 @@ export interface IAuthEmployeeResponse {
     accessToken: string;
     refreshToken: string;
     authenticated: boolean;
+}
+
+export interface IPermissionGroupResponse {
+    id: number;
+    displayName: string;
+    isActive: boolean;
+    description: string;
+    permissions?: IPermissionResponse[];
+}
+
+export interface IPermissionResponse {
+    id: number;
+    displayName: string;
+    isActive: boolean;
+    description: string;
+    enumName: string;
 }

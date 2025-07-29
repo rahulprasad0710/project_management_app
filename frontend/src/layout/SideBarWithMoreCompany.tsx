@@ -29,43 +29,38 @@ const navItems: NavItem[] = [
     {
         icon: <GridIcon />,
         name: "Dashboard",
-        path: "/admin/dashboard",
+        path: "/dashboard",
     },
-
     {
         icon: <CalenderIcon />,
-        name: "Bookings",
+        name: "Mystic Mountain",
         subItems: [
-            { name: "Tasks", path: "/admin/bookings/tasks", pro: false },
-            {
-                name: "Listings",
-                path: "/admin/bookings/listings?status=NEW",
-                pro: false,
-            },
-            { name: "Settings", path: "/admin/bookings/settings", pro: false },
+            { name: "Bookings", path: "/bookings", pro: false },
+            { name: "projects", path: "/projects", pro: false },
+            { name: "Clients", path: "/clients", pro: false },
         ],
     },
     {
-        icon: <UserCircleIcon />,
-        name: "Clients",
-        path: "/admin/clients",
+        icon: <CalenderIcon />,
+        name: "Ecommerce",
+        subItems: [
+            { name: "Orders", path: "/orders", pro: false },
+            { name: "projects", path: "/projects", pro: false },
+            { name: "Clients", path: "/clients", pro: false },
+        ],
     },
-    {
-        icon: <UserCircleIcon />,
-        name: "Projects",
-        path: "/admin/projects",
-    },
+
     {
         icon: <UserCircleIcon />,
         name: "Employees",
-        path: "/admin/employees",
+        path: "/employees",
     },
 ];
 
 const othersItems: NavItem[] = [
     {
         icon: <PieChartIcon />,
-        name: "Company Settings",
+        name: "Charts",
         subItems: [
             { name: "Line Chart", path: "/line-chart", pro: false },
             { name: "Bar Chart", path: "/bar-chart", pro: false },
@@ -73,7 +68,7 @@ const othersItems: NavItem[] = [
     },
     {
         icon: <BoxCubeIcon />,
-        name: "Other Settings",
+        name: "UI Elements",
         subItems: [
             { name: "Alerts", path: "/alerts", pro: false },
             { name: "Avatar", path: "/avatars", pro: false },
@@ -84,25 +79,11 @@ const othersItems: NavItem[] = [
         ],
     },
     {
-        // PERMISSION ONLY TO ADMIN
         icon: <PlugInIcon />,
-        name: "Roles & Permissions",
+        name: "Authentication",
         subItems: [
-            {
-                name: "Employee",
-                path: "/admin/auth-settings/employees",
-                pro: false,
-            },
-            {
-                name: "Roles",
-                path: "/admin/auth-settings/roles",
-                pro: false,
-            },
-            {
-                name: "Permissions",
-                path: "/admin/auth-settings/permissions",
-                pro: false,
-            },
+            { name: "Sign In", path: "/signin", pro: false },
+            { name: "Sign Up", path: "/signup", pro: false },
         ],
     },
 ];
@@ -373,7 +354,7 @@ const AppSidebar: React.FC = () => {
             </div>
             <div className='flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar'>
                 <nav className='mb-6'>
-                    <div className='flex flex-col gap-4 justify-between h-full md:h-[85vh]'>
+                    <div className='flex flex-col gap-4'>
                         <div>
                             <h2
                                 className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
@@ -399,9 +380,7 @@ const AppSidebar: React.FC = () => {
                                 }`}
                             >
                                 {isExpanded || isHovered || isMobileOpen ? (
-                                    <div className='text-bold text-sm text-slate-900 '>
-                                        Settings
-                                    </div>
+                                    "Others"
                                 ) : (
                                     <HorizontaLDots />
                                 )}
@@ -410,6 +389,9 @@ const AppSidebar: React.FC = () => {
                         </div>
                     </div>
                 </nav>
+                {isExpanded || isHovered || isMobileOpen ? (
+                    <SidebarWidget />
+                ) : null}
             </div>
         </aside>
     );

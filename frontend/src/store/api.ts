@@ -9,12 +9,13 @@ import type {
     ICommentUpdatePayload,
     IEmployeePayload,
     IEmployeeResponse,
-    IInternalCompanyPayload,
     IInternalCompanyResponse,
     IInternalCompanyUpdatePayload,
     ILabelPayload,
     ILabelResponse,
     ILabelUpdatePayload,
+    IPaginationWithActive,
+    IPermissionGroupResponse,
     IProject,
     IProjectPagination,
     IProjectTaskPagination,
@@ -25,9 +26,9 @@ import type {
     ITaskPayload,
     IUpdateProjectPayload,
     IUploadFile,
-    IUser,
     IVerifyPayload,
     LabelPagination,
+    Pagination,
     Response,
     ResponseWithPagination,
     SprintPagination,
@@ -65,6 +66,7 @@ export const api = createApi({
         "ProjectTasks",
         "Employees",
         "InternalCompany",
+        "PermissionGroup",
     ],
     endpoints: (build) => ({
         createLoginEmployee: build.mutation<
@@ -637,6 +639,50 @@ export const api = createApi({
         }),
 
         // ! LABELS-ENDS
+
+        // ! PERMISSION-GROUP-STARTS
+        getAllPermissionGroups: build.query<
+            ResponseWithPagination<IPermissionGroupResponse[]>,
+            IPaginationWithActive
+        >({
+            query: ({
+                isPaginationEnabled = true,
+                page = 1,
+                pageSize = 10,
+                keyword,
+                isActive,
+            }) => ({
+                url: "permissions/groups",
+                method: "GET",
+                params: {
+                    isPaginationEnabled,
+                    page,
+                    pageSize,
+                    keyword: keyword ? keyword : undefined,
+                    isActive,
+                },
+            }),
+            providesTags: (result) =>
+                result
+                    ? [
+                          ...result.data.result.map((item) => ({
+                              type: "PermissionGroup" as const,
+                              id: item.id,
+                          })),
+                          { type: "PermissionGroup" as const, id: "LIST" },
+                      ]
+                    : [{ type: "PermissionGroup" as const, id: "LIST" }],
+        }),
+
+        getPermissionGroupsDetailsById: build.query<
+            Response<IPermissionGroupResponse>,
+            { permissionGroupId: number }
+        >({
+            query: ({ permissionGroupId }) => ({
+                url: `permissions/groups/${permissionGroupId}`,
+                method: "GET",
+            }),
+        }),
     }),
 });
 
@@ -690,4 +736,7 @@ export const {
     useCreateInternalCompanyMutation,
     useUpdateInternalCompanyMutation,
     useUpdateInternalCompanyStatusMutation,
+    // PERMISSIONS
+    useGetAllPermissionGroupsQuery,
+    useLazyGetPermissionGroupsDetailsByIdQuery,
 } = api;
