@@ -12,7 +12,7 @@ import { inputFieldClass } from "@/utils/style";
 import { setAuthenticateEmployeeDetailsData } from "@/store";
 import { toast } from "react-toastify";
 import { useAppDispatch } from "@/store/reduxHook";
-import { useCreateLoginEmployeeMutation } from "@/store/api";
+import { useCreateLoginEmployeeMutation } from "@api/api";
 // import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { useState } from "react";

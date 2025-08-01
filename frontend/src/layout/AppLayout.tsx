@@ -38,15 +38,14 @@ const AppLayout: React.FC = () => {
     );
 
     useEffect(() => {
-        if (authenticateEmployee?.id) {
-            navigate("/admin/dashboard");
-        } else {
+        if (!authenticateEmployee?.id) {
             navigate("/auth/login");
         }
     }, [authenticateEmployee, navigate]);
 
     return (
         <SidebarProvider>
+            {/* {JSON.stringify(authenticateEmployee)} */}
             <LayoutContent />
         </SidebarProvider>
     );

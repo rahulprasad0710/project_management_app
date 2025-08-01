@@ -17,7 +17,7 @@ import type { SubmitHandler } from "react-hook-form";
 import { getCustomerError } from "@utils/customError";
 import { inputFieldClass } from "@/utils/style";
 import { toast } from "react-toastify";
-import { useCreateVerifyEmailMutation } from "@/store/api";
+import { useCreateVerifyEmailMutation } from "@api/api";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";

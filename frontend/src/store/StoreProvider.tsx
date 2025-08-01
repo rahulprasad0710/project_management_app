@@ -12,7 +12,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 
 import { PersistGate } from "redux-persist/integration/react";
 import { Provider } from "react-redux";
-import { api } from "./api";
+import { api } from "@/api/api";
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 import globalReducer from "./index";
 import { setupListeners } from "@reduxjs/toolkit/query";

@@ -399,3 +399,20 @@ export interface IPermissionResponse {
     description: string;
     enumName: string;
 }
+
+export interface IRoleResponse {
+    id: number;
+    name: string;
+    isActive: boolean;
+    permissions: IPermissionResponse[];
+}
+
+export interface IRolePayload {
+    name: string;
+    isActive: boolean;
+    permissions: number[];
+}
+
+export interface IRoleUpdatePayload extends IRolePayload {
+    id: number;
+}

@@ -4,6 +4,7 @@ import internalCompanyRoute from "./internalCompany.route";
 import labelRoute from "./label.route";
 import permissionRoute from "./permission.route";
 import projectRoute from "./projects.route";
+import roleRoute from "./role.route";
 import sprintRoute from "./sprint.route";
 import taskRoute from "./tasks.route";
 import uploadRoute from "./uploads.route";
@@ -52,6 +53,10 @@ const routes = [
     {
         path: "/permissions",
         route: permissionRoute,
+    },
+    {
+        path: "/roles",
+        route: roleRoute,
     },
 ];
 

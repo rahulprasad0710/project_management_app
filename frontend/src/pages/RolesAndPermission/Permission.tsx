@@ -1,12 +1,12 @@
+import { useEffect, useState } from "react";
 import {
     useGetAllPermissionGroupsQuery,
     useLazyGetPermissionGroupsDetailsByIdQuery,
-} from "@/store/api";
+} from "@apiHooks/usePermission";
 
 import type { IPermissionGroupResponse } from "@/types/config.types";
 import Skeleton from "@/components/common/Skeleton";
 import { TrashBinIcon } from "@/icons";
-import { useState } from "react";
 
 const Permission = () => {
     const { data: PermissionGroups, isFetching } =
@@ -22,7 +22,7 @@ const Permission = () => {
         { isFetching: isFetchingDetails, data: PermissionGroupDetails },
     ] = useLazyGetPermissionGroupsDetailsByIdQuery();
 
-    const [itemIndex, setItemIndex] = useState<number>(1);
+    const [itemIndex, setItemIndex] = useState<number>(0);
 
     const handleClick = (index: number, item: IPermissionGroupResponse) => {
         setItemIndex(index);
@@ -33,6 +33,22 @@ const Permission = () => {
             permissionGroupId: item.id,
         });
     };
+
+    useEffect(() => {
+        if (
+            PermissionGroups?.data?.result?.length &&
+            PermissionGroups?.data?.result[0]?.id
+        ) {
+            setItemIndex(0);
+            fetchDetailsById({
+                permissionGroupId: PermissionGroups?.data?.result[0]?.id,
+            });
+        }
+    }, [
+        PermissionGroups?.data?.result,
+        PermissionGroups?.data?.result?.length,
+        fetchDetailsById,
+    ]);
 
     const activeClassName =
         "inline-flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors duration-200 ease-in-out bg-white text-gray-900 shadow-theme-xs dark:bg-white/[0.03] dark:text-white";
@@ -88,8 +104,8 @@ const Permission = () => {
                                 {PermissionGroupDetails?.data.description}
                             </p>
                         </div>
-                        <div className='border border-t border-gray-200 py-4 mt-4 dark:border-gray-800 sm:p-6'>
-                            <table className='min-w-full'>
+                        <div className='border border-t border-gray-200 py-4 mt-4 dark:border-gray-800 sm:p-6 overflow-x-auto'>
+                            <table className='min-w-full '>
                                 <thead className='border-gray-100 border-y bg-gray-50 dark:border-gray-800 dark:bg-gray-900'>
                                     <tr>
                                         <th className='px-6 py-3 whitespace-nowrap'>
