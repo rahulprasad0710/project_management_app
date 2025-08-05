@@ -10,9 +10,13 @@ import {
 
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/button/Button";
+import Input from "@/components/form/input/InputField";
+import Label from "@/components/form/Label";
+import { Modal } from "@/components/common/Modal";
 import { PlusIcon } from "lucide-react";
 import ReactTable from "@/components/common/ReactTable";
 import { SquarePen } from "lucide-react";
+import TaskStatusModal from "@/components/settings/TaskStatusModal";
 import { createColumnHelper } from "@tanstack/react-table";
 
 const TaskStatus = () => {
@@ -77,6 +81,10 @@ const TaskStatus = () => {
 
     const handleEdit = (data: ITaskStatusResponse) => {
         setSelectedData(data);
+        setToggle(true);
+    };
+
+    const handleOpenModal = () => {
         setToggle(true);
     };
 
@@ -154,34 +162,49 @@ const TaskStatus = () => {
     ];
 
     return (
-        <div className='rounded-md border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]'>
-            <div className='px-6 py-5 flex justify-between items-center'>
-                <h2 className='text-xl font-semibold text-gray-800 dark:text-white/90'>
-                    Task Status
-                </h2>
-                <Button variant='primary' size='sm'>
-                    <PlusIcon />
-                    Add Task Status
-                </Button>
-            </div>
-            <div className='border-t border-gray-100 p-4 dark:border-gray-800 sm:p-6'>
-                <ReactTable
-                    isFetching={isFetching}
-                    showPagination={true}
-                    columns={columns ?? []}
-                    handleNext={handleNext}
-                    handlePrevious={handlePrevious}
-                    data={dataList?.data.result ?? []}
-                    pagination={
-                        dataList?.data?.pagination ?? {
-                            currentPage: 1,
-                            pageSize: 10,
-                            totalCount: 10,
-                            totalPages: 1,
+        <div>
+            <div className='rounded-md border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]'>
+                <div className='px-6 py-5 flex justify-between items-center'>
+                    <h2 className='text-xl font-semibold text-gray-800 dark:text-white/90'>
+                        Task Status
+                    </h2>
+                    <Button
+                        onClick={handleOpenModal}
+                        variant='primary'
+                        size='sm'
+                    >
+                        <PlusIcon />
+                        Add Task Status
+                    </Button>
+                </div>
+                <div className='border-t border-gray-100 p-4 dark:border-gray-800 sm:p-6'>
+                    <ReactTable
+                        isFetching={isFetching}
+                        showPagination={true}
+                        columns={columns ?? []}
+                        handleNext={handleNext}
+                        handlePrevious={handlePrevious}
+                        data={dataList?.data.result ?? []}
+                        pagination={
+                            dataList?.data?.pagination ?? {
+                                currentPage: 1,
+                                pageSize: 10,
+                                totalCount: 10,
+                                totalPages: 1,
+                            }
                         }
-                    }
-                />
+                    />
+                </div>
             </div>
+
+            <Modal
+                isOpen={toggle}
+                onClose={() => setToggle(false)}
+                className='max-w-[700px] m-4'
+                isFullscreen={false}
+            >
+                <TaskStatusModal setToggle={setToggle} />
+            </Modal>
         </div>
     );
 };
