@@ -4,6 +4,7 @@ import { BaseEntityWithAudit } from "./Audit";
 import { Comment } from "./comment";
 import { Department } from "./department";
 import { Feature } from "./Feature";
+import { FeatureTaskStatus } from "./FeatureTaskStatus";
 import { FeatureUpload } from "./FeatureUpload";
 import { InternalCompany } from "./InternalCompany";
 import { Label } from "./taskLabel";
@@ -40,4 +41,5 @@ export default [
     Feature,
     FeatureUpload,
     AdminAudit,
+    FeatureTaskStatus,
 ];

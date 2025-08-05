@@ -1,4 +1,5 @@
 import {
+    Check,
     Column,
     Entity,
     JoinColumn,
@@ -9,6 +10,7 @@ import {
 } from "typeorm";
 import { Priority, TaskStatus } from "../../enums/Priority";
 
+import { Feature } from "./Feature";
 import { Label } from "./taskLabel";
 import { Project } from "./project";
 import { Sprint } from "./sprint";
@@ -16,6 +18,10 @@ import { UploadFile } from "./uploads";
 import { User } from "./User";
 
 @Entity()
+@Check(`(
+  ("projectId" IS NOT NULL AND "feature_id" IS NULL) OR
+  ("projectId" IS NULL AND "feature_id" IS NOT NULL)
+)`)
 export class Task {
     @PrimaryGeneratedColumn()
     id: number;
@@ -67,11 +73,17 @@ export class Task {
     })
     priority: Priority;
 
-    @ManyToOne(() => Project, (project) => project.id, { nullable: false })
+    @ManyToOne(() => Project, (project) => project.id, { nullable: true })
     @JoinColumn({
         name: "projectId",
     })
     project: Project;
+
+    @ManyToOne(() => Feature, (feature) => feature.id, { nullable: true })
+    @JoinColumn({
+        name: "feature_id",
+    })
+    feature: Feature;
 
     @ManyToMany(() => UploadFile, (upload) => upload.id, {
         cascade: true,

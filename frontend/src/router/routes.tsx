@@ -5,8 +5,10 @@ import Dashboard from "@/pages/Dashboard";
 import EmailVerify from "@/pages/AuthPages/ EmailVerify";
 import HomePage from "@/pages/HomePage";
 import Permission from "@/pages/RolesAndPermission/Permission";
-import Roles from "@/pages/RolesAndPermission/Role";
+import Roles from "@/pages/RolesAndPermission/RolePage";
 import SignIn from "@/pages/AuthPages/SignIn";
+import TaskPage from "@/pages/features/TaskPage";
+import TaskStatusPage from "@/pages/settings/TaskStatusPage";
 
 const router = createBrowserRouter([
     {
@@ -21,6 +23,38 @@ const router = createBrowserRouter([
             {
                 path: "dashboard",
                 element: <Dashboard />,
+            },
+            {
+                path: "features",
+                element: (
+                    <div className='mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6'>
+                        <Outlet />
+                    </div>
+                ),
+                children: [
+                    {
+                        path: "tasks",
+                        element: <TaskPage />,
+                    },
+                    {
+                        path: "listings",
+                        element: <Roles />,
+                    },
+                ],
+            },
+            {
+                path: "settings",
+                element: <Outlet />,
+                children: [
+                    {
+                        path: "task-status",
+                        element: <TaskStatusPage />,
+                    },
+                    {
+                        path: "roles",
+                        element: <Roles />,
+                    },
+                ],
             },
             {
                 path: "auth-settings",

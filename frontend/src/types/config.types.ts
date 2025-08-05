@@ -416,3 +416,19 @@ export interface IRolePayload {
 export interface IRoleUpdatePayload extends IRolePayload {
     id: number;
 }
+
+export interface ITaskStatusResponse {
+    id: number;
+    name: string;
+    is_active: boolean;
+    color_code: string;
+}
+
+export interface ITaskStatusPayload {
+    name: string;
+    color_code: string;
+}
+
+export interface ITaskStatusUpdatePayload extends ITaskStatusPayload {
+    id: number;
+}

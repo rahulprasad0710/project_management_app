@@ -6,23 +6,27 @@ import {
     GridIcon,
     HorizontaLDots,
     ListIcon,
-    PageIcon,
     PieChartIcon,
     PlugInIcon,
-    TableIcon,
     UserCircleIcon,
 } from "../icons";
+import { CalendarCog, KanbanSquare } from "lucide-react";
 import { Link, useLocation } from "react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import SidebarWidget from "./SidebarWidget";
 import useSidebar from "@/context/useSidebar";
 
 type NavItem = {
     name: string;
     icon: React.ReactNode;
     path?: string;
-    subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+    subItems?: {
+        name: string;
+        path: string;
+        pro?: boolean;
+        new?: boolean;
+        icon?: React.ReactNode;
+    }[];
 };
 
 const navItems: NavItem[] = [
@@ -36,13 +40,24 @@ const navItems: NavItem[] = [
         icon: <CalenderIcon />,
         name: "Bookings",
         subItems: [
-            { name: "Tasks", path: "/admin/bookings/tasks", pro: false },
+            {
+                name: "Tasks",
+                path: "/admin/features/tasks",
+                pro: false,
+                icon: <KanbanSquare />,
+            },
             {
                 name: "Listings",
-                path: "/admin/bookings/listings?status=NEW",
+                path: "/admin/features/listings?status=NEW",
                 pro: false,
+                icon: <ListIcon />,
             },
-            { name: "Settings", path: "/admin/bookings/settings", pro: false },
+            {
+                name: "Settings",
+                path: "/admin/features/settings",
+                pro: false,
+                icon: <CalendarCog />,
+            },
         ],
     },
     {
@@ -64,6 +79,27 @@ const navItems: NavItem[] = [
 
 const othersItems: NavItem[] = [
     {
+        icon: <BoxCubeIcon />,
+        name: "Settings",
+        subItems: [
+            {
+                name: "Sprints",
+                path: "/admin/other-settings/sprints",
+                pro: false,
+            },
+            {
+                name: "Labels",
+                path: "/admin/other-settings/sprints",
+                pro: false,
+            },
+            {
+                name: "Task Status",
+                path: "/admin/settings/task-status",
+                pro: false,
+            },
+        ],
+    },
+    {
         icon: <PieChartIcon />,
         name: "Company Settings",
         subItems: [
@@ -71,25 +107,14 @@ const othersItems: NavItem[] = [
             { name: "Bar Chart", path: "/bar-chart", pro: false },
         ],
     },
-    {
-        icon: <BoxCubeIcon />,
-        name: "Other Settings",
-        subItems: [
-            { name: "Alerts", path: "/alerts", pro: false },
-            { name: "Avatar", path: "/avatars", pro: false },
-            { name: "Badge", path: "/badge", pro: false },
-            { name: "Buttons", path: "/buttons", pro: false },
-            { name: "Images", path: "/images", pro: false },
-            { name: "Videos", path: "/videos", pro: false },
-        ],
-    },
+
     {
         // PERMISSION ONLY TO ADMIN
         icon: <PlugInIcon />,
-        name: "Roles & Permissions",
+        name: "Admin Settings",
         subItems: [
             {
-                name: "Employee",
+                name: "Employee's Permissions",
                 path: "/admin/auth-settings/employees",
                 pro: false,
             },
@@ -101,6 +126,16 @@ const othersItems: NavItem[] = [
             {
                 name: "Permissions",
                 path: "/admin/auth-settings/permissions",
+                pro: false,
+            },
+            {
+                name: "Feature & Team",
+                path: "/admin/auth-settings/features",
+                pro: false,
+            },
+            {
+                name: "Internal Company",
+                path: "/admin/auth-settings/internal-company",
                 pro: false,
             },
         ],
@@ -281,6 +316,13 @@ const AppSidebar: React.FC = () => {
                                                         : "menu-dropdown-item-inactive"
                                                 }`}
                                             >
+                                                {subItem.icon && (
+                                                    <span
+                                                        className={`menu-sub-item-icon-size`}
+                                                    >
+                                                        {subItem.icon}
+                                                    </span>
+                                                )}
                                                 {subItem.name}
                                                 <span className='flex items-center gap-1 ml-auto'>
                                                     {subItem.new && (

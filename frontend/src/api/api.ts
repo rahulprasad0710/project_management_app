@@ -12,6 +12,7 @@ import type {
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 import { roleEndpoints } from "./apiRoutes/rolesApi";
+import { taskStatusEndpoints } from "./apiRoutes/taskStatusApi";
 
 // /* REDUX API */
 
@@ -46,6 +47,7 @@ export const api = createApi({
         "InternalCompany",
         "PermissionGroup",
         "Role",
+        "TaskStatus",
     ],
     endpoints: (build) => ({
         createLoginEmployee: build.mutation<
@@ -131,6 +133,7 @@ export const api = createApi({
 
         // ! ROLES-STARTS
         ...roleEndpoints(build),
+        ...taskStatusEndpoints(build),
     }),
 });
 

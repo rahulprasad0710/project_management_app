@@ -1,4 +1,6 @@
 import { Router as ExpressRouter } from "express";
+// Main router that aggregates all routes
+import SettingRoute from "./settings/setting.route"; // Importing Route type from settings
 import authRoute from "./auth.route";
 import internalCompanyRoute from "./internalCompany.route";
 import labelRoute from "./label.route";
@@ -57,6 +59,11 @@ const routes = [
     {
         path: "/roles",
         route: roleRoute,
+    },
+
+    {
+        path: "/settings",
+        route: SettingRoute,
     },
 ];
 

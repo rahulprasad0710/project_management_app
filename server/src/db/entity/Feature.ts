@@ -4,7 +4,6 @@ import {
     JoinTable,
     ManyToMany,
     ManyToOne,
-    OneToMany,
     PrimaryGeneratedColumn,
 } from "typeorm";
 
@@ -28,9 +27,8 @@ export class Feature {
     @Column({ nullable: true, default: null })
     profilePicture: string;
 
-    @ManyToOne(() => InternalCompany, (company) => company.projects, {
-        onDelete: "SET NULL",
-        nullable: true,
+    @ManyToOne(() => InternalCompany, (company) => company.id, {
+        nullable: false,
     })
     internalCompany: InternalCompany;
 

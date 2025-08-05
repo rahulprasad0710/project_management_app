@@ -55,3 +55,7 @@ export interface IProjectTaskPagination extends IPagination {
     assignedTo?: number[] | undefined;
     projectId: number;
 }
+
+export interface IActivePagination extends IPagination {
+    isActive?: boolean | undefined;
+}

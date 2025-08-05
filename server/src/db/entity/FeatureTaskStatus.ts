@@ -2,19 +2,19 @@
 
 import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
-import { Project } from "./project";
+import { Feature } from "./Feature";
 import { TaskStatus } from "./taskStatus";
 
-@Entity("project_task_status")
-export class ProjectTaskStatus {
+@Entity("feature_task_status")
+export class FeatureTaskStatus {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => Project, (project) => project.id, {
+    @ManyToOne(() => Feature, (feature) => feature.id, {
         onDelete: "CASCADE",
     })
-    @JoinColumn({ name: "project_id" })
-    project: Project;
+    @JoinColumn({ name: "feature_id" })
+    feature: Feature;
 
     @ManyToOne(() => TaskStatus, (taskStatus) => taskStatus.id, {
         onDelete: "CASCADE",

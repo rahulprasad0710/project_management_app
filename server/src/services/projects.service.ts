@@ -1,4 +1,4 @@
-import { ILike, In, Like } from "typeorm";
+import { ILike, In } from "typeorm";
 import {
     IProject,
     IProjectPagination,
@@ -6,7 +6,6 @@ import {
 } from "../types/payload";
 import UploadService, { IUploadFileURL } from "./upload.service";
 
-import { IPagination } from "../types/express";
 import { Project } from "../db/entity/project";
 import { Task } from "../db/entity/task";
 import { UploadFile } from "../db/entity/uploads";

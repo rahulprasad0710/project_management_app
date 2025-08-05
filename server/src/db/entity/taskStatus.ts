@@ -1,6 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-
-import { ProjectTaskStatus } from "./ProjectTaskStatus";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class TaskStatus {
@@ -11,8 +9,8 @@ export class TaskStatus {
     name: string;
 
     @Column({ type: "text", default: "#023047" })
-    colorCode: string;
+    color_code: string;
 
-    @OneToMany(() => ProjectTaskStatus, (pts) => pts.taskStatus)
-    projectTaskStatus: ProjectTaskStatus[];
+    @Column({ default: true })
+    is_active: boolean;
 }

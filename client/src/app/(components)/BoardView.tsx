@@ -111,7 +111,7 @@ const TaskColumn = (props: TaskColumnProps) => {
       ref={(instance) => {
         drop(instance);
       }}
-      className={`sl:py-4 h-[600px] rounded-lg bg-gray-100 py-2 shadow-sm xl:px-2 ${isOver ? "bg-blue-100" : ""} `}
+      className={`sl:py-4 rounded-lg bg-blue-100 py-2 shadow-sm xl:px-2 ${isOver ? "bg-blue-100" : ""} `}
     >
       <div
         className={`h-1 bg-[${taskStatusColor[status as TaskStatus]}] mx-2 rounded-lg`}
@@ -138,7 +138,7 @@ const TaskColumn = (props: TaskColumnProps) => {
           </button>
         </div>
       </div>
-      <div>
+      <div className="no-scrollbar h-[600px] overflow-y-scroll">
         {tasks
           .filter((task) => task.status === status)
           .map((task: ITask) => {
