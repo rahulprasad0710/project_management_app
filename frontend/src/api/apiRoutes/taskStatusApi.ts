@@ -65,12 +65,12 @@ export const taskStatusEndpoints = (
             method: "GET",
         }),
     }),
-    createRoles: build.mutation<
+    createTaskStatus: build.mutation<
         Response<ITaskStatusResponse>,
         ITaskStatusPayload
     >({
         query: (payload) => ({
-            url: "task-status",
+            url: "/settings/task-status",
             method: "POST",
             body: payload,
         }),
@@ -82,7 +82,7 @@ export const taskStatusEndpoints = (
         ITaskStatusUpdatePayload
     >({
         query: ({ id, ...payload }) => ({
-            url: `task-status/${id}`,
+            url: `/settings/task-status/${id}`,
             method: "PUT",
             body: payload,
         }),

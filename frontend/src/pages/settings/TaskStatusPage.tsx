@@ -1,23 +1,15 @@
-import type {
-    ITaskStatusResponse,
-    ResponseWithPagination,
-} from "@/types/config.types";
 import { useEffect, useState } from "react";
-import {
-    useGetAllTaskStatusQuery,
-    useLazyGetAllTaskStatusQuery,
-} from "@api/hooks/useTaskStatus";
 
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/button/Button";
-import Input from "@/components/form/input/InputField";
-import Label from "@/components/form/Label";
+import type { ITaskStatusResponse } from "@/types/config.types";
 import { Modal } from "@/components/common/Modal";
 import { PlusIcon } from "lucide-react";
 import ReactTable from "@/components/common/ReactTable";
 import { SquarePen } from "lucide-react";
 import TaskStatusModal from "@/components/settings/TaskStatusModal";
 import { createColumnHelper } from "@tanstack/react-table";
+import { useLazyGetAllTaskStatusQuery } from "@api/hooks/useTaskStatus";
 
 const TaskStatus = () => {
     const [keyword, setKeyword] = useState<string>("");
@@ -86,6 +78,11 @@ const TaskStatus = () => {
 
     const handleOpenModal = () => {
         setToggle(true);
+    };
+
+    const handleCloseModal = () => {
+        setSelectedData(undefined);
+        setToggle(false);
     };
 
     const columnHelper = createColumnHelper<ITaskStatusResponse>();
@@ -199,11 +196,15 @@ const TaskStatus = () => {
 
             <Modal
                 isOpen={toggle}
-                onClose={() => setToggle(false)}
-                className='max-w-[700px] m-4'
+                onClose={() => handleCloseModal()}
+                className='max-w-[500px] mb-4'
                 isFullscreen={false}
             >
-                <TaskStatusModal setToggle={setToggle} />
+                <TaskStatusModal
+                    setSelectedData={setSelectedData}
+                    selectedData={selectedData}
+                    handleCloseModal={handleCloseModal}
+                />
             </Modal>
         </div>
     );

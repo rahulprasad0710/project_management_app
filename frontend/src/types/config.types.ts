@@ -426,7 +426,7 @@ export interface ITaskStatusResponse {
 
 export interface ITaskStatusPayload {
     name: string;
-    color_code: string;
+    colorCode: string;
 }
 
 export interface ITaskStatusUpdatePayload extends ITaskStatusPayload {
