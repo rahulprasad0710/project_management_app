@@ -34,7 +34,6 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 import dotenv from "dotenv";
 import { getSession } from "next-auth/react";
-import { use } from "react";
 
 dotenv.config();
 

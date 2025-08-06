@@ -1,4 +1,3 @@
-import { FeatureTaskStatus } from "../../db/entity/FeatureTaskStatus";
 import { IActivePagination } from "../../types/payload";
 import { ILike } from "typeorm";
 import { ProjectTaskStatus } from "../../db/entity/ProjectTaskStatus";
@@ -15,10 +14,6 @@ export class TaskStatusService {
     constructor(
         private readonly taskStatusRepository = dataSource.getRepository(
             TaskStatus
-        ),
-
-        private readonly featureTaskStatusRepository = dataSource.getRepository(
-            FeatureTaskStatus
         ),
 
         private readonly projectTaskStatusRepository = dataSource.getRepository(
@@ -70,20 +65,6 @@ export class TaskStatusService {
                 isPaginationEnabled
             ),
         };
-    }
-
-    /**
-     * This method retrieves all task statuses associated with a specific feature ID.
-     * @param featureId
-     * @returns FeatureTaskStatus[]
-     * @description Get all task status for a feature
-     */
-    async getTaskStatusByFeatureId(featureId: number) {
-        const result = await this.featureTaskStatusRepository.find({
-            where: { feature: { id: featureId } },
-        });
-
-        return result;
     }
 
     async getTaskStatusByProjectId(projectId: number) {

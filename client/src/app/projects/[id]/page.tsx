@@ -9,7 +9,7 @@ import {
   IUser,
   priorityOptions,
 } from "@/types/user.types";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/StoreProvider";
 import {
   useGetLabelsQuery,

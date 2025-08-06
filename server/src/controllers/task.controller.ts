@@ -39,42 +39,41 @@ const create = async (req: Request, res: Response): Promise<void> => {
 };
 
 const getAll = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { projectId } = req.params;
-        const { skip, take, keyword, isPaginationEnabled }: IPagination =
-            req.pagination;
+    const { skip, take, keyword, isPaginationEnabled }: IPagination =
+        req.pagination;
 
-        const rawLabels = normalizeToString(req.query.labels);
-        const labelArray = rawLabels
-            ? rawLabels.split(",").map((item) => Number(item))
-            : undefined;
+    const rawLabels = normalizeToString(req.query.labels);
+    const rawProjectId = normalizeToString(req.query.projectId);
+    const rawFeatureId = normalizeToString(req.query.featureId);
 
-        const rawAssignedTo = normalizeToString(req.query.assignedTo);
-        const assignedToArray = rawAssignedTo
-            ? rawAssignedTo.split(",").map((item) => Number(item))
-            : undefined;
+    const labelArray = rawLabels
+        ? rawLabels.split(",").map((item) => Number(item))
+        : undefined;
 
-        const rawPriority = normalizeToString(req.query.priority);
-        const priorityArray = rawPriority ? rawPriority.split(",") : undefined;
+    const rawAssignedTo = normalizeToString(req.query.assignedTo);
+    const assignedToArray = rawAssignedTo
+        ? rawAssignedTo.split(",").map((item) => Number(item))
+        : undefined;
 
-        const result = await taskService.getAll({
-            projectId: Number(projectId),
-            skip,
-            take,
-            keyword,
-            isPaginationEnabled,
-            labels: labelArray,
-            assignedTo: assignedToArray,
-            priority: priorityArray,
-        });
-        res.status(200).json({
-            success: true,
-            data: result,
-            message: "Task fetched successfully",
-        });
-    } catch (error) {
-        res.status(500).json({ message: error });
-    }
+    const rawPriority = normalizeToString(req.query.priority);
+    const priorityArray = rawPriority ? rawPriority.split(",") : undefined;
+
+    const result = await taskService.getAll({
+        projectId: Number(rawProjectId),
+        featureId: Number(rawFeatureId),
+        skip,
+        take,
+        keyword,
+        isPaginationEnabled,
+        labels: labelArray,
+        assignedTo: assignedToArray,
+        priority: priorityArray,
+    });
+    res.status(200).json({
+        success: true,
+        data: result,
+        message: "Task fetched successfully",
+    });
 };
 
 const getById = async (req: Request, res: Response): Promise<void> => {

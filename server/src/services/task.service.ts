@@ -1,17 +1,9 @@
 import { ILike, In } from "typeorm";
-import {
-    IProjectTaskPagination,
-    ITask,
-    IUpdateTaskPayload,
-} from "../types/payload";
-import { Priority, TaskStatus } from "../enums/Priority";
+import { ITask, ITaskPagination, IUpdateTaskPayload } from "../types/payload";
+import { Priority, TaskStatusEnum } from "../enums/Priority";
 
-import { IPagination } from "../types/express";
-import { Label } from "../db/entity/taskLabel";
-import { Project } from "../db/entity/project";
 import { Task } from "../db/entity/task";
 import { UploadFile } from "../db/entity/uploads";
-import { User } from "../db/entity/User";
 import createPagination from "../utils/createPagination";
 import dataSource from "../db/data-source";
 
@@ -53,7 +45,7 @@ export class TaskService {
         return await this.taskRepository.save(taskObj);
     }
 
-    async getAll(query: IProjectTaskPagination) {
+    async getAll(query: ITaskPagination) {
         const {
             skip,
             take,
@@ -63,6 +55,7 @@ export class TaskService {
             assignedTo,
             keyword,
             projectId,
+            featureId,
         } = query;
 
         const result = await this.taskRepository.find({
@@ -73,7 +66,8 @@ export class TaskService {
             },
             relations: ["assignedTo", "taskLabel"],
             where: {
-                project: { id: projectId },
+                ...(projectId ? { project: { id: projectId } } : {}),
+                ...(featureId ? { feature: { id: featureId } } : {}),
                 ...(keyword ? { taskNumber: ILike(`%${keyword}%`) } : {}),
                 ...(priority ? { priority: In(priority) } : {}),
                 ...(labels ? { taskLabel: In(labels) } : {}),
@@ -83,7 +77,8 @@ export class TaskService {
 
         const totalCount = await this.taskRepository.find({
             where: {
-                project: { id: projectId },
+                ...(projectId ? { project: { id: projectId } } : {}),
+                ...(featureId ? { feature: { id: featureId } } : {}),
                 ...(keyword ? { taskNumber: ILike(`%${keyword}%`) } : {}),
                 ...(priority ? { priority: In(priority) } : {}),
                 ...(labels ? { taskLabel: In(labels) } : {}),
@@ -151,16 +146,14 @@ export class TaskService {
         }
     }
 
-    async updateStatus(id: number, status: TaskStatus) {
+    async updateStatus(id: number, status: TaskStatusEnum) {
         const taskObj = await this.taskRepository.findOne({
             where: { id },
         });
 
-        if (!taskObj) {
+        if (!taskObj || !status) {
             throw new Error("Task not found");
         }
-
-        taskObj.status = status;
 
         return await this.taskRepository.save(taskObj);
     }

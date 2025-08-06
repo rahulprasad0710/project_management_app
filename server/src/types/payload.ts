@@ -49,11 +49,12 @@ export interface IEmployeePagination extends IPagination {
     isActive?: boolean | undefined;
 }
 
-export interface IProjectTaskPagination extends IPagination {
+export interface ITaskPagination extends IPagination {
     priority?: string[] | undefined;
     labels?: number[] | undefined;
     assignedTo?: number[] | undefined;
-    projectId: number;
+    projectId?: number | undefined;
+    featureId?: number | undefined;
 }
 
 export interface IActivePagination extends IPagination {

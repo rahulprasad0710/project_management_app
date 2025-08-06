@@ -8,12 +8,13 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn,
 } from "typeorm";
-import { Priority, TaskStatus } from "../../enums/Priority";
+import { Priority, TaskStatusEnum } from "../../enums/Priority";
 
 import { Feature } from "./Feature";
 import { Label } from "./taskLabel";
 import { Project } from "./project";
 import { Sprint } from "./sprint";
+import { TaskStatus } from "./taskStatus";
 import { UploadFile } from "./uploads";
 import { User } from "./User";
 
@@ -61,10 +62,16 @@ export class Task {
 
     @Column({
         type: "enum",
-        enum: TaskStatus,
-        default: TaskStatus.TODO,
+        enum: TaskStatusEnum,
+        default: TaskStatusEnum.TODO,
     })
     status: TaskStatus;
+
+    @ManyToOne(() => TaskStatus, (taskStatus) => taskStatus.id, {
+        nullable: true,
+    })
+    @JoinColumn()
+    task_status: TaskStatus;
 
     @Column({
         type: "enum",

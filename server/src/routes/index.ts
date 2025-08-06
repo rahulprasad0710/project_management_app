@@ -2,6 +2,7 @@ import { Router as ExpressRouter } from "express";
 // Main router that aggregates all routes
 import SettingRoute from "./settings/setting.route"; // Importing Route type from settings
 import authRoute from "./auth.route";
+import featureRoute from "./feature.route";
 import internalCompanyRoute from "./internalCompany.route";
 import labelRoute from "./label.route";
 import permissionRoute from "./permission.route";
@@ -31,6 +32,10 @@ const routes = [
     {
         path: "/projects",
         route: projectRoute,
+    },
+    {
+        path: "/features",
+        route: featureRoute,
     },
     {
         path: "/tasks",

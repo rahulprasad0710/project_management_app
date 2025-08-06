@@ -37,6 +37,14 @@ export interface IProjectTaskPagination extends Pagination {
   projectId: number;
 }
 
+export interface ITaskPagination extends Pagination {
+  priority?: string[] | undefined;
+  labels?: string[] | undefined;
+  assignedTo?: string[] | undefined;
+  projectId?: number;
+  featureId?: number;
+}
+
 export interface SprintPagination extends Pagination {
   isActive: boolean;
 }

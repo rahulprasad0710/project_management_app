@@ -79,22 +79,6 @@ const updateStatus = async (req: Request, res: Response): Promise<void> => {
     });
 };
 
-const getTaskStatusByFeatureId = async (
-    req: Request,
-    res: Response
-): Promise<void> => {
-    const { featureId } = req.params;
-    const data = await taskStatusService.getTaskStatusByFeatureId(
-        Number(featureId)
-    );
-
-    res.status(200).json({
-        success: true,
-        data,
-        message: "Task status fetched successfully",
-    });
-};
-
 const getTaskStatusByProjectId = async (
     req: Request,
     res: Response
@@ -117,6 +101,5 @@ export default {
     getById,
     updateStatus,
     update,
-    getTaskStatusByFeatureId,
     getTaskStatusByProjectId,
 };
