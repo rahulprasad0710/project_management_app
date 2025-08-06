@@ -37,7 +37,7 @@ export const taskEndpoints = (
             assignedTo,
             featureId,
         }) => ({
-            url: `tasks/${projectId}`,
+            url: `tasks`,
             method: "GET",
             params: {
                 isPaginationEnabled,
@@ -48,6 +48,7 @@ export const taskEndpoints = (
                 priority,
                 assignedTo,
                 featureId,
+                projectId,
             },
         }),
         providesTags: (result) =>

@@ -3,12 +3,12 @@ import type {
     ILabelResponse,
     IMultiList,
     IPriorityOptions,
-    IUser,
 } from "@/types/config.types";
 import { useAppDispatch, useAppSelector } from "@/store/reduxHook";
 import { useEffect, useState } from "react";
 
 import Button from "@/components/ui/button/Button";
+import KanbanTask from "@/components/task/KanbanTask";
 import MultiSelect2 from "@components/atoms/MultiSelect2";
 import MultiSelectUser from "@components/atoms/MultiSelectUser";
 import { PlusIcon } from "@/icons";
@@ -116,7 +116,6 @@ const TaskPage = () => {
 
     const handleFetchData = () => {
         fetchProjectTasksByProjectId({
-            projectId: Number(id),
             isPaginationEnabled: false,
             page: 1,
             pageSize: 10,
@@ -124,6 +123,7 @@ const TaskPage = () => {
             labels: selectedLabelsIds,
             priority: selectedPriorityIds,
             assignedTo: selectedAssigneeIds,
+            featureId: 1,
         });
     };
 
@@ -166,7 +166,7 @@ const TaskPage = () => {
         handleFetchData();
     };
 
-    const handleToggleProjectModal = () => {
+    const handleToggleModal = () => {
         setIsTaskModalOpen(!isTaskModalOpen);
     };
 
@@ -262,6 +262,11 @@ const TaskPage = () => {
                         Search
                     </button>
                 </div>
+                <KanbanTask
+                    isTaskModalOpen={isTaskModalOpen}
+                    setIsTaskModalOpen={setIsTaskModalOpen}
+                    projectTasks={projectTasks}
+                />
             </div>
         </div>
     );

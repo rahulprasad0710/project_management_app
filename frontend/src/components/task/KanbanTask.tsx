@@ -1,6 +1,11 @@
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import type { DragLayerMonitor, DropTargetMonitor } from "react-dnd";
-import { EllipsisVertical, TicketCheck } from "lucide-react";
+import {
+    EllipsisVertical,
+    MessageSquare,
+    Paperclip,
+    TicketCheck,
+} from "lucide-react";
 import type { ResponseWithPagination, TaskStatus } from "@/types/config.types";
 import { setIsTaskDetailsModalOpen, setTaskDetailsData } from "@/store";
 
@@ -25,11 +30,10 @@ const taskStatus: TaskStatus[] = [
     "TODO",
     "IN_PROGRESS",
     "COMPLETED",
-    "FOR_FIX",
     "UNDER_REVIEW",
 ];
 
-const BoardView = (props: IProps) => {
+const KanbanTask = (props: IProps) => {
     const dispatch = useAppDispatch();
     const { projectTasks, setIsTaskModalOpen, isTaskModalOpen } = props;
     const [updateTaskStatus] = useUpdateTaskStatusMutation();
@@ -55,7 +59,7 @@ const BoardView = (props: IProps) => {
     return (
         <div>
             <DndProvider backend={HTML5Backend}>
-                <div className='grid grid-cols-1 gap-4 p-4 md:grid-cols-2 xl:grid-cols-5'>
+                <div className='grid grid-cols-1 gap-4 mt-4 md:grid-cols-2 xl:grid-cols-4'>
                     {taskStatus.map((status: TaskStatus) => {
                         return (
                             <TaskColumn
@@ -99,8 +103,7 @@ const TaskColumn = (props: TaskColumnProps) => {
     const taskStatusColor: Record<TaskStatus, string> = {
         TODO: "#2563EB",
         IN_PROGRESS: "#2a9d8f",
-        FOR_FIX: "#e76f51",
-        UNDER_REVIEW: "#e9c46a",
+        UNDER_REVIEW: "#e76f51",
         COMPLETED: "#264653",
     };
 
@@ -109,7 +112,7 @@ const TaskColumn = (props: TaskColumnProps) => {
             ref={(instance) => {
                 drop(instance);
             }}
-            className={`sl:py-4 rounded-lg bg-blue-100 py-2 shadow-sm xl:px-2 ${
+            className={`sl:py-4 rounded-lg bg-gray-50 py-2 shadow-sm xl:px-2 ${
                 isOver ? "bg-blue-100" : ""
             } `}
         >
@@ -199,10 +202,11 @@ const TaskItem = (props: TaskItemProps) => {
                                 {task.taskNumber}
                             </span>
                         </div>
+                        <div></div>
                         <div className='flex items-center gap-2'>
-                            {/* <Paperclip className="h-4 w-4 text-gray-500" />
-              <MessageSquare className="h-4 w-4 text-gray-500" /> */}
-                            <UserAvatar user={task.assignedTo} />
+                            <Paperclip className='h-4 w-4 text-gray-500' />
+                            <MessageSquare className='h-4 w-4 text-gray-500' />
+                            <UserAvatar size='sm' user={task.assignedTo} />
                         </div>
                     </div>
                 </div>
@@ -211,4 +215,4 @@ const TaskItem = (props: TaskItemProps) => {
     );
 };
 
-export default BoardView;
+export default KanbanTask;
