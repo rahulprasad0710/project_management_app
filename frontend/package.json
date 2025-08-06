@@ -19,6 +19,8 @@
     "dotenv": "^17.2.1",
     "lucide-react": "^0.526.0",
     "react": "^19.1.0",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^19.1.0",
     "react-helmet": "^6.1.0",
     "react-hook-form": "^7.61.1",

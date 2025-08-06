@@ -113,8 +113,8 @@ const TaskStatusModal = (props: Props) => {
                 className='flex flex-col'
             >
                 <div className='px-2 overflow-y-auto custom-scrollbar'>
-                    <div className='grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-1'>
-                        <div>
+                    <div className='grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-4'>
+                        <div className='col-span-3'>
                             <Label>
                                 Task Status name{" "}
                                 <span className='text-error-500'>*</span>
@@ -135,7 +135,7 @@ const TaskStatusModal = (props: Props) => {
                                 )}
                             </div>
                         </div>
-                        <div>
+                        <div className='col-span-1'>
                             <Label>
                                 Color code{" "}
                                 <span className='text-error-500'>*</span>

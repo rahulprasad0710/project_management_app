@@ -11,7 +11,10 @@ import type {
 } from "../types/config.types";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+import { employeeEndpoints } from "./apiRoutes/employeeApi";
+import { labelEndpoints } from "./apiRoutes/labelApi";
 import { roleEndpoints } from "./apiRoutes/rolesApi";
+import { taskEndpoints } from "./apiRoutes/taskApi";
 import { taskStatusEndpoints } from "./apiRoutes/taskStatusApi";
 
 // /* REDUX API */
@@ -62,17 +65,6 @@ export const api = createApi({
             invalidatesTags: ["Users"],
         }),
 
-        createEmployee: build.mutation<
-            Response<IEmployeeResponse>,
-            IEmployeePayload
-        >({
-            query: (payload) => ({
-                url: "users",
-                method: "POST",
-                body: payload,
-            }),
-            invalidatesTags: [{ type: "Employees", id: "LIST" }],
-        }),
         createVerifyEmail: build.mutation<
             Response<IEmployeeResponse>,
             IVerifyPayload
@@ -83,9 +75,6 @@ export const api = createApi({
                 body: payload,
             }),
         }),
-        // ! INTERNAL COMPANY-STARTS
-
-        // ! LABELS-ENDS
 
         // ! PERMISSION-GROUP-STARTS
         getAllPermissionGroups: build.query<
@@ -134,6 +123,9 @@ export const api = createApi({
         // ! ROLES-STARTS
         ...roleEndpoints(build),
         ...taskStatusEndpoints(build),
+        ...taskEndpoints(build),
+        ...employeeEndpoints(build),
+        ...labelEndpoints(build),
     }),
 });
 
