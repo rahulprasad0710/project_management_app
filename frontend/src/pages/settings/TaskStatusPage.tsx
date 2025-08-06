@@ -7,6 +7,7 @@ import { Modal } from "@/components/common/Modal";
 import { PlusIcon } from "lucide-react";
 import ReactTable from "@/components/common/ReactTable";
 import { SquarePen } from "lucide-react";
+import TaskStatusFeatureModal from "@/components/settings/TaskStatusFeature";
 import TaskStatusModal from "@/components/settings/TaskStatusModal";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useLazyGetAllTaskStatusQuery } from "@api/hooks/useTaskStatus";
@@ -143,7 +144,7 @@ const TaskStatus = () => {
         columnHelper.accessor((row) => row.id, {
             id: "action",
             cell: (info) => (
-                <div className='flex items-center gap-4'>
+                <div className='flex  gap-4 '>
                     <Button
                         size='sm'
                         variant='outline'
@@ -154,7 +155,7 @@ const TaskStatus = () => {
                     </Button>
                 </div>
             ),
-            header: () => <span>Action</span>,
+            header: () => <span className='text-center'>Action</span>,
         }),
     ];
 
@@ -197,7 +198,7 @@ const TaskStatus = () => {
             <Modal
                 isOpen={toggle}
                 onClose={() => handleCloseModal()}
-                className='max-w-[500px] mb-4'
+                className='max-w-[700px] mb-4  '
                 isFullscreen={false}
             >
                 <TaskStatusModal

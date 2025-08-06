@@ -59,7 +59,7 @@ const MultiSelect = (props: Props) => {
   }, []);
 
   return (
-    <div ref={multiSelectRef} className="multi-select-box relative">
+    <div ref={multiSelectRef} className="relative">
       <button
         onClick={() => setOpenSelect(!openSelect)}
         className={`py-${size ?? 2} block w-full rounded border border-gray-200 bg-white px-4 text-left text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none`}
@@ -101,7 +101,7 @@ const MultiSelect = (props: Props) => {
         </svg>
       </div>
       <div
-        className={`${openSelect ? "block" : "hidden"} absolute top-full z-50 mt-2 max-h-72 w-full space-y-0.5 overflow-hidden overflow-y-auto rounded-lg border border-gray-200 bg-white p-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 [&::-webkit-scrollbar]:w-2`}
+        className={`${openSelect ? "block" : "hidden"} multi-select-box absolute top-full z-50 mt-2 max-h-72 w-full space-y-0.5 overflow-hidden overflow-y-auto rounded-lg border border-gray-200 bg-white p-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 [&::-webkit-scrollbar]:w-2`}
       >
         {list.map((item: IMultiList) => (
           <div
