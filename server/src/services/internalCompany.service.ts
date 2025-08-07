@@ -1,3 +1,6 @@
+import AppError from "../utils/AppError";
+import { ErrorType } from "../enums/Eums";
+import { Feature } from "../db/entity/Feature";
 import { InternalCompany } from "../db/entity/InternalCompany";
 import dataSource from "../db/data-source";
 
@@ -14,7 +17,9 @@ export class InternalCompanyService {
     constructor(
         private readonly companyRepository = dataSource.getRepository(
             InternalCompany
-        )
+        ),
+
+        private readonly featureRepository = dataSource.getRepository(Feature)
     ) {}
 
     async create(companyData: IInternalCompany) {
@@ -37,7 +42,7 @@ export class InternalCompanyService {
     }
 
     async getById(id: number) {
-        return await this.companyRepository.findOne({
+        const result = await this.companyRepository.findOne({
             where: { id },
             relations: ["projects"],
         });
@@ -57,6 +62,65 @@ export class InternalCompanyService {
 
         company.isActive = isActive;
         return await this.companyRepository.save(company);
+    }
+
+    async getInternalCompanyDetailsForEmployee(employeeId: number) {
+        console.log({
+            employeeId,
+        });
+        const internalCompanyResult = dataSource
+            .getRepository(InternalCompany)
+            .createQueryBuilder("internal_company")
+            .select([
+                "internal_company.id",
+                "internal_company.name",
+                "internal_company.slug",
+                "internal_company.logoUrl",
+            ])
+            .leftJoin("internal_company.internalCompanyTeamMember", "user")
+            .addSelect("user.id", "internal_company_user_id")
+            .where("user.id = :userId", { userId: employeeId });
+
+        const result = await internalCompanyResult.getRawMany();
+
+        console.log(internalCompanyResult.getSql());
+
+        if (!internalCompanyResult)
+            throw new AppError(
+                "Internal company not found",
+                404,
+                ErrorType.NOT_FOUND_ERROR
+            );
+
+        const resultAll = await Promise.all(
+            result.map(async (company) => {
+                const feature = await dataSource
+                    .getRepository(Feature)
+                    .createQueryBuilder("features")
+                    .select([
+                        "features.id",
+                        "features.name",
+                        "features.slug",
+                        "features.profilePicture",
+                    ])
+                    .leftJoin("features.featureTeamMember", "user")
+                    .addSelect("user.id", "features_user_id")
+                    .where("user.id = :userId", { userId: employeeId })
+                    .andWhere(
+                        "features.internalCompanyId = :internalCompanyId",
+                        {
+                            internalCompanyId: company.internal_company_id,
+                        }
+                    )
+                    .getRawMany();
+                return {
+                    ...company,
+                    feature,
+                };
+            })
+        );
+
+        return resultAll;
     }
 }
 

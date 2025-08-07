@@ -29,7 +29,7 @@ export class TaskService {
         taskObj.description = task.description;
         taskObj.addedDate = task.addedDate;
         taskObj.assignedBy = task.assignedBy;
-        taskObj.status = task.status;
+        // taskObj.status = task.status;
         taskObj.priority = task.priority;
         taskObj.project = task.project;
         if (task.taskLabel) {
@@ -124,7 +124,7 @@ export class TaskService {
             taskObj.description = task.description;
             taskObj.addedDate = task.addedDate;
             taskObj.assignedBy = task.assignedBy;
-            taskObj.status = task.status;
+            // taskObj.status = task.status;
             taskObj.priority = task.priority;
             taskObj.project = task.project;
             const response = await this.taskRepository.update(id, taskObj);

@@ -1,4 +1,4 @@
-import { Priority, ProjectStatus, TaskStatus } from "../enums/Priority";
+import { Priority, ProjectStatus, TaskStatusEnum } from "../enums/Priority";
 
 import { IPagination } from "./express";
 import { Label } from "../db/entity/taskLabel";
@@ -30,7 +30,7 @@ export interface ITask {
     assignedTo: User;
     assignedBy: User;
     project: Project;
-    status: TaskStatus;
+    status: TaskStatusEnum;
     priority: Priority;
     taskLabel?: Label;
     taskUploads: string[];

@@ -1,12 +1,20 @@
 import { Request, Response } from "express";
 
+import { InternalCompanyService } from "./../services/internalCompany.service";
 import authService from "../services/auth.service";
+
+const internalCompanyService = new InternalCompanyService();
 
 const login = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
 
     const { user, accessToken, refreshToken } =
         await authService.loginWithCredentials(email, password);
+
+    const companyInfo =
+        await internalCompanyService.getInternalCompanyDetailsForEmployee(
+            user.id
+        );
 
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
@@ -23,6 +31,7 @@ const login = async (req: Request, res: Response): Promise<void> => {
                 type: "credentials",
                 accessToken,
                 refreshToken,
+                companyInfo,
             },
             message: "login successful",
         });
