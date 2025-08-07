@@ -1,3 +1,5 @@
+import type { ActivityAction } from "@/enums/utils";
+
 export interface Response<T> {
     message: string;
     success: boolean;
@@ -310,16 +312,6 @@ export interface Response<T> {
     message: string;
 }
 
-export enum ActivityAction {
-    CREATED_TICKET = "CREATED_TICKET",
-    ASSIGNED_TICKET = "ASSIGNED_TICKET",
-    MOVED_TICKET = "MOVED_TICKET",
-    UPDATED_TICKET = "UPDATED_TICKET",
-    COMMENTED_TICKET = "COMMENTED_TICKET",
-    DELETED_COMMENT = "DELETED_COMMENT",
-    EDITED_COMMENT = "EDITED_COMMENT",
-}
-
 export type IActivityResponse = {
     id: number;
     action: ActivityAction;
@@ -382,6 +374,38 @@ export interface IAuthEmployeeResponse {
     accessToken: string;
     refreshToken: string;
     authenticated: boolean;
+    companyInfo: InternalCompanyInfo[];
+}
+
+export interface InternalCompanyInfo {
+    internal_company_id: number;
+    internal_company_name: string;
+    internal_company_slug: string;
+    internal_company_logoUrl: string;
+    internal_company_user_id: number;
+    feature: FeatureInfo[];
+}
+
+export interface FeatureInfo {
+    features_id: number;
+    features_name: string;
+    features_slug: string;
+    features_profilePicture: string;
+    features_user_id: number;
+}
+
+export interface ICompanyDetails {
+    id: number;
+    name: string;
+    slug: string;
+    logoUrl: string;
+    address: string;
+    contactEmail: string;
+    contactPhone: string;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+    projects?: IProject[];
 }
 
 export interface IPermissionGroupResponse {

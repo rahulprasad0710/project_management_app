@@ -53,10 +53,10 @@ export default function UserDropdown() {
             >
                 <div>
                     <span className='block font-medium text-gray-700 text-theme-sm dark:text-gray-400'>
-                        Musharof Chowdhury
+                        Rahul Prasad
                     </span>
                     <span className='mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400'>
-                        randomuser@pimjo.com
+                        raulshah2021@hotmail.com
                     </span>
                 </div>
 
@@ -156,7 +156,7 @@ export default function UserDropdown() {
                             fill=''
                         />
                     </svg>
-                    Sign out
+                    Logout
                 </Link>
             </Dropdown>
         </div>

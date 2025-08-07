@@ -14,6 +14,7 @@ import { CalendarCog, KanbanSquare } from "lucide-react";
 import { Link, useLocation } from "react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { useAppSelector } from "@/store/reduxHook";
 import useSidebar from "@/context/useSidebar";
 
 type NavItem = {
@@ -29,123 +30,135 @@ type NavItem = {
     }[];
 };
 
-const navItems: NavItem[] = [
-    {
-        icon: <GridIcon />,
-        name: "Dashboard",
-        path: "/admin/dashboard",
-    },
-
-    {
-        icon: <CalenderIcon />,
-        name: "Bookings",
-        subItems: [
-            {
-                name: "Tasks",
-                path: "/admin/features/tasks",
-                pro: false,
-                icon: <KanbanSquare />,
-            },
-            {
-                name: "Listings",
-                path: "/admin/features/listings?status=NEW",
-                pro: false,
-                icon: <ListIcon />,
-            },
-            {
-                name: "Settings",
-                path: "/admin/features/settings",
-                pro: false,
-                icon: <CalendarCog />,
-            },
-        ],
-    },
-    {
-        icon: <UserCircleIcon />,
-        name: "Clients",
-        path: "/admin/clients",
-    },
-    {
-        icon: <UserCircleIcon />,
-        name: "Projects",
-        path: "/admin/projects",
-    },
-    {
-        icon: <UserCircleIcon />,
-        name: "Employees",
-        path: "/admin/employees",
-    },
-];
-
-const othersItems: NavItem[] = [
-    {
-        icon: <BoxCubeIcon />,
-        name: "Settings",
-        subItems: [
-            {
-                name: "Sprints",
-                path: "/admin/other-settings/sprints",
-                pro: false,
-            },
-            {
-                name: "Labels",
-                path: "/admin/other-settings/sprints",
-                pro: false,
-            },
-            {
-                name: "Task Status",
-                path: "/admin/settings/task-status",
-                pro: false,
-            },
-        ],
-    },
-    {
-        icon: <PieChartIcon />,
-        name: "Company Settings",
-        subItems: [
-            { name: "Line Chart", path: "/line-chart", pro: false },
-            { name: "Bar Chart", path: "/bar-chart", pro: false },
-        ],
-    },
-
-    {
-        // PERMISSION ONLY TO ADMIN
-        icon: <PlugInIcon />,
-        name: "Admin Settings",
-        subItems: [
-            {
-                name: "Employee's Permissions",
-                path: "/admin/auth-settings/employees",
-                pro: false,
-            },
-            {
-                name: "Roles",
-                path: "/admin/auth-settings/roles",
-                pro: false,
-            },
-            {
-                name: "Permissions",
-                path: "/admin/auth-settings/permissions",
-                pro: false,
-            },
-            {
-                name: "Feature & Team",
-                path: "/admin/auth-settings/features",
-                pro: false,
-            },
-            {
-                name: "Internal Company",
-                path: "/admin/auth-settings/internal-company",
-                pro: false,
-            },
-        ],
-    },
-];
-
 const AppSidebar: React.FC = () => {
     const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
     const location = useLocation();
+    const authenticateEmployee = useAppSelector(
+        (state) => state.global.authenticateEmployee
+    );
 
+    const dynamicNavItems = authenticateEmployee?.companyInfo?.map(
+        (companyInfo) => {
+            return {
+                icon: <GridIcon />,
+                name: companyInfo.internal_company_name,
+                path: `/admin/dashboard/${companyInfo.internal_company_slug}`,
+            };
+        }
+    );
+
+    const navItems: NavItem[] = [
+        {
+            icon: <GridIcon />,
+            name: "Dashboard",
+            path: "/admin/dashboard",
+        },
+
+        {
+            icon: <CalenderIcon />,
+            name: "Bookings",
+            subItems: [
+                {
+                    name: "Tasks",
+                    path: "/admin/features/tasks",
+                    pro: false,
+                    icon: <KanbanSquare />,
+                },
+                {
+                    name: "Listings",
+                    path: "/admin/features/listings?status=NEW",
+                    pro: false,
+                    icon: <ListIcon />,
+                },
+                {
+                    name: "Settings",
+                    path: "/admin/features/settings",
+                    pro: false,
+                    icon: <CalendarCog />,
+                },
+            ],
+        },
+        {
+            icon: <UserCircleIcon />,
+            name: "Clients",
+            path: "/admin/clients",
+        },
+        {
+            icon: <UserCircleIcon />,
+            name: "Projects",
+            path: "/admin/projects",
+        },
+        {
+            icon: <UserCircleIcon />,
+            name: "Employees",
+            path: "/admin/employees",
+        },
+    ];
+
+    const othersItems: NavItem[] = [
+        {
+            icon: <BoxCubeIcon />,
+            name: "Settings",
+            subItems: [
+                {
+                    name: "Sprints",
+                    path: "/admin/other-settings/sprints",
+                    pro: false,
+                },
+                {
+                    name: "Labels",
+                    path: "/admin/other-settings/sprints",
+                    pro: false,
+                },
+                {
+                    name: "Task Status",
+                    path: "/admin/settings/task-status",
+                    pro: false,
+                },
+            ],
+        },
+        {
+            icon: <PieChartIcon />,
+            name: "Company Settings",
+            subItems: [
+                { name: "Line Chart", path: "/line-chart", pro: false },
+                { name: "Bar Chart", path: "/bar-chart", pro: false },
+            ],
+        },
+
+        {
+            // PERMISSION ONLY TO ADMIN
+            icon: <PlugInIcon />,
+            name: "Admin Settings",
+            subItems: [
+                {
+                    name: "Employee's Permissions",
+                    path: "/admin/auth-settings/employees",
+                    pro: false,
+                },
+                {
+                    name: "Roles",
+                    path: "/admin/auth-settings/roles",
+                    pro: false,
+                },
+                {
+                    name: "Permissions",
+                    path: "/admin/auth-settings/permissions",
+                    pro: false,
+                },
+                {
+                    name: "Feature & Team",
+                    path: "/admin/auth-settings/features",
+                    pro: false,
+                },
+                {
+                    name: "Internal Company",
+                    path: "/admin/auth-settings/internal-company",
+                    pro: false,
+                },
+            ],
+        },
+    ];
     const [openSubmenu, setOpenSubmenu] = useState<{
         type: "main" | "others";
         index: number;

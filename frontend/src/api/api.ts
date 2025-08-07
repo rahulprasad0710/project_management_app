@@ -1,7 +1,6 @@
 import type {
     IAuthEmployeePayload,
     IAuthEmployeeResponse,
-    IEmployeePayload,
     IEmployeeResponse,
     IPaginationWithActive,
     IPermissionGroupResponse,
