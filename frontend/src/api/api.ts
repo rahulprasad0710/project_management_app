@@ -14,8 +14,10 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { employeeEndpoints } from "./apiRoutes/employeeApi";
 import { labelEndpoints } from "./apiRoutes/labelApi";
 import { roleEndpoints } from "./apiRoutes/rolesApi";
+import { sprintEndpoints } from "./apiRoutes/sprintApi";
 import { taskEndpoints } from "./apiRoutes/taskApi";
 import { taskStatusEndpoints } from "./apiRoutes/taskStatusApi";
+import { uploadsEndpoints } from "./apiRoutes/uploadApi";
 
 // /* REDUX API */
 
@@ -126,6 +128,8 @@ export const api = createApi({
         ...taskEndpoints(build),
         ...employeeEndpoints(build),
         ...labelEndpoints(build),
+        ...uploadsEndpoints(build),
+        ...sprintEndpoints(build),
     }),
 });
 

@@ -9,10 +9,12 @@ import { useEffect, useState } from "react";
 
 import Button from "@/components/ui/button/Button";
 import KanbanTask from "@/components/task/KanbanTask";
+import { Modal } from "@/components/common/Modal";
 import MultiSelect2 from "@components/atoms/MultiSelect2";
 import MultiSelectUser from "@components/atoms/MultiSelectUser";
-import { PlusIcon } from "@/icons";
+import { PlusIcon } from "lucide-react";
 import SearchBar from "@/components/molecules/SearchBar";
+import TaskModal from "@/components/settings/TaskModal";
 import { priorityOptions } from "@/types/config.types";
 import { setRefetchProjectTaskList } from "@/store/index";
 import { toast } from "react-toastify";
@@ -47,7 +49,6 @@ const TaskPage = () => {
         }
     );
 
-    const [activeTab, setActiveTab] = useState<BOARD_TYPES>("BOARD");
     const [keyword, setKeyword] = useState<string>("");
     const [selectedLabels, setSelectedLabels] = useState<IMultiList[]>([]);
     const [selectedLabelsIds, setSelectedLabelsIds] = useState<string[]>([]);
@@ -192,8 +193,12 @@ const TaskPage = () => {
                     </p>
                 </div>
                 <div>
-                    <Button variant='primary' size='sm'>
-                        <PlusIcon />
+                    <Button
+                        onClick={handleToggleModal}
+                        variant='primary'
+                        size='sm'
+                    >
+                        <PlusIcon size={16} />
                         Add Task
                     </Button>
                 </div>
@@ -268,6 +273,15 @@ const TaskPage = () => {
                     projectTasks={projectTasks}
                 />
             </div>
+            <Modal
+                className='max-w-[900px] mb-4  '
+                isFullscreen={false}
+                isOpen={isTaskModalOpen}
+                onClose={handleToggleModal}
+                showCloseButton={true}
+            >
+                <TaskModal onClose={handleToggleModal} />
+            </Modal>
         </div>
     );
 };

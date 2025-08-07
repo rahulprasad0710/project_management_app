@@ -197,14 +197,6 @@ export interface IProjectStatusOptions {
     label: string;
 }
 
-export const statusOptions: IStatusOptions[] = [
-    { value: "TODO", label: "To Do" },
-    { value: "IN_PROGRESS", label: "In Progress" },
-    { value: "FOR_FIX", label: "For Fix" },
-    { value: "UNDER_REVIEW", label: "Under Review" },
-    { value: "COMPLETED", label: "Completed" },
-];
-
 export const projectStatusOptions: IProjectStatusOptions[] = [
     { value: "STARTED", label: "Start" },
     { value: "TODO", label: "To Do" },
