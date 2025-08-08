@@ -6,6 +6,7 @@ const {
     useGetTasksByProjectIdQuery,
     useCreateTasksMutation,
     useUpdateTaskStatusMutation,
+    useLazyGetTasksByTaskIdQuery,
 } = api;
 
 export {
@@ -14,5 +15,6 @@ export {
     useGetTasksByProjectIdQuery,
     useCreateTasksMutation,
     useUpdateTaskStatusMutation,
+    useLazyGetTasksByTaskIdQuery,
 };
 export * from "./useTask";

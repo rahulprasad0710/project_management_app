@@ -10,6 +10,7 @@ import type {
 } from "../types/config.types";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+import { commentEndpoints } from "./apiRoutes/commentApi";
 import { employeeEndpoints } from "./apiRoutes/employeeApi";
 import { labelEndpoints } from "./apiRoutes/labelApi";
 import { roleEndpoints } from "./apiRoutes/rolesApi";
@@ -129,6 +130,7 @@ export const api = createApi({
         ...labelEndpoints(build),
         ...uploadsEndpoints(build),
         ...sprintEndpoints(build),
+        ...commentEndpoints(build),
     }),
 });
 

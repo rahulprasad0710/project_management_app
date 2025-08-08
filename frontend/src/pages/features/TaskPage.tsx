@@ -4,6 +4,10 @@ import type {
     IMultiList,
     IPriorityOptions,
 } from "@/types/config.types";
+import {
+    setIsTaskDetailsModalOpen,
+    setRefetchProjectTaskList,
+} from "@/store/index";
 import { useAppDispatch, useAppSelector } from "@/store/reduxHook";
 import { useEffect, useState } from "react";
 import { useOutletContext, useParams } from "react-router-dom";
@@ -16,9 +20,9 @@ import MultiSelect2 from "@components/atoms/MultiSelect2";
 import MultiSelectUser from "@components/atoms/MultiSelectUser";
 import { PlusIcon } from "lucide-react";
 import SearchBar from "@/components/molecules/SearchBar";
+import TaskDetailsModal from "@/components/settings/TaskDetailsModal";
 import TaskModal from "@/components/settings/TaskModal";
 import { priorityOptions } from "@/types/config.types";
-import { setRefetchProjectTaskList } from "@/store/index";
 import { toast } from "react-toastify";
 import { useGetEmployeesQuery } from "@apiHooks/useEmployee";
 import { useGetLabelsQuery } from "@apiHooks/useLabel";
@@ -30,6 +34,10 @@ const TaskPage = () => {
     const dispatch = useAppDispatch();
     const isDataRefetchList = useAppSelector(
         (state) => state.global.isDataRefetchList
+    );
+
+    const isTaskDetailsModalOpen = useAppSelector(
+        (state) => state.global.isTaskDetailsModalOpen
     );
 
     const { selectedFeature } = useOutletContext<FeatureOutletContextType>();
@@ -282,6 +290,11 @@ const TaskPage = () => {
             >
                 <TaskModal onClose={handleToggleModal} />
             </Modal>
+            <TaskDetailsModal
+                isTaskModalOpen={isTaskDetailsModalOpen}
+                setIsTaskModalOpen={setIsTaskDetailsModalOpen}
+                handleToggleModal={handleToggleModal}
+            />
         </div>
     );
 };

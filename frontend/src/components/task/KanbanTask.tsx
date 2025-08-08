@@ -170,6 +170,9 @@ const TaskItem = (props: TaskItemProps) => {
     }));
 
     const handleOpenTaskDetails = (data: ITask) => {
+        console.log({
+            data,
+        });
         dispatch(setTaskDetailsData(data));
         dispatch(setIsTaskDetailsModalOpen(true));
     };
