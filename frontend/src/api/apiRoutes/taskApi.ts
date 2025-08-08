@@ -36,6 +36,7 @@ export const taskEndpoints = (
             projectId,
             assignedTo,
             featureId,
+            sprintId,
         }) => ({
             url: `tasks`,
             method: "GET",
@@ -49,15 +50,16 @@ export const taskEndpoints = (
                 assignedTo,
                 featureId,
                 projectId,
+                sprintId,
             },
         }),
         providesTags: (result) =>
             result?.data
                 ? result.data.result?.map(({ id }) => ({
-                      type: "ProjectTasks" as const,
+                      type: "Tasks" as const,
                       id,
                   }))
-                : [{ type: "ProjectTasks" as const }],
+                : [{ type: "Tasks" as const }],
     }),
     getTasksByTaskId: build.query<Response<ITask>, { taskId: number }>({
         query: ({ taskId }) => ({
@@ -93,6 +95,6 @@ export const taskEndpoints = (
             method: "PUT",
             body: { status },
         }),
-        invalidatesTags: [{ type: "ProjectTasks", id: "LIST" }],
+        invalidatesTags: [{ type: "Tasks", id: "LIST" }],
     }),
 });

@@ -9,8 +9,11 @@ import type {
     Priority,
     TaskStatus,
 } from "@/types/config.types";
+import { useEffect, useState } from "react";
+import { useOutletContext, useParams } from "react-router-dom";
 
 import Dropzone from "@components/common/Dropzone";
+import type { FeatureOutletContextType } from "@/types/state.types";
 import { Spinner } from "../atoms/Spinner";
 import type { SubmitHandler } from "react-hook-form";
 import TextEditor from "@components/common/TextEditor";
@@ -23,19 +26,17 @@ import { useForm } from "react-hook-form";
 import { useGetEmployeesQuery } from "@/api/hooks/useEmployee";
 import { useGetLabelsQuery } from "@apiHooks/useLabel";
 import { useGetSprintsQuery } from "@/api/hooks/useSprint";
-import { useParams } from "react-router-dom";
-import { useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 interface IFormInput {
     title: string;
-    assignTo: number;
-    assignedBy: number;
-    status: TaskStatus;
     priority: Priority;
+    assignTo: number | undefined;
+    assignedBy: number | undefined;
+    status: TaskStatus;
     sprint: number;
-    project: number;
-    label: number;
+    project: number | undefined;
+    label: number | undefined;
 }
 
 type Props = {
@@ -51,6 +52,9 @@ const TaskModal = (props: Props) => {
     const editorPlaceholder = `Type here...`;
     const [editorContent, setEditorContent] = useState(editorPlaceholder);
     const [createUploadMutation] = useCreateUploadsMutation();
+
+    const { selectedFeature, userId } =
+        useOutletContext<FeatureOutletContextType>();
 
     const { isFetching: isLabelFetching, data: labelList } = useGetLabelsQuery({
         isPaginationEnabled: false,
@@ -76,41 +80,62 @@ const TaskModal = (props: Props) => {
 
     const schema = yup.object().shape({
         title: yup.string().required("Title is required"),
-        priority: yup.string(),
+        priority: yup.mixed<Priority>().required("Priority is required"),
         status: yup.string(),
-        assignTo: yup.number(),
+        assignTo: yup.number().optional(),
         sprint: yup.number(),
+        assignedBy: yup.number(),
         project: yup.number().optional(),
-        label: yup.number(),
+        label: yup.number().optional(),
     });
 
     const defaultValues: IFormInput = {
         title: "",
         priority: "MEDIUM",
-        assignTo: 1,
-        assignedBy: 1,
+        assignTo: userId,
+        assignedBy: undefined,
         status: "TODO",
-        sprint: 2,
-        label: 1,
-        project: projectIdFromParams ? Number(projectIdFromParams) : 1,
+        sprint: selectedFeature.features_sprint_id,
+        label: undefined,
+        project: undefined,
     };
 
     const {
         register,
         handleSubmit,
+        setValue,
         formState: { errors, isSubmitting },
     } = useForm<IFormInput>({
         defaultValues: defaultValues,
         resolver: yupResolver(schema),
     });
 
-    const onSubmit: SubmitHandler<IFormInput> = async (data) => {
-        console.log(data);
-        console.log({
-            editorContent,
-        });
+    console.log("error", errors);
 
+    useEffect(() => {
+        if (sprintList && sprintList?.data?.result?.length > 0) {
+            setValue("sprint", selectedFeature.features_sprint_id);
+        }
+    }, [selectedFeature.features_sprint_id, setValue, sprintList]);
+
+    useEffect(() => {
+        if (userList && userList?.data?.result?.length > 0) {
+            setValue("assignTo", userId);
+        }
+    }, [
+        selectedFeature.features_sprint_id,
+        setValue,
+        sprintList,
+        userId,
+        userList,
+    ]);
+
+    const onSubmit: SubmitHandler<IFormInput> = async (data) => {
         try {
+            console.log(data);
+            console.log({
+                editorContent,
+            });
             const payload: ITaskPayload = {
                 title: data.title,
                 priority: data.priority,
@@ -124,6 +149,8 @@ const TaskModal = (props: Props) => {
                 description:
                     editorContent === editorPlaceholder ? "" : editorContent,
                 taskUploads: [],
+                featureId: selectedFeature.features_id,
+                sprint: data.sprint,
             };
 
             if (files?.length > 0) {

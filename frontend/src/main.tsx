@@ -14,6 +14,10 @@ createRoot(document.getElementById("root")!).render(
         <StoreProvider>
             <RouterProvider router={routes} />
         </StoreProvider>
-        <ToastContainer />
+        <ToastContainer
+            position='bottom-right'
+            autoClose={5000}
+            hideProgressBar
+        />
     </ThemeProvider>
 );

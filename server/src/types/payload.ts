@@ -1,8 +1,10 @@
 import { Priority, ProjectStatus, TaskStatusEnum } from "../enums/Priority";
 
+import { Feature } from "../db/entity/Feature";
 import { IPagination } from "./express";
 import { Label } from "../db/entity/taskLabel";
 import { Project } from "./../db/entity/project";
+import { Sprint } from "../db/entity/sprint";
 import { User } from "../db/entity/User";
 
 export interface IProject {
@@ -34,6 +36,8 @@ export interface ITask {
     priority: Priority;
     taskLabel?: Label;
     taskUploads: string[];
+    featureId: Feature;
+    sprint: Sprint;
 }
 
 export interface IUpdateTaskPayload extends ITask {
@@ -55,6 +59,7 @@ export interface ITaskPagination extends IPagination {
     assignedTo?: number[] | undefined;
     projectId?: number | undefined;
     featureId?: number | undefined;
+    sprintId: number;
 }
 
 export interface IActivePagination extends IPagination {

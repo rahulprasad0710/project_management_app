@@ -104,7 +104,11 @@ export class InternalCompanyService {
                         "features.profilePicture",
                     ])
                     .leftJoin("features.featureTeamMember", "user")
+
                     .addSelect("user.id", "features_user_id")
+                    .leftJoin("features.active_sprint", "sprint")
+                    .addSelect("sprint.id", "features_sprint_id")
+                    .addSelect("sprint.name", "features_sprint_name")
                     .where("user.id = :userId", { userId: employeeId })
                     .andWhere(
                         "features.internalCompanyId = :internalCompanyId",

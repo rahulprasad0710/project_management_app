@@ -6,8 +6,10 @@ import type {
 } from "@/types/config.types";
 import { useAppDispatch, useAppSelector } from "@/store/reduxHook";
 import { useEffect, useState } from "react";
+import { useOutletContext, useParams } from "react-router-dom";
 
 import Button from "@/components/ui/button/Button";
+import type { FeatureOutletContextType } from "@/types/state.types";
 import KanbanTask from "@/components/task/KanbanTask";
 import { Modal } from "@/components/common/Modal";
 import MultiSelect2 from "@components/atoms/MultiSelect2";
@@ -22,9 +24,6 @@ import { useGetEmployeesQuery } from "@apiHooks/useEmployee";
 import { useGetLabelsQuery } from "@apiHooks/useLabel";
 import { useGetQueryParams } from "@hooks/useGetQueryParams";
 import { useLazyGetTasksQuery } from "@apiHooks/useTask";
-import { useParams } from "react-router-dom";
-
-type BOARD_TYPES = "BOARD" | "LIST" | "CALENDAR" | "TIMELINE" | "TABLE";
 
 const TaskPage = () => {
     const { id } = useParams();
@@ -32,6 +31,8 @@ const TaskPage = () => {
     const isDataRefetchList = useAppSelector(
         (state) => state.global.isDataRefetchList
     );
+
+    const { selectedFeature } = useOutletContext<FeatureOutletContextType>();
 
     const { data: labelList, isFetching: isLabelFetching } = useGetLabelsQuery({
         isPaginationEnabled: false,
@@ -112,11 +113,11 @@ const TaskPage = () => {
         selectedAssigneeIds,
     });
 
-    const [fetchProjectTasksByProjectId, { data: projectTasks, isError }] =
+    const [fetchAllTasks, { data: projectTasks, isError }] =
         useLazyGetTasksQuery();
 
     const handleFetchData = () => {
-        fetchProjectTasksByProjectId({
+        fetchAllTasks({
             isPaginationEnabled: false,
             page: 1,
             pageSize: 10,
@@ -124,7 +125,8 @@ const TaskPage = () => {
             labels: selectedLabelsIds,
             priority: selectedPriorityIds,
             assignedTo: selectedAssigneeIds,
-            featureId: 1,
+            featureId: selectedFeature.features_id,
+            sprintId: selectedFeature?.features_sprint_id,
         });
     };
 
@@ -183,7 +185,7 @@ const TaskPage = () => {
     }, [selectedLabelsIds, selectedPriorityIds, selectedAssigneeIds]);
     return (
         <div className='rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]'>
-            <div className='flex flex-col justify-between gap-5 border-b border-gray-200 px-5 py-4 sm:flex-row sm:items-center dark:border-gray-800'>
+            <div className='flex flex-col justify-end md:justify-between gap-5 border-b border-gray-200 px-5 py-4 sm:flex-row sm:items-center dark:border-gray-800'>
                 <div>
                     <h3 className='text-lg font-semibold text-gray-800 dark:text-white/90'>
                         Booking Task
@@ -192,19 +194,17 @@ const TaskPage = () => {
                         Track your task progress of booking service.
                     </p>
                 </div>
-                <div>
-                    <Button
-                        onClick={handleToggleModal}
-                        variant='primary'
-                        size='sm'
-                    >
-                        <PlusIcon size={16} />
-                        Add Task
-                    </Button>
-                </div>
+                <Button onClick={handleToggleModal} variant='primary' size='sm'>
+                    <PlusIcon size={16} />
+                    Add Task
+                </Button>
             </div>
             <div className='border-b border-gray-200 px-5 py-4 dark:border-gray-800'>
-                <div className='flex items-center justify-end gap-2 md:gap-4'>
+                <div className='flex items-center  justify-end md:justify-between gap-2 md:gap-4 flex-wrap'>
+                    <div className='bg-green-200 px-4  rounded-full text-center font-semibold text-green-800 dark:bg-green-800 dark:text-green-200'>
+                        {selectedFeature?.features_sprint_name}
+                    </div>
+
                     <button
                         type='button'
                         onClick={handleClearFilter}

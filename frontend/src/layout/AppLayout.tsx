@@ -45,7 +45,7 @@ const AppLayout: React.FC = () => {
 
     return (
         <SidebarProvider>
-            {JSON.stringify(authenticateEmployee)}
+            {/* {JSON.stringify(authenticateEmployee)} */}
             <LayoutContent />
         </SidebarProvider>
     );

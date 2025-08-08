@@ -4,10 +4,12 @@ import {
     JoinTable,
     ManyToMany,
     ManyToOne,
+    OneToOne,
     PrimaryGeneratedColumn,
 } from "typeorm";
 
 import { InternalCompany } from "./InternalCompany";
+import { Sprint } from "./sprint";
 import { User } from "./User";
 
 @Entity()
@@ -34,6 +36,9 @@ export class Feature {
 
     @ManyToOne(() => User, (user) => user.id)
     admin: User;
+
+    @ManyToOne(() => Sprint, (sprint) => sprint.id)
+    active_sprint: Sprint;
 
     @ManyToMany(() => User, (user) => user.id, {
         cascade: true,

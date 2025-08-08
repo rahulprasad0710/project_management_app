@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 
 import ActivityService from "../services/activity.service";
 import { IPagination } from "../types/express";
-import { Priority } from "../enums/Priority";
 import TaskService from "../services/task.service";
 import normalizeToString from "../utils/sanatizeQueryParams";
 
@@ -23,6 +22,8 @@ const create = async (req: Request, res: Response): Promise<void> => {
             assignedTo: req.body.assignTo,
             taskLabel: req.body.taskLabel,
             taskUploads: req.body.taskUploads,
+            featureId: req.body.featureId,
+            sprint: req.body.sprint,
         });
         res.status(201).json({
             success: true,
@@ -43,6 +44,8 @@ const getAll = async (req: Request, res: Response): Promise<void> => {
         req.pagination;
 
     const rawLabels = normalizeToString(req.query.labels);
+    const sprintId = normalizeToString(req.query.sprintId);
+
     const rawProjectId = normalizeToString(req.query.projectId);
     const rawFeatureId = normalizeToString(req.query.featureId);
 
@@ -68,6 +71,7 @@ const getAll = async (req: Request, res: Response): Promise<void> => {
         labels: labelArray,
         assignedTo: assignedToArray,
         priority: priorityArray,
+        sprintId: Number(sprintId),
     });
     res.status(200).json({
         success: true,
@@ -131,6 +135,8 @@ const update = async (req: Request, res: Response): Promise<void> => {
             taskLabel: req.body.taskLabel,
             taskUploads: req.body.taskUploads,
             updatedTaskUploads: req.body.updatedTaskUploads,
+            featureId: req.body.featureId,
+            sprint: req.body.sprint,
         });
         res.status(200).json({
             success: true,

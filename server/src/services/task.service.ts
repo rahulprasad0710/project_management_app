@@ -14,9 +14,6 @@ export class TaskService {
     ) {}
 
     async create(task: ITask) {
-        console.log({
-            task,
-        });
         const taskObj = new Task();
 
         const totalCount = await this.taskRepository.count();
@@ -32,10 +29,14 @@ export class TaskService {
         // taskObj.status = task.status;
         taskObj.priority = task.priority;
         taskObj.project = task.project;
+        taskObj.feature = task.featureId;
+        taskObj.sprint = task.sprint;
         if (task.taskLabel) {
             taskObj.taskLabel = task.taskLabel;
         }
-
+        console.log({
+            taskObj,
+        });
         const result = await this.taskRepository.save(taskObj);
 
         if (task.taskUploads.length > 0) {
@@ -56,6 +57,7 @@ export class TaskService {
             keyword,
             projectId,
             featureId,
+            sprintId,
         } = query;
 
         const result = await this.taskRepository.find({
@@ -66,6 +68,7 @@ export class TaskService {
             },
             relations: ["assignedTo", "taskLabel"],
             where: {
+                ...(sprintId ? { sprint: { id: sprintId } } : {}),
                 ...(projectId ? { project: { id: projectId } } : {}),
                 ...(featureId ? { feature: { id: featureId } } : {}),
                 ...(keyword ? { taskNumber: ILike(`%${keyword}%`) } : {}),
@@ -77,6 +80,7 @@ export class TaskService {
 
         const totalCount = await this.taskRepository.find({
             where: {
+                ...(sprintId ? { sprint: { id: sprintId } } : {}),
                 ...(projectId ? { project: { id: projectId } } : {}),
                 ...(featureId ? { feature: { id: featureId } } : {}),
                 ...(keyword ? { taskNumber: ILike(`%${keyword}%`) } : {}),

@@ -49,6 +49,7 @@ export interface ITaskPagination extends Pagination {
     assignedTo?: string[] | undefined;
     projectId?: number | undefined;
     featureId?: number | undefined;
+    sprintId: number;
 }
 
 export interface SprintPagination extends Pagination {
@@ -110,6 +111,8 @@ export interface ITaskPayload {
     project: number;
     taskLabel?: number;
     taskUploads: string[];
+    featureId: number;
+    sprint: number;
 }
 
 export interface IAddProjectPayload {
@@ -383,6 +386,7 @@ export interface InternalCompanyInfo {
     internal_company_slug: string;
     internal_company_logoUrl: string;
     internal_company_user_id: number;
+
     feature: FeatureInfo[];
 }
 
@@ -392,6 +396,8 @@ export interface FeatureInfo {
     features_slug: string;
     features_profilePicture: string;
     features_user_id: number;
+    features_sprint_id: number;
+    features_sprint_name: string;
 }
 
 export interface ICompanyDetails {

@@ -33,19 +33,9 @@ type NavItem = {
 const AppSidebar: React.FC = () => {
     const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
     const location = useLocation();
-    const authenticateEmployee = useAppSelector(
-        (state) => state.global.authenticateEmployee
-    );
-
-    const dynamicNavItems = authenticateEmployee?.companyInfo?.map(
-        (companyInfo) => {
-            return {
-                icon: <GridIcon />,
-                name: companyInfo.internal_company_name,
-                path: `/admin/dashboard/${companyInfo.internal_company_slug}`,
-            };
-        }
-    );
+    // const authenticateEmployee = useAppSelector(
+    //     (state) => state.global.authenticateEmployee
+    // );
 
     const navItems: NavItem[] = [
         {
@@ -60,7 +50,7 @@ const AppSidebar: React.FC = () => {
             subItems: [
                 {
                     name: "Tasks",
-                    path: "/admin/features/tasks",
+                    path: "/admin/features/booking/tasks",
                     pro: false,
                     icon: <KanbanSquare />,
                 },

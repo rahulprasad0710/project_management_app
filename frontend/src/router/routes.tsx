@@ -3,6 +3,7 @@ import { Outlet, createBrowserRouter } from "react-router-dom";
 import AppLayout from "@/layout/AppLayout";
 import Dashboard from "@/pages/Dashboard";
 import EmailVerify from "@/pages/AuthPages/ EmailVerify";
+import FeatureLayout from "@/layout/FeatureLayout";
 import HomePage from "@/pages/HomePage";
 import Permission from "@/pages/RolesAndPermission/Permission";
 import Roles from "@/pages/RolesAndPermission/RolePage";
@@ -17,7 +18,7 @@ const router = createBrowserRouter([
     },
 
     {
-        path: "admin",
+        path: ":internal-company-slug",
         element: <AppLayout />,
         children: [
             {
@@ -25,12 +26,8 @@ const router = createBrowserRouter([
                 element: <Dashboard />,
             },
             {
-                path: "features",
-                element: (
-                    <div className='mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6'>
-                        <Outlet />
-                    </div>
-                ),
+                path: "features/:feature-slug",
+                element: <FeatureLayout />,
                 children: [
                     {
                         path: "tasks",
