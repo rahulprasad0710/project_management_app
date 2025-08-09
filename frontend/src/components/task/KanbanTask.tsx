@@ -8,16 +8,11 @@ import {
 } from "lucide-react";
 import type {
     FeatureInfo,
+    ITaskStatusResponse,
     ResponseWithPagination,
-    TaskStatus,
 } from "@/types/config.types";
 import { setIsTaskDetailsModalOpen, setTaskDetailsData } from "@/store";
-import {
-    useGetTaskStatusByFeatureIdQuery,
-    useLazyGetTaskStatusByFeatureIdQuery,
-} from "@/api/hooks/useTaskStatus";
 
-import type { FeatureOutletContextType } from "@/types/state.types";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import type { ITask } from "@/types/config.types";
 import PriorityTag from "@molecules/PriorityTag";
@@ -26,7 +21,7 @@ import { setRefetchProjectTaskList } from "@/store";
 import { toast } from "react-toastify";
 import { useAppDispatch } from "@store/reduxHook";
 import { useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useLazyGetTaskStatusByFeatureIdQuery } from "@/api/hooks/useTaskStatus";
 import { useUpdateTaskStatusMutation } from "@/api/hooks/useTask";
 
 type IProps = {
@@ -35,13 +30,6 @@ type IProps = {
     projectTasks: ResponseWithPagination<ITask[]> | undefined;
     selectedFeature: FeatureInfo;
 };
-
-const taskStatus: TaskStatus[] = [
-    "TODO",
-    "IN_PROGRESS",
-    "COMPLETED",
-    "UNDER_REVIEW",
-];
 
 const KanbanTask = (props: IProps) => {
     const dispatch = useAppDispatch();
@@ -56,7 +44,7 @@ const KanbanTask = (props: IProps) => {
 
     const [
         fetchTaskStatus,
-        { data: taskStatusList, isError, isFetching: isTaskStatusFetching },
+        { data: taskStatusList, isFetching: isTaskStatusFetching },
     ] = useLazyGetTaskStatusByFeatureIdQuery({});
 
     console.log({
@@ -75,14 +63,11 @@ const KanbanTask = (props: IProps) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedFeature]);
 
-    const handleUpdateTaskStatus = async (
-        taskId: number,
-        status: TaskStatus
-    ) => {
+    const handleUpdateTaskStatus = async (taskId: number, status: number) => {
         try {
             const response = await updateTaskStatus({
                 id: taskId,
-                status,
+                taskStatus: status,
             });
             if (response?.data?.success) {
                 dispatch(setRefetchProjectTaskList(true));
@@ -102,18 +87,21 @@ const KanbanTask = (props: IProps) => {
                             : `grid-cols-${taskStatusList?.data?.result?.length}`
                     }`}
                 >
-                    {taskStatus.map((status: TaskStatus) => {
-                        return (
-                            <TaskColumn
-                                setIsTaskModalOpen={setIsTaskModalOpen}
-                                isTaskModalOpen={isTaskModalOpen}
-                                key={status}
-                                status={status}
-                                tasks={tasksList}
-                                moveTask={handleUpdateTaskStatus}
-                            />
-                        );
-                    })}
+                    {taskStatusList?.data?.result?.map(
+                        (status: ITaskStatusResponse) => {
+                            return (
+                                <TaskColumn
+                                    setIsTaskModalOpen={setIsTaskModalOpen}
+                                    isTaskModalOpen={isTaskModalOpen}
+                                    key={status.id}
+                                    status={status.name}
+                                    taskStatusId={status.id}
+                                    tasks={tasksList}
+                                    moveTask={handleUpdateTaskStatus}
+                                />
+                            );
+                        }
+                    )}
                 </div>
             </DndProvider>
         </div>
@@ -121,33 +109,28 @@ const KanbanTask = (props: IProps) => {
 };
 
 type TaskColumnProps = {
-    status: TaskStatus;
+    status: string;
+    taskStatusId: number;
     tasks: ITask[];
     isTaskModalOpen: boolean;
     setIsTaskModalOpen: (isOpen: boolean) => void;
-    moveTask: (taskId: number, status: TaskStatus) => void;
+    moveTask: (taskId: number, status: number) => void;
 };
 
 const TaskColumn = (props: TaskColumnProps) => {
-    const { status, tasks, moveTask, setIsTaskModalOpen, isTaskModalOpen } =
-        props;
+    const { status, tasks, moveTask, taskStatusId } = props;
 
     const [{ isOver }, drop] = useDrop(() => ({
         accept: "task",
-        drop: (items: { id: number }) => moveTask(items.id, status),
+        drop: (items: { id: number }) => moveTask(items.id, taskStatusId),
         collect: (monitor: DropTargetMonitor) => ({
             isOver: !!monitor.isOver(),
         }),
     }));
 
-    const taskCounter = tasks.filter((task) => task.status === status).length;
-
-    const taskStatusColor: Record<TaskStatus, string> = {
-        TODO: "#2563EB",
-        IN_PROGRESS: "#2a9d8f",
-        UNDER_REVIEW: "#e76f51",
-        COMPLETED: "#264653",
-    };
+    const taskCounter = tasks.filter(
+        (task) => task.task_status.id === taskStatusId
+    ).length;
 
     return (
         <div
@@ -158,14 +141,6 @@ const TaskColumn = (props: TaskColumnProps) => {
                 isOver ? "bg-blue-100" : ""
             } `}
         >
-            <div
-                className={`h-1 bg-[${
-                    taskStatusColor[status as TaskStatus]
-                }] mx-2 rounded-lg`}
-                style={{
-                    backgroundColor: taskStatusColor[status],
-                }}
-            ></div>
             <div className='flex w-full'>
                 <div className='flex w-full items-center justify-between rounded-e-lg px-2 py-4'>
                     <h3 className='text-md flex items-center font-semibold'>
@@ -184,12 +159,18 @@ const TaskColumn = (props: TaskColumnProps) => {
                         <EllipsisVertical />
                     </button>
                 </div>
+                {taskStatusId}
             </div>
             <div className='no-scrollbar h-[600px] overflow-y-scroll'>
                 {tasks
-                    .filter((task) => task.status === status)
+                    .filter((task) => task.task_status.id === taskStatusId)
                     .map((task: ITask) => {
-                        return <TaskItem key={task.id} task={task} />;
+                        return (
+                            <div>
+                                <h1>taskStatusId :{task.task_status.name}</h1>
+                                <TaskItem key={task.id} task={task} />
+                            </div>
+                        );
                     })}
             </div>
         </div>

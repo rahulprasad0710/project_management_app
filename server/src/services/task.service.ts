@@ -66,7 +66,8 @@ export class TaskService {
             order: {
                 id: "DESC",
             },
-            relations: ["assignedTo", "taskLabel"],
+            relations: ["taskLabel", "assignedTo", "task_status"],
+
             where: {
                 ...(sprintId ? { sprint: { id: sprintId } } : {}),
                 ...(projectId ? { project: { id: projectId } } : {}),

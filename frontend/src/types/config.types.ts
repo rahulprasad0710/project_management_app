@@ -101,6 +101,7 @@ export interface ITask {
     taskNumber: string;
     priority: Priority;
     taskUploads: IUploadFile[];
+    task_status: ITaskStatusResponse;
 }
 
 export interface ITaskPayload {

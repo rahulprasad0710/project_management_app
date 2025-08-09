@@ -89,11 +89,14 @@ export const taskEndpoints = (
         }),
         invalidatesTags: ["Tasks"],
     }),
-    updateTaskStatus: build.mutation<Response<ITask>, Partial<ITask>>({
-        query: ({ id, status }) => ({
+    updateTaskStatus: build.mutation<
+        Response<ITask>,
+        { taskStatus: number; id: number }
+    >({
+        query: ({ id, taskStatus }) => ({
             url: `tasks/status/${id}`,
             method: "PUT",
-            body: { status },
+            body: { taskStatus },
         }),
         invalidatesTags: [{ type: "Tasks", id: "LIST" }],
     }),

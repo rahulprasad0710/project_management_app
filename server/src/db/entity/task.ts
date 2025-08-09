@@ -48,7 +48,11 @@ export class Task {
     @Column()
     addedDate: Date;
 
-    @ManyToOne(() => User, (user) => user.id)
+    @ManyToOne(() => User, (user) => user.id, {
+        lazy: true,
+        nullable: true,
+        eager: false,
+    })
     @JoinColumn()
     assignedBy: User;
 
@@ -69,6 +73,7 @@ export class Task {
 
     @ManyToOne(() => TaskStatus, (taskStatus) => taskStatus.id, {
         nullable: true,
+        eager: false,
     })
     @JoinColumn()
     task_status: TaskStatus;

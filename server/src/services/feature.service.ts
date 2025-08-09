@@ -33,10 +33,18 @@ class FeatureService {
         const result = await this.featureTaskStatusRepository.find({
             where: { feature: { id: featureId } },
             relations: ["taskStatus"],
+            select: ["taskStatus"],
+        });
+
+        const mappedResult = result.map((feature) => {
+            return {
+                ...feature.taskStatus,
+                taskStatusId: feature.taskStatus.id,
+            };
         });
 
         return {
-            result,
+            result: mappedResult,
             pagination: 0,
         };
     }
