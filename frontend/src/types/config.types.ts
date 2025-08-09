@@ -31,6 +31,10 @@ export interface IPaginationWithActive extends Pagination {
     isActive: boolean;
 }
 
+export interface IPaginationWithTaskStatusByFeatureId extends Pagination {
+    featureId: number;
+}
+
 export interface IProjectPagination extends Pagination {
     status?: ProjectStatus[] | undefined;
     priority?: Priority | undefined;

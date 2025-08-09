@@ -5,6 +5,7 @@ import type {
 } from "@reduxjs/toolkit/query";
 //
 import type {
+    IPaginationWithTaskStatusByFeatureId,
     ITaskStatusPayload,
     ITaskStatusResponse,
     ITaskStatusUpdatePayload,
@@ -105,5 +106,26 @@ export const taskStatusEndpoints = (
             { type: "TaskStatus", id: taskStatusId },
             { type: "TaskStatus", id: "LIST" },
         ],
+    }),
+    getTaskStatusByFeatureId: build.query<
+        ResponseWithPagination<ITaskStatusResponse[]>,
+        IPaginationWithTaskStatusByFeatureId
+    >({
+        query: ({
+            isPaginationEnabled = true,
+            page = 1,
+            pageSize = 10,
+            keyword,
+            featureId,
+        }) => ({
+            url: `features/${featureId}/task-status`,
+            method: "GET",
+            params: {
+                isPaginationEnabled,
+                page,
+                pageSize,
+                keyword: keyword ? keyword : undefined,
+            },
+        }),
     }),
 });

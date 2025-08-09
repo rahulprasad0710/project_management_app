@@ -4,10 +4,6 @@ import type {
     IMultiList,
     IPriorityOptions,
 } from "@/types/config.types";
-import {
-    setIsTaskDetailsModalOpen,
-    setRefetchProjectTaskList,
-} from "@/store/index";
 import { useAppDispatch, useAppSelector } from "@/store/reduxHook";
 import { useEffect, useState } from "react";
 import { useOutletContext, useParams } from "react-router-dom";
@@ -23,6 +19,7 @@ import SearchBar from "@/components/molecules/SearchBar";
 import TaskDetailsModal from "@/components/settings/TaskDetailsModal";
 import TaskModal from "@/components/settings/TaskModal";
 import { priorityOptions } from "@/types/config.types";
+import { setRefetchProjectTaskList } from "@/store/index";
 import { toast } from "react-toastify";
 import { useGetEmployeesQuery } from "@apiHooks/useEmployee";
 import { useGetLabelsQuery } from "@apiHooks/useLabel";
@@ -36,12 +33,10 @@ const TaskPage = () => {
         (state) => state.global.isDataRefetchList
     );
 
-    const isTaskDetailsModalOpen = useAppSelector(
-        (state) => state.global.isTaskDetailsModalOpen
-    );
-
     const { selectedFeature } = useOutletContext<FeatureOutletContextType>();
-
+    console.log({
+        selectedFeatureTaskPage: selectedFeature,
+    });
     const { data: labelList, isFetching: isLabelFetching } = useGetLabelsQuery({
         isPaginationEnabled: false,
         page: 1,
@@ -276,6 +271,7 @@ const TaskPage = () => {
                     </button>
                 </div>
                 <KanbanTask
+                    selectedFeature={selectedFeature}
                     isTaskModalOpen={isTaskModalOpen}
                     setIsTaskModalOpen={setIsTaskModalOpen}
                     projectTasks={projectTasks}
@@ -290,11 +286,7 @@ const TaskPage = () => {
             >
                 <TaskModal onClose={handleToggleModal} />
             </Modal>
-            <TaskDetailsModal
-                isTaskModalOpen={isTaskDetailsModalOpen}
-                setIsTaskModalOpen={setIsTaskDetailsModalOpen}
-                handleToggleModal={handleToggleModal}
-            />
+            <TaskDetailsModal />
         </div>
     );
 };

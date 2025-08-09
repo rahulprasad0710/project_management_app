@@ -6,9 +6,18 @@ import {
     Paperclip,
     TicketCheck,
 } from "lucide-react";
-import type { ResponseWithPagination, TaskStatus } from "@/types/config.types";
+import type {
+    FeatureInfo,
+    ResponseWithPagination,
+    TaskStatus,
+} from "@/types/config.types";
 import { setIsTaskDetailsModalOpen, setTaskDetailsData } from "@/store";
+import {
+    useGetTaskStatusByFeatureIdQuery,
+    useLazyGetTaskStatusByFeatureIdQuery,
+} from "@/api/hooks/useTaskStatus";
 
+import type { FeatureOutletContextType } from "@/types/state.types";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import type { ITask } from "@/types/config.types";
 import PriorityTag from "@molecules/PriorityTag";
@@ -16,14 +25,15 @@ import UserAvatar from "@molecules/UserAvatar";
 import { setRefetchProjectTaskList } from "@/store";
 import { toast } from "react-toastify";
 import { useAppDispatch } from "@store/reduxHook";
+import { useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import { useUpdateTaskStatusMutation } from "@/api/hooks/useTask";
-
-// import { format } from "date-fns";
 
 type IProps = {
     isTaskModalOpen: boolean;
     setIsTaskModalOpen: (isOpen: boolean) => void;
     projectTasks: ResponseWithPagination<ITask[]> | undefined;
+    selectedFeature: FeatureInfo;
 };
 
 const taskStatus: TaskStatus[] = [
@@ -35,9 +45,35 @@ const taskStatus: TaskStatus[] = [
 
 const KanbanTask = (props: IProps) => {
     const dispatch = useAppDispatch();
-    const { projectTasks, setIsTaskModalOpen, isTaskModalOpen } = props;
+    const {
+        projectTasks,
+        setIsTaskModalOpen,
+        isTaskModalOpen,
+        selectedFeature,
+    } = props;
     const [updateTaskStatus] = useUpdateTaskStatusMutation();
     const tasksList = projectTasks?.data?.result || [];
+
+    const [
+        fetchTaskStatus,
+        { data: taskStatusList, isError, isFetching: isTaskStatusFetching },
+    ] = useLazyGetTaskStatusByFeatureIdQuery({});
+
+    console.log({
+        taskStatusList,
+    });
+
+    useEffect(() => {
+        if (selectedFeature) {
+            fetchTaskStatus({
+                featureId: selectedFeature.features_id,
+                isPaginationEnabled: false,
+                page: 1,
+                pageSize: 10,
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedFeature]);
 
     const handleUpdateTaskStatus = async (
         taskId: number,
@@ -59,7 +95,13 @@ const KanbanTask = (props: IProps) => {
     return (
         <div>
             <DndProvider backend={HTML5Backend}>
-                <div className='grid grid-cols-1 gap-4 mt-4 md:grid-cols-2 xl:grid-cols-4'>
+                <div
+                    className={`grid grid-cols-1 gap-4 mt-4 md:grid-cols-2 xl:grid-cols-4 ${
+                        isTaskStatusFetching
+                            ? "opacity-50 xl:grid-cols-4"
+                            : `grid-cols-${taskStatusList?.data?.result?.length}`
+                    }`}
+                >
                     {taskStatus.map((status: TaskStatus) => {
                         return (
                             <TaskColumn

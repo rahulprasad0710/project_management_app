@@ -6,6 +6,8 @@ const {
     useLazyGetAllTaskStatusQuery,
     useCreateTaskStatusMutation,
     useUpdateTaskStatusMutation,
+    useGetTaskStatusByFeatureIdQuery,
+    useLazyGetTaskStatusByFeatureIdQuery,
 } = api;
 
 export {
@@ -14,5 +16,7 @@ export {
     useLazyGetAllTaskStatusQuery,
     useCreateTaskStatusMutation,
     useUpdateTaskStatusMutation,
+    useGetTaskStatusByFeatureIdQuery,
+    useLazyGetTaskStatusByFeatureIdQuery,
 };
 export * from "./useTaskStatus";

@@ -35,7 +35,10 @@ class FeatureService {
             relations: ["taskStatus"],
         });
 
-        return result;
+        return {
+            result,
+            pagination: 0,
+        };
     }
 }
 
