@@ -184,7 +184,7 @@ const TaskModal = (props: Props) => {
     // max-h-[700px] overflow-y-auto
 
     return (
-        <div className='relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900 lg:p-11'>
+        <div className='relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900 lg:p-6'>
             <div className='px-2 pr-14'>
                 <h4 className='mb-2 text-xl font-semibold text-gray-800 dark:text-white/90'>
                     Add Task

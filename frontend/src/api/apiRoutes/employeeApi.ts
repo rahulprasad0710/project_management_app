@@ -4,6 +4,7 @@ import type {
     EmployeePagination,
     IEmployeePayload,
     IEmployeeResponse,
+    IEmployeeUpdatePayload,
     Response,
     ResponseWithPagination,
 } from "@/types/config.types";
@@ -36,7 +37,39 @@ export const employeeEndpoints = (
             keyword,
             isActive,
         }) => ({
-            url: "users",
+            url: "employees",
+            method: "GET",
+            params: {
+                isPaginationEnabled,
+                page,
+                pageSize,
+                keyword: keyword ? keyword : undefined,
+                isActive,
+            },
+        }),
+        providesTags: (result) =>
+            result
+                ? [
+                      ...result.data.result.map((employee) => ({
+                          type: "Employees" as const,
+                          id: employee.id,
+                      })),
+                      { type: "Employees" as const, id: "LIST" },
+                  ]
+                : [{ type: "Employees" as const, id: "LIST" }],
+    }),
+    getEmployeeView: build.query<
+        ResponseWithPagination<IEmployeeResponse[]>,
+        EmployeePagination
+    >({
+        query: ({
+            isPaginationEnabled = true,
+            page = 1,
+            pageSize = 10,
+            keyword,
+            isActive,
+        }) => ({
+            url: "employees/view",
             method: "GET",
             params: {
                 isPaginationEnabled,
@@ -58,12 +91,12 @@ export const employeeEndpoints = (
                 : [{ type: "Employees" as const, id: "LIST" }],
     }),
 
-    getEmployeeById: build.query<
-        Response<IEmployeeResponse>,
-        { employeeId: number }
+    getEmployeesByFeatureId: build.query<
+        Response<IEmployeeResponse[]>,
+        { featureId: number }
     >({
-        query: ({ employeeId }) => ({
-            url: `users/${employeeId}`,
+        query: ({ featureId }) => ({
+            url: `employees/feature/${featureId}`,
             method: "GET",
         }),
     }),
@@ -73,7 +106,18 @@ export const employeeEndpoints = (
         IEmployeePayload
     >({
         query: (payload) => ({
-            url: "users",
+            url: "employees",
+            method: "POST",
+            body: payload,
+        }),
+        invalidatesTags: [{ type: "Employees", id: "LIST" }],
+    }),
+    updateEmployee: build.mutation<
+        Response<IEmployeeResponse>,
+        IEmployeeUpdatePayload
+    >({
+        query: (payload) => ({
+            url: `employees/${payload.id}`,
             method: "POST",
             body: payload,
         }),

@@ -21,9 +21,9 @@ import TaskModal from "@/components/settings/TaskModal";
 import { priorityOptions } from "@/types/config.types";
 import { setRefetchProjectTaskList } from "@/store/index";
 import { toast } from "react-toastify";
-import { useGetEmployeesQuery } from "@apiHooks/useEmployee";
 import { useGetLabelsQuery } from "@apiHooks/useLabel";
 import { useGetQueryParams } from "@hooks/useGetQueryParams";
+import { useLazyGetEmployeesByFeatureIdQuery } from "@apiHooks/useEmployee";
 import { useLazyGetTasksQuery } from "@apiHooks/useTask";
 
 const TaskPage = () => {
@@ -45,14 +45,18 @@ const TaskPage = () => {
         isActive: true,
     });
 
-    const { isFetching: isUserFetching, data: userList } = useGetEmployeesQuery(
-        {
-            isPaginationEnabled: false,
-            page: 1,
-            pageSize: 10,
-            isActive: true,
+    const [
+        fetchEmployeeByFeatureId,
+        { isFetching: isUserFetching, data: userList },
+    ] = useLazyGetEmployeesByFeatureIdQuery();
+
+    useEffect(() => {
+        if (selectedFeature?.features_id) {
+            fetchEmployeeByFeatureId({
+                featureId: selectedFeature.features_id,
+            });
         }
-    );
+    }, [fetchEmployeeByFeatureId, selectedFeature]);
 
     const [keyword, setKeyword] = useState<string>("");
     const [selectedLabels, setSelectedLabels] = useState<IMultiList[]>([]);
@@ -234,8 +238,8 @@ const TaskPage = () => {
                             list={
                                 !isUserFetching &&
                                 userList?.data &&
-                                userList?.data?.result?.length > 0
-                                    ? userList?.data.result?.map((item) => {
+                                userList?.data?.length > 0
+                                    ? userList?.data.map((item) => {
                                           return {
                                               label: `${item.firstName} ${item.lastName}`,
                                               value: String(item.id),

@@ -49,8 +49,13 @@ export interface IProjectPagination extends IPagination {
     priority?: Priority[] | undefined;
 }
 
+export interface IEmployeeViewPagination extends IPagination {
+    isActive?: boolean | undefined;
+}
+
 export interface IEmployeePagination extends IPagination {
     isActive?: boolean | undefined;
+    emailVerified?: boolean | undefined;
 }
 
 export interface ITaskPagination extends IPagination {

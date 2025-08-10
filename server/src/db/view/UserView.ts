@@ -36,16 +36,16 @@ export class UserView {
     employeeId: string;
 
     @ViewColumn()
-    roleName: string;
-
-    @ViewColumn()
-    department: string;
+    roleId: string;
 
     @ViewColumn()
     mobileNumber: string;
 
     @ViewColumn()
     isActive: boolean;
+
+    @ViewColumn()
+    profilePictureUrl: string;
 
     @OneToMany(() => Notification, (notification) => notification.recipient)
     notifications: Notification[];

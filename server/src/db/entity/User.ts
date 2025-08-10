@@ -1,6 +1,7 @@
 import {
     Column,
     Entity,
+    JoinColumn,
     ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
@@ -31,7 +32,11 @@ export class User {
     @Column({ type: "varchar", default: "PMA-0001" })
     employeeId: string;
 
-    @ManyToOne(() => Role, (role) => role.users)
+    @Column()
+    roleId: number;
+
+    @ManyToOne(() => Role, { eager: false })
+    @JoinColumn({ name: "roleId" })
     role: Role;
 
     @Column({ nullable: true })

@@ -1,8 +1,8 @@
 import "reflect-metadata";
-import { DataSource } from "typeorm";
-import entities from "./entity/index";
 
 import APP_CONSTANT from "../constants/AppConfig";
+import { DataSource } from "typeorm";
+import entities from "./index";
 
 const dataSource = new DataSource({
     type: "postgres",

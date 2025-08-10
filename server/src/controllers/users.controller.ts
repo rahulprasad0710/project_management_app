@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 
 import { IPagination } from "../types/express";
 import UserService from "../services/users.service";
-import normalizeToString from "../utils/sanatizeQueryParams";
 
 const userService = new UserService();
 
@@ -17,8 +16,6 @@ const create = async (req: Request, res: Response) => {
 };
 
 const getAll = async (req: Request, res: Response) => {
-    const rawIsActive = normalizeToString(req.query.isActive);
-
     const { skip, take, keyword, isPaginationEnabled }: IPagination =
         req.pagination;
     const users = await userService.getAll({
@@ -26,7 +23,34 @@ const getAll = async (req: Request, res: Response) => {
         take,
         keyword,
         isPaginationEnabled,
-        isActive: rawIsActive === "true" ? true : false,
+    });
+    res.status(200).json({
+        success: true,
+        data: users,
+        message: "User fetched successfully",
+    });
+};
+
+const getEmployeeViewByFeatureId = async (req: Request, res: Response) => {
+    const { featureId } = req.params;
+    const users = await userService.getEmployeeViewByFeatureId({
+        featureId: Number(featureId),
+    });
+    res.status(200).json({
+        success: true,
+        data: users,
+        message: "User fetched successfully",
+    });
+};
+
+const getAllEmployeeDetails = async (req: Request, res: Response) => {
+    const { skip, take, keyword, isPaginationEnabled }: IPagination =
+        req.pagination;
+    const users = await userService.getAllEmployee({
+        skip,
+        take,
+        keyword,
+        isPaginationEnabled,
     });
     res.status(200).json({
         success: true,
@@ -37,5 +61,7 @@ const getAll = async (req: Request, res: Response) => {
 
 export default {
     create,
+    getAllEmployeeDetails,
     getAll,
+    getEmployeeViewByFeatureId,
 };

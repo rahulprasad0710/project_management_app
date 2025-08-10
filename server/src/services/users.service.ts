@@ -1,12 +1,16 @@
 import APP_CONSTANT from "../constants/AppConfig";
 import { EmailService } from "./config/email.service";
+import { Feature } from "../db/entity/Feature";
 import { IEmployeePagination } from "../types/payload";
 import { ILike } from "typeorm";
+import { IPagination } from "../types/express";
 import { Role } from "../db/entity/role";
 import { User } from "../db/entity/User";
+import { UserView } from "../db/view/UserView";
 import createPagination from "../utils/createPagination";
 import crypto from "crypto";
 import dataSource from "../db/data-source";
+import { sanitizeDBResult } from "../utils/sanitizeDbResult";
 
 const emailService = new EmailService();
 
@@ -20,7 +24,11 @@ interface IUser {
 
 export class UserService {
     constructor(
-        private readonly userRepository = dataSource.getRepository(User)
+        private readonly userRepository = dataSource.getRepository(User),
+        private readonly userViewRepository = dataSource.getRepository(
+            UserView
+        ),
+        private readonly featureRepository = dataSource.getRepository(Feature)
     ) {}
 
     async create(user: IUser) {
@@ -60,18 +68,10 @@ export class UserService {
         return response;
     }
 
-    async getAll(query: IEmployeePagination) {
-        const { skip, take, isPaginationEnabled, isActive, keyword } = query;
-
-        console.log({
-            skip,
-            take,
-            isPaginationEnabled,
-            isActive,
-            keyword,
-        });
-
-        let whereClause: any = { isActive: isActive ? isActive : true };
+    async getAll(query: IPagination) {
+        const { skip, take, isPaginationEnabled, keyword } = query;
+        console.log("getAll");
+        let whereClause = {};
         if (keyword) {
             whereClause = [
                 { ...whereClause, firstName: ILike(`%${keyword}%`) },
@@ -81,24 +81,75 @@ export class UserService {
             ];
         }
 
-        const result = await this.userRepository.find({
-            select: [
-                "id",
-                "firstName",
-                "lastName",
-                "employeeId",
-                "profilePictureUrl",
-                "isActive",
-                "emailVerified",
-                "role",
-                "mobileNumber",
-            ],
+        const result = await this.userViewRepository.find({
             skip: skip,
             take: take,
             order: {
                 id: "DESC",
             },
             where: whereClause,
+        });
+        const totalCount = await this.userRepository.count();
+        return {
+            result,
+            pagination: createPagination(
+                skip,
+                take,
+                totalCount,
+                isPaginationEnabled
+            ),
+        };
+    }
+
+    async getAllEmployee(query: IEmployeePagination) {
+        console.log("getAllEmployeefff");
+
+        const {
+            skip,
+            take,
+            isPaginationEnabled,
+            isActive,
+            keyword,
+            emailVerified,
+        } = query;
+
+        console.log({
+            skip,
+            take,
+            isPaginationEnabled,
+            isActive,
+            keyword,
+            emailVerified,
+        });
+
+        const result = await this.userRepository.find({
+            select: [
+                "id",
+                "email",
+                "firstName",
+                "lastName",
+                "employeeId",
+                "profilePictureUrl",
+                "isActive",
+                "emailVerified",
+                "mobileNumber",
+                "createdAt",
+                "emailVerified",
+                "roleId",
+            ],
+            skip: skip,
+            take: take,
+            order: {
+                id: "DESC",
+            },
+
+            where: {
+                ...(keyword ? { firstName: ILike(`%${keyword}%`) } : {}),
+                ...(keyword ? { lastName: ILike(`%${keyword}%`) } : {}),
+                ...(keyword ? { employeeId: ILike(`%${keyword}%`) } : {}),
+                ...(isActive ? { isActive: isActive } : {}),
+                ...(emailVerified ? { emailVerified: emailVerified } : {}),
+            },
         });
         const totalCount = await this.userRepository.count();
         return {
@@ -157,6 +208,45 @@ export class UserService {
             emailVerified: true,
             isActive: true,
         });
+        return response;
+    }
+
+    async getEmployeeViewByProjectId({ featureId }: { featureId: number }) {
+        return await this.featureRepository.findOne({
+            where: { id: featureId },
+            relations: ["featureTeamMember"],
+        });
+    }
+
+    async getEmployeeViewByFeatureId({ featureId }: { featureId: number }) {
+        const result = await this.featureRepository.findOne({
+            where: { id: featureId },
+            relations: ["featureTeamMember"],
+            select: ["id", "featureTeamMember"],
+        });
+
+        const response = sanitizeDBResult<
+            User,
+            | "id"
+            | "firstName"
+            | "lastName"
+            | "email"
+            | "mobileNumber"
+            | "profilePictureUrl"
+            | "role"
+        >({
+            selectFields: [
+                "id",
+                "firstName",
+                "lastName",
+                "email",
+                "mobileNumber",
+                "profilePictureUrl",
+                "role",
+            ],
+            result: result?.featureTeamMember ?? [],
+        });
+
         return response;
     }
 

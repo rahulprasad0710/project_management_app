@@ -248,11 +248,12 @@ export interface IEmployeeResponse {
     email: string;
     emailVerified: boolean;
     mobileNumber: string;
-    role: string;
+    roleId: number;
     employeeId: string;
     department: string | null;
     createdAt: string;
     profilePictureUrl: string | null;
+    isActive: boolean;
 }
 
 export interface ISprintResponse extends ISprintPayload {

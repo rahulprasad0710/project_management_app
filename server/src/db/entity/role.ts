@@ -21,7 +21,9 @@ export class Role {
     @Column({ unique: true })
     name: string;
 
-    @OneToMany(() => User, (user) => user.role)
+    @OneToMany(() => User, (user) => user.role, {
+        eager: false,
+    })
     users: User[];
 
     @ManyToMany(() => Permission, { cascade: true })

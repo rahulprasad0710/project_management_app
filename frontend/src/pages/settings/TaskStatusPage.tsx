@@ -7,13 +7,11 @@ import { Modal } from "@/components/common/Modal";
 import { PlusIcon } from "lucide-react";
 import ReactTable from "@/components/common/ReactTable";
 import { SquarePen } from "lucide-react";
-import TaskStatusFeatureModal from "@/components/settings/TaskStatusFeature";
 import TaskStatusModal from "@/components/settings/TaskStatusModal";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useLazyGetAllTaskStatusQuery } from "@api/hooks/useTaskStatus";
 
 const TaskStatus = () => {
-    const [keyword, setKeyword] = useState<string>("");
     const [selectedData, setSelectedData] = useState<
         undefined | ITaskStatusResponse
     >();
@@ -39,7 +37,7 @@ const TaskStatus = () => {
             isPaginationEnabled: true,
             page: 1,
             pageSize: 10,
-            keyword: keyword,
+            keyword: "",
         });
     };
 
@@ -54,7 +52,7 @@ const TaskStatus = () => {
             isPaginationEnabled: true,
             page: dataList?.data?.pagination?.currentPage - 1,
             pageSize: dataList?.data?.pagination?.pageSize,
-            keyword: keyword,
+            keyword: "",
         });
     };
 

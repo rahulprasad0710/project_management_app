@@ -6,6 +6,19 @@ import usersController from "../controllers/users.controller";
 const router = ExpressRouter();
 
 router.post("", asyncTryCatchFn(usersController.create));
-router.get("", applyPagination, asyncTryCatchFn(usersController.getAll));
+
+router.get(
+    "",
+    applyPagination,
+    asyncTryCatchFn(usersController.getAllEmployeeDetails)
+);
+
+router.get("/view", applyPagination, asyncTryCatchFn(usersController.getAll));
+
+router.get(
+    "/feature/:featureId",
+    applyPagination,
+    asyncTryCatchFn(usersController.getEmployeeViewByFeatureId)
+);
 
 export default router;
