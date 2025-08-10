@@ -33,7 +33,8 @@ const TaskPage = () => {
         (state) => state.global.isDataRefetchList
     );
 
-    const { selectedFeature } = useOutletContext<FeatureOutletContextType>();
+    const { selectedFeature, authenticatedEmployeeId } =
+        useOutletContext<FeatureOutletContextType>();
     console.log({
         selectedFeatureTaskPage: selectedFeature,
     });
@@ -166,6 +167,15 @@ const TaskPage = () => {
         setSelectedPriority([]);
         setSelectedLabels([]);
         setSelectedTeamMember([]);
+
+        const temp = selectedTeamMember.find(
+            (item) => item.value === String(authenticatedEmployeeId)
+        );
+
+        if (temp) {
+            setSelectedTeamMember([temp]);
+            setSelectedAssigneeIds([String(authenticatedEmployeeId)]);
+        }
     };
 
     const handleSearch = () => {
@@ -286,6 +296,7 @@ const TaskPage = () => {
             >
                 <TaskModal onClose={handleToggleModal} />
             </Modal>
+
             <TaskDetailsModal />
         </div>
     );

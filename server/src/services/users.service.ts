@@ -1,13 +1,15 @@
 import APP_CONSTANT from "../constants/AppConfig";
+import { EmailService } from "./config/email.service";
 import { IEmployeePagination } from "../types/payload";
 import { ILike } from "typeorm";
 import { Role } from "../db/entity/role";
-import { TEmail } from "../types/types";
 import { User } from "../db/entity/User";
-import { addEmailToQueue } from "../jobs/emailQueue";
 import createPagination from "../utils/createPagination";
 import crypto from "crypto";
 import dataSource from "../db/data-source";
+
+const emailService = new EmailService();
+
 interface IUser {
     firstName: string;
     lastName: string;
@@ -21,26 +23,6 @@ export class UserService {
         private readonly userRepository = dataSource.getRepository(User)
     ) {}
 
-    async sendVerificationEmail(user: User, verifyLink: string) {
-        const emailObj: TEmail = {
-            to: [user.email],
-            subject: "Welcome to the project",
-            html: `
-                <h1>Welcome to the project</h1>
-                <p>Your employee id is ${user.employeeId}</p>
-                <p>Please login to the app <a href="${verifyLink}">here</a></p>
-                `,
-            text: `
-                Welcome to the project
-                Your employee id is ${user.employeeId}
-                Please login to the app
-                `,
-        };
-        const emailQueue = await addEmailToQueue(emailObj);
-        console.log(emailQueue);
-        return verifyLink;
-    }
-
     async create(user: IUser) {
         const generateVerificationToken = () =>
             crypto.randomBytes(32).toString("hex");
@@ -51,9 +33,9 @@ export class UserService {
 
         const response = await this.addUser(user, employeeId, token);
 
-        const verifyLink = `${APP_CONSTANT.FRONTEND_BASE_URL}verify-email/${response.id}?token=${token}`;
+        const verifyLink = `${APP_CONSTANT.FRONTEND_BASE_URL}auth/verify-email/${response.id}?token=${token}`;
 
-        const emailResponse = await this.sendVerificationEmail(
+        const emailResponse = await emailService.sendVerificationEmail(
             response,
             verifyLink
         );

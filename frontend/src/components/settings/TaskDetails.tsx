@@ -1,4 +1,8 @@
-import type { IStatusOptions, ITask, TaskStatus } from "@/types/config.types";
+import type {
+    FeatureInfo,
+    ITask,
+    ITaskStatusResponse,
+} from "@/types/config.types";
 import { useEffect, useState } from "react";
 import {
     useLazyGetTasksByTaskIdQuery,
@@ -7,14 +11,16 @@ import {
 
 import ActivityBox from "@molecules/ActivityBox";
 import { Edit } from "lucide-react";
+import type { FeatureOutletContextType } from "@/types/state.types";
 import PriorityTag from "@molecules/PriorityTag";
 import { Spinner } from "@components/atoms/Spinner";
 import TaskComments from "@molecules/TaskComments";
 import { format } from "date-fns";
 import { setRefetchProjectTaskList } from "@/store";
-import { statusOptions } from "@/constant/utils";
 import { toast } from "react-toastify";
 import { useAppDispatch } from "@store/reduxHook";
+import { useLazyGetTaskStatusByFeatureIdQuery } from "@/api/hooks/useTaskStatus";
+import { useOutletContext } from "react-router-dom";
 
 type Props = {
     selectedData: ITask | undefined;
@@ -26,6 +32,8 @@ type TAB_TYPES = "ACTIVITY" | "COMMENTS";
 const TaskDetails = ({ selectedData }: Props) => {
     const dispatch = useAppDispatch();
 
+    const { selectedFeature } = useOutletContext<FeatureOutletContextType>();
+
     const [activeTab, setActiveTab] = useState<TAB_TYPES>("COMMENTS");
     const [updateTaskStatus, { isLoading: isTaskUpdateLoading }] =
         useUpdateTaskStatusMutation();
@@ -33,16 +41,34 @@ const TaskDetails = ({ selectedData }: Props) => {
     const [fetchTaskByTaskId, { data, isLoading, error }] =
         useLazyGetTasksByTaskIdQuery();
 
+    const [
+        fetchTaskStatus,
+        { data: taskStatusList, isFetching: isTaskStatusFetching },
+    ] = useLazyGetTaskStatusByFeatureIdQuery();
+
+    useEffect(() => {
+        if (selectedFeature) {
+            fetchTaskStatus({
+                featureId: selectedFeature.features_id,
+                isPaginationEnabled: false,
+                page: 1,
+                pageSize: 10,
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedFeature]);
+
     useEffect(() => {
         if (selectedData?.id) {
             fetchTaskByTaskId({ taskId: selectedData.id });
         }
     }, [selectedData]);
 
-    const handleUpdateTaskStatus = async (status: TaskStatus) => {
+    const handleUpdateTaskStatus = async (status: number) => {
+        if (!selectedData?.id) return;
         const response = await updateTaskStatus({
             id: selectedData?.id,
-            status,
+            taskStatus: status,
         });
 
         if (response?.data?.success) {
@@ -127,22 +153,24 @@ const TaskDetails = ({ selectedData }: Props) => {
                             <select
                                 onChange={(e) =>
                                     handleUpdateTaskStatus(
-                                        e.target.value as TaskStatus
+                                        Number(e.target.value)
                                     )
                                 }
-                                value={data?.data?.status}
+                                value={data?.data?.task_status?.id}
                                 className='block w-full appearance-none rounded border border-gray-200 bg-white px-4 py-2 pr-8 font-semibold leading-tight text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none'
                             >
-                                {statusOptions.map((status: IStatusOptions) => (
-                                    <option
-                                        value={status.value}
-                                        key={status.value}
-                                    >
-                                        {status.label}
-                                    </option>
-                                ))}
+                                {taskStatusList?.data?.result?.map(
+                                    (status: ITaskStatusResponse) => (
+                                        <option
+                                            value={status.id}
+                                            key={status.id}
+                                        >
+                                            {status.name}
+                                        </option>
+                                    )
+                                )}
                             </select>
-                            {isTaskUpdateLoading ? (
+                            {isTaskUpdateLoading || isTaskStatusFetching ? (
                                 <div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700'>
                                     <Spinner />
                                 </div>

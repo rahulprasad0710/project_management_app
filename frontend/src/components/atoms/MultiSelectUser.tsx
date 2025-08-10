@@ -75,7 +75,7 @@ const MultiSelectUser = (props: Props) => {
                     selectedList?.length > 0 ? "justify-end" : "justify-end"
                 } gap-1 rounded bg-white p-1`}
             >
-                <div className='flex flex-wrap gap-1'>
+                <div className='flex -space-x-1'>
                     {list?.slice(0, 5).map((item: IMultiList) => {
                         const isItemAlreadyPresent = selectedList.find(
                             (item2) => item2.value === item.value

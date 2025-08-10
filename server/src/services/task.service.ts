@@ -1,8 +1,9 @@
 import { ILike, In } from "typeorm";
 import { ITask, ITaskPagination, IUpdateTaskPayload } from "../types/payload";
-import { Priority, TaskStatusEnum } from "../enums/Priority";
 
+import { Priority } from "../enums/Priority";
 import { Task } from "../db/entity/task";
+import { TaskStatus } from "../db/entity/taskStatus";
 import { UploadFile } from "../db/entity/uploads";
 import createPagination from "../utils/createPagination";
 import dataSource from "../db/data-source";
@@ -10,7 +11,12 @@ import dataSource from "../db/data-source";
 export class TaskService {
     constructor(
         private readonly taskRepository = dataSource.getRepository(Task),
-        private readonly uploadRepository = dataSource.getRepository(UploadFile)
+        private readonly uploadRepository = dataSource.getRepository(
+            UploadFile
+        ),
+        private readonly taskStatusRepository = dataSource.getRepository(
+            TaskStatus
+        )
     ) {}
 
     async create(task: ITask) {
@@ -151,16 +157,23 @@ export class TaskService {
         }
     }
 
-    async updateStatus(id: number, status: TaskStatusEnum) {
-        const taskObj = await this.taskRepository.findOne({
-            where: { id },
+    async updateStatus(id: number, taskStatusId: number) {
+        console.log({
+            id,
+            taskStatusId,
+        });
+        const taskObj = new Task();
+
+        const task_status = await this.taskStatusRepository.findOne({
+            where: { id: taskStatusId },
         });
 
-        if (!taskObj || !status) {
-            throw new Error("Task not found");
+        if (!task_status) {
+            throw new Error("Task status not found");
         }
-
-        return await this.taskRepository.save(taskObj);
+        taskObj.task_status = task_status;
+        const result = await this.taskRepository.update(id, taskObj);
+        return result;
     }
 
     async delete(id: number) {
@@ -204,6 +217,7 @@ export class TaskService {
                 "assignedBy",
                 "assignedTo",
                 "sprint",
+                "task_status",
             ],
         });
     }

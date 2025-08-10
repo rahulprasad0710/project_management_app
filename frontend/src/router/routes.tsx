@@ -3,10 +3,11 @@ import { Outlet, createBrowserRouter } from "react-router-dom";
 import AppLayout from "@/layout/AppLayout";
 import Dashboard from "@/pages/Dashboard";
 import EmailVerify from "@/pages/AuthPages/ EmailVerify";
+import Employee from "@/pages/AdminSettings/Employee";
 import FeatureLayout from "@/layout/FeatureLayout";
 import HomePage from "@/pages/HomePage";
-import Permission from "@/pages/RolesAndPermission/Permission";
-import Roles from "@/pages/RolesAndPermission/RolePage";
+import Permission from "@/pages/AdminSettings/Permission";
+import Roles from "@/pages/AdminSettings/RolePage";
 import SignIn from "@/pages/AuthPages/SignIn";
 import TaskPage from "@/pages/features/TaskPage";
 import TaskStatusPage from "@/pages/settings/TaskStatusPage";
@@ -15,6 +16,21 @@ const router = createBrowserRouter([
     {
         path: "/",
         element: <HomePage />,
+    },
+    {
+        path: "auth",
+        element: <Outlet />,
+        children: [
+            {
+                path: "login",
+                element: <SignIn />,
+            },
+
+            {
+                path: "verify-email/:id",
+                element: <EmailVerify />,
+            },
+        ],
     },
 
     {
@@ -54,9 +70,13 @@ const router = createBrowserRouter([
                 ],
             },
             {
-                path: "auth-settings",
+                path: "admin-settings",
                 element: <Outlet />,
                 children: [
+                    {
+                        path: "employees",
+                        element: <Employee />,
+                    },
                     {
                         path: "permissions",
                         element: <Permission />,
@@ -68,16 +88,6 @@ const router = createBrowserRouter([
                 ],
             },
         ],
-    },
-
-    {
-        path: "/auth/login",
-        element: <SignIn />,
-    },
-
-    {
-        path: "/auth/verify-email/:id",
-        element: <EmailVerify />,
     },
 ]);
 

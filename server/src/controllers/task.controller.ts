@@ -97,7 +97,9 @@ const getById = async (req: Request, res: Response): Promise<void> => {
 const updateStatus = async (req: Request, res: Response): Promise<void> => {
     const { taskId } = req.params;
 
-    const { status } = req.body;
+    const { taskStatus } = req.body;
+
+    const status = parseInt(taskStatus);
 
     try {
         const response = await taskService.updateStatus(

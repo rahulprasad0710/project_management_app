@@ -73,7 +73,6 @@ export class Task {
 
     @ManyToOne(() => TaskStatus, (taskStatus) => taskStatus.id, {
         nullable: true,
-        eager: false,
     })
     @JoinColumn()
     task_status: TaskStatus;

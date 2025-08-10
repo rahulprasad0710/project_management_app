@@ -33,9 +33,9 @@ type NavItem = {
 const AppSidebar: React.FC = () => {
     const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
     const location = useLocation();
-    // const authenticateEmployee = useAppSelector(
-    //     (state) => state.global.authenticateEmployee
-    // );
+    const authenticateEmployee = useAppSelector(
+        (state) => state.global.authenticateEmployee
+    );
 
     const navItems: NavItem[] = [
         {
@@ -50,7 +50,7 @@ const AppSidebar: React.FC = () => {
             subItems: [
                 {
                     name: "Tasks",
-                    path: "/admin/features/booking/tasks",
+                    path: `/admin/features/booking/tasks?assignee=${authenticateEmployee?.id}`,
                     pro: false,
                     icon: <KanbanSquare />,
                 },
@@ -122,28 +122,28 @@ const AppSidebar: React.FC = () => {
             name: "Admin Settings",
             subItems: [
                 {
-                    name: "Employee's Permissions",
-                    path: "/admin/auth-settings/employees",
+                    name: "Employee",
+                    path: "/admin/admin-settings/employees",
                     pro: false,
                 },
                 {
                     name: "Roles",
-                    path: "/admin/auth-settings/roles",
+                    path: "/admin/admin-settings/roles",
                     pro: false,
                 },
                 {
                     name: "Permissions",
-                    path: "/admin/auth-settings/permissions",
+                    path: "/admin/admin-settings/permissions",
                     pro: false,
                 },
                 {
                     name: "Feature & Team",
-                    path: "/admin/auth-settings/features",
+                    path: "/admin/admin-settings/features",
                     pro: false,
                 },
                 {
                     name: "Internal Company",
-                    path: "/admin/auth-settings/internal-company",
+                    path: "/admin/admin-settings/internal-company",
                     pro: false,
                 },
             ],

@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  Check,
-  ContactRound,
-  SquarePen,
-  SquarePlus,
-  UserRoundCheck,
-  UserRoundX,
-  X,
-} from "lucide-react";
+import { Check, ContactRound, SquarePen, SquarePlus, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 import EmployeeModal from "../(components)/modals/EmployeeModal";
@@ -17,7 +9,6 @@ import { IEmployeeResponse } from "@/types/user.types";
 import Modal from "@/app/(components)/Modal";
 import ReactTable from "../(components)/ReactTable";
 import SearchBar from "@/app/(components)/molecules/SearchBar";
-import SprintModal from "@/app/(components)/modals/SprintModal";
 import UserAvatar from "../(components)/molecules/UserAvatar";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useLazyGetEmployeesQuery } from "@/store/api";

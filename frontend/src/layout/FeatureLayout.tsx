@@ -36,7 +36,7 @@ const FeatureLayout = () => {
                 context={{
                     internalCompanyInfo,
                     selectedFeature,
-                    userId: authenticateEmployee?.id,
+                    authenticatedEmployeeId: authenticateEmployee?.id,
                 }}
             />
         </div>

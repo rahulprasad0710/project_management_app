@@ -1,22 +1,26 @@
-import { Job } from "bull";
 import { TEmail } from "../types/types";
 import emailQueue from "./emailQueue";
+import { sendEmail } from "../config/email.config";
 
-const sendEmailMock = async (job: Job<TEmail>) => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(
-                `Job ${job.id} completed successfully after ${job.timestamp}`
-            );
-        }, 2000);
-    });
-};
+// const sendEmailMock = async (job: Job<TEmail>) => {
+//     return new Promise((resolve) => {
+//         setTimeout(() => {
+//             resolve(
+//                 `Job ${job.id} completed successfully after ${job.timestamp}`
+//             );
+//         }, 2000);
+//     });
+// };
 
 function startQueue() {
     // Process jobs from the queue
     emailQueue.process("email-queue", async (job) => {
         console.log("Processing job:", job.data);
-        const response = await sendEmailMock(job);
+
+        const emailTemplate: TEmail = job.data;
+        console.log("LOG: ~ startQueue ~ emailTemplate:", emailTemplate);
+
+        const response = await sendEmail(emailTemplate);
         return response;
     });
 

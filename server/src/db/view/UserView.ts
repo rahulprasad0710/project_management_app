@@ -1,6 +1,6 @@
-import { DataSource, ViewColumn, ViewEntity } from "typeorm";
+import { DataSource, OneToMany, ViewColumn, ViewEntity } from "typeorm";
 
-import { Role } from "../entity/role";
+import { Notification } from "../entity/Notification";
 import { User } from "../entity/User";
 
 @ViewEntity({
@@ -13,14 +13,11 @@ import { User } from "../entity/User";
             .addSelect("u.firstName", "firstName")
             .addSelect("u.lastName", "lastName")
             .addSelect("u.employeeId", "employeeId")
-            .addSelect("r.name", "roleName")
-            .addSelect("u.department", "department")
+            .addSelect("u.role", "roleId")
             .addSelect("u.mobileNumber", "mobileNumber")
-            .addSelect("u.emailVerified", "emailVerified")
             .addSelect("u.isActive", "isActive")
-            .addSelect("u.createdAt", "createdAt")
-            .from(User, "u")
-            .leftJoin(Role, "r", "u.roleId = r.id"),
+            .addSelect("u.profilePictureUrl", "profilePictureUrl")
+            .from(User, "u"),
 })
 export class UserView {
     @ViewColumn()
@@ -48,11 +45,8 @@ export class UserView {
     mobileNumber: string;
 
     @ViewColumn()
-    emailVerified: boolean;
-
-    @ViewColumn()
     isActive: boolean;
 
-    @ViewColumn()
-    createdAt: Date;
+    @OneToMany(() => Notification, (notification) => notification.recipient)
+    notifications: Notification[];
 }

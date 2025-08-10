@@ -1,5 +1,4 @@
-import Queue, { Job } from "bull";
-
+import Queue from "bull";
 import { TEmail } from "./../types/types";
 
 const redisConfig = {

@@ -47,10 +47,6 @@ const KanbanTask = (props: IProps) => {
         { data: taskStatusList, isFetching: isTaskStatusFetching },
     ] = useLazyGetTaskStatusByFeatureIdQuery({});
 
-    console.log({
-        taskStatusList,
-    });
-
     useEffect(() => {
         if (selectedFeature) {
             fetchTaskStatus({
@@ -72,7 +68,7 @@ const KanbanTask = (props: IProps) => {
             if (response?.data?.success) {
                 dispatch(setRefetchProjectTaskList(true));
             }
-        } catch (error: unknown) {
+        } catch (_error: unknown) {
             toast.error("Something Went Wrong");
         }
     };
@@ -98,6 +94,7 @@ const KanbanTask = (props: IProps) => {
                                     taskStatusId={status.id}
                                     tasks={tasksList}
                                     moveTask={handleUpdateTaskStatus}
+                                    statusColorCode={status.color_code}
                                 />
                             );
                         }
@@ -111,6 +108,7 @@ const KanbanTask = (props: IProps) => {
 type TaskColumnProps = {
     status: string;
     taskStatusId: number;
+    statusColorCode: string;
     tasks: ITask[];
     isTaskModalOpen: boolean;
     setIsTaskModalOpen: (isOpen: boolean) => void;
@@ -118,7 +116,7 @@ type TaskColumnProps = {
 };
 
 const TaskColumn = (props: TaskColumnProps) => {
-    const { status, tasks, moveTask, taskStatusId } = props;
+    const { status, tasks, moveTask, taskStatusId, statusColorCode } = props;
 
     const [{ isOver }, drop] = useDrop(() => ({
         accept: "task",
@@ -128,9 +126,9 @@ const TaskColumn = (props: TaskColumnProps) => {
         }),
     }));
 
-    const taskCounter = tasks.filter(
-        (task) => task.task_status.id === taskStatusId
-    ).length;
+    const taskCounter =
+        tasks?.filter((task) => task?.task_status?.id === taskStatusId)
+            .length || 0;
 
     return (
         <div
@@ -141,37 +139,39 @@ const TaskColumn = (props: TaskColumnProps) => {
                 isOver ? "bg-blue-100" : ""
             } `}
         >
-            <div className='flex w-full'>
-                <div className='flex w-full items-center justify-between rounded-e-lg px-2 py-4'>
-                    <h3 className='text-md flex items-center font-semibold'>
-                        {status}
-                        <span
-                            className='ml-2 inline-block rounded-full bg-gray-100 p-1 text-center text-sm'
+            <div className='flex w-full mb-4'>
+                <div
+                    style={{
+                        backgroundColor: statusColorCode,
+                    }}
+                    className='flex w-full items-center justify-between rounded-md px-2  '
+                >
+                    <div className='flex w-full items-center justify-between rounded-md  px-2 py-2 '>
+                        <h3 className='text-md flex items-center font-semibold text-white'>
+                            {status}
+                        </h3>
+                        <div
+                            className='ml-2 flex items-center font-semibold text-white justify-center rounded-full bg-slate-800 p-1 text-center text-sm'
                             style={{
                                 height: "1.5rem",
                                 width: "1.5rem",
                             }}
                         >
                             {taskCounter}
-                        </span>
-                    </h3>
-                    <button className='flex h-6 w-5 items-center justify-center rounded bg-gray-200'>
-                        <EllipsisVertical />
-                    </button>
+                        </div>
+                    </div>
                 </div>
-                {taskStatusId}
             </div>
-            <div className='no-scrollbar h-[600px] overflow-y-scroll'>
-                {tasks
-                    .filter((task) => task.task_status.id === taskStatusId)
-                    .map((task: ITask) => {
-                        return (
-                            <div>
-                                <h1>taskStatusId :{task.task_status.name}</h1>
-                                <TaskItem key={task.id} task={task} />
-                            </div>
-                        );
-                    })}
+            <div className='no-scrollbar h-[550px] overflow-y-scroll'>
+                {tasks?.length
+                    ? tasks
+                          ?.filter(
+                              (task) => task?.task_status?.id === taskStatusId
+                          )
+                          ?.map((task: ITask) => {
+                              return <TaskItem key={task.id} task={task} />;
+                          })
+                    : []}
             </div>
         </div>
     );
@@ -217,10 +217,27 @@ const TaskItem = (props: TaskItemProps) => {
                     onClick={() => handleOpenTaskDetails(task)}
                     className='w-full px-4 py-2'
                 >
-                    <div className='flex items-center gap-2'>
-                        <PriorityTag priority={task.priority} />
-                        <span className='text-md'> {task.title}</span>
+                    <div className=' flex justify-between items-baseline '>
+                        <div className='flex items-center gap-2'>
+                            <PriorityTag priority={task.priority} />
+                            <span className='text-md'> {task.title}</span>
+                        </div>
+                        <button className='flex h-6 w-5 items-center justify-center rounded bg-gray-200'>
+                            <EllipsisVertical />
+                        </button>
                     </div>
+                    <div className=' my-2'>
+                        <span
+                            style={{
+                                borderColor: task?.taskLabel?.colorCode,
+                                borderWidth: "1px",
+                            }}
+                            className='text-slate-800 px-2'
+                        >
+                            {task?.taskLabel?.name ?? "None"}
+                        </span>
+                    </div>
+
                     <div className='mt-4 flex items-center justify-between'>
                         <div className='flex items-center gap-2'>
                             <TicketCheck className='text-blue-600' />
@@ -228,10 +245,10 @@ const TaskItem = (props: TaskItemProps) => {
                                 {task.taskNumber}
                             </span>
                         </div>
-                        <div></div>
-                        <div className='flex items-center gap-2'>
-                            <Paperclip className='h-4 w-4 text-gray-500' />
-                            <MessageSquare className='h-4 w-4 text-gray-500' />
+
+                        <div className='flex items-center gap-4'>
+                            {/* <Paperclip className='h-5 w-5 text-gray-500' />
+                            <MessageSquare className='h-5 w-5 text-gray-500' /> */}
                             <UserAvatar size='sm' user={task.assignedTo} />
                         </div>
                     </div>
