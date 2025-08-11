@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+} from "typeorm";
 
 import { User } from "./User";
 
@@ -22,6 +28,10 @@ export class Label {
     @Column()
     addedAt: Date;
 
-    @ManyToOne(() => User, (user) => user.id)
+    @Column()
+    addedById: number;
+
+    @ManyToOne(() => User, (user) => user.id, { eager: false })
+    @JoinColumn({ name: "addedById" })
     addedBy: User;
 }

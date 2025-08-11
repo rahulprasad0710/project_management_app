@@ -131,7 +131,7 @@ const EmployeeModal = (props: Props) => {
                 </h4>
             </div>
             <form
-                className='bg-white px-4 py-2'
+                className='bg-white px-4 py-4 dark:bg-slate-800'
                 onSubmit={handleSubmit(onSubmit)}
             >
                 <div className='flex w-full gap-4'>

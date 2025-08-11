@@ -2,28 +2,27 @@ import { useEffect, useState } from "react";
 
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/button/Button";
-import EmployeeModal from "@/modal/EmployeeModal";
-import type { IEmployeeResponse } from "@/types/config.types";
+import type { ISprintResponse } from "@/types/config.types";
 import { Modal } from "@/components/common/Modal";
 import { PlusIcon } from "lucide-react";
 import ReactTable from "@/components/common/ReactTable";
 import SearchBar from "@/components/molecules/SearchBar";
+import SprintModal from "@/modal/SprintModal";
 import { SquarePen } from "lucide-react";
 import Switch from "@/components/form/switch/Switch";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useLazyGetEmployeesQuery } from "@api/hooks/useEmployee";
+import { useLazyGetSprintsQuery } from "@api/hooks/useSprint";
 
-const EmployeePage = () => {
+const SprintPage = () => {
     const [selectedData, setSelectedData] = useState<
-        undefined | IEmployeeResponse
+        undefined | ISprintResponse
     >();
 
     const [isActive, setIsActive] = useState<boolean>(true);
     const [keyword, setKeyword] = useState<string>("");
     const [toggle, setToggle] = useState(false);
 
-    const [fetchAll, { isFetching, data: dataList }] =
-        useLazyGetEmployeesQuery();
+    const [fetchAll, { isFetching, data: dataList }] = useLazyGetSprintsQuery();
 
     console.log({
         dataList,
@@ -37,7 +36,7 @@ const EmployeePage = () => {
             isActive: isActive,
             keyword: keyword,
         });
-    }, [fetchAll]);
+    }, [fetchAll, isActive]);
 
     const handleSearch = () => {
         fetchAll({
@@ -90,7 +89,7 @@ const EmployeePage = () => {
         );
     };
 
-    const handleEdit = (data: IEmployeeResponse) => {
+    const handleEdit = (data: ISprintResponse) => {
         setSelectedData(data);
         setToggle(true);
     };
@@ -104,36 +103,46 @@ const EmployeePage = () => {
         setToggle(false);
     };
 
-    const columnHelper = createColumnHelper<IEmployeeResponse>();
+    const columnHelper = createColumnHelper<ISprintResponse>();
 
     const columns = [
-        columnHelper.accessor((row) => row.employeeId, {
-            id: "employeeId",
-            cell: (info) => (
-                <div className='font-semibold text-gray-700 dark:text-slate-100'>
-                    {info.renderValue()}
-                </div>
-            ),
-            header: () => <div>Employee ID</div>,
-        }),
-        columnHelper.accessor((row) => row.id, {
+        columnHelper.accessor((row) => row.name, {
             id: "name",
             cell: (info) => (
                 <div className='font-semibold text-gray-700 dark:text-slate-100'>
-                    {info.row.original.firstName} {info.row.original.lastName}
-                </div>
-            ),
-            header: () => <span>First Name</span>,
-        }),
-        columnHelper.accessor((row) => row.email, {
-            id: "email",
-            cell: (info) => (
-                <div className='font-semibold text-gray-700 dark:text-slate-100'>
                     {info.renderValue()}
                 </div>
             ),
-            header: () => <span>Email</span>,
+            header: () => <div>Name</div>,
         }),
+        columnHelper.accessor((row) => row.goal, {
+            id: "goal",
+            cell: (info) => (
+                <p className='font-semibold text-gray-700 dark:text-slate-100'>
+                    {info.renderValue()}
+                </p>
+            ),
+            header: () => <span>Goal</span>,
+        }),
+        columnHelper.accessor((row) => row.startDate, {
+            id: "startDate",
+            cell: (info) => (
+                <p className='font-semibold text-gray-700 dark:text-slate-100'>
+                    {info.renderValue()}
+                </p>
+            ),
+            header: () => <span>Description</span>,
+        }),
+        columnHelper.accessor((row) => row.endDate, {
+            id: "endDate",
+            cell: (info) => (
+                <p className='font-semibold text-gray-700 dark:text-slate-100'>
+                    {info.renderValue()}
+                </p>
+            ),
+            header: () => <span>Description</span>,
+        }),
+
         columnHelper.accessor((row) => row.isActive, {
             id: "is_active",
             cell: (info) => (
@@ -151,28 +160,6 @@ const EmployeePage = () => {
                 </div>
             ),
             header: () => <div>Status</div>,
-        }),
-
-        columnHelper.accessor((row) => row.emailVerified, {
-            id: "emailVerified",
-            cell: (info) => (
-                <div className='font-semibold py-1 px-4'>
-                    {info.renderValue() ? (
-                        <Badge badgeType='success' title='Verified' />
-                    ) : (
-                        <Badge badgeType='error' title='Not Verified' />
-                    )}
-                </div>
-            ),
-            header: () => (
-                <div
-                    style={{
-                        width: "120px",
-                    }}
-                >
-                    Email Verified
-                </div>
-            ),
         }),
 
         columnHelper.accessor((row) => row.id, {
@@ -199,10 +186,10 @@ const EmployeePage = () => {
                 <div className='flex flex-col justify-end md:justify-between gap-5 border-b border-gray-200 px-5 py-4 sm:flex-row sm:items-center dark:border-gray-700'>
                     <div>
                         <h3 className='text-lg font-semibold text-gray-800 dark:text-white/90'>
-                            Employee Details
+                            Sprint
                         </h3>
                         <p className='text-sm text-gray-500 dark:text-gray-400'>
-                            Track your task progress of booking service.
+                            Add/Edit sprint for feature.
                         </p>
                     </div>
                     <Button
@@ -211,7 +198,7 @@ const EmployeePage = () => {
                         size='sm'
                     >
                         <PlusIcon />
-                        Add Employee
+                        Add Sprint
                     </Button>
                 </div>
 
@@ -220,7 +207,6 @@ const EmployeePage = () => {
                         <Switch
                             onChange={() => {
                                 setIsActive(!isActive);
-                                handleSearch();
                             }}
                             label='Active'
                             defaultChecked={isActive}
@@ -268,7 +254,7 @@ const EmployeePage = () => {
                 className='max-w-[700px] mb-4  '
                 isFullscreen={false}
             >
-                <EmployeeModal
+                <SprintModal
                     setSelectedData={setSelectedData}
                     selectedData={selectedData}
                     handleCloseModal={handleCloseModal}
@@ -278,4 +264,4 @@ const EmployeePage = () => {
     );
 };
 
-export default EmployeePage;
+export default SprintPage;

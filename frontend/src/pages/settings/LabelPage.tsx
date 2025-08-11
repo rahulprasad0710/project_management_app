@@ -2,28 +2,28 @@ import { useEffect, useState } from "react";
 
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/button/Button";
-import EmployeeModal from "@/modal/EmployeeModal";
-import type { IEmployeeResponse } from "@/types/config.types";
+import type { ILabelResponse } from "@/types/config.types";
 import { Modal } from "@/components/common/Modal";
 import { PlusIcon } from "lucide-react";
 import ReactTable from "@/components/common/ReactTable";
 import SearchBar from "@/components/molecules/SearchBar";
 import { SquarePen } from "lucide-react";
 import Switch from "@/components/form/switch/Switch";
+import TaskLabelModal from "@/modal/TaskLabelModal";
+import UserAvatar from "@/components/molecules/UserAvatar";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useLazyGetEmployeesQuery } from "@api/hooks/useEmployee";
+import { useLazyGetLabelsQuery } from "@api/hooks/useLabel";
 
-const EmployeePage = () => {
+const LabelPage = () => {
     const [selectedData, setSelectedData] = useState<
-        undefined | IEmployeeResponse
+        undefined | ILabelResponse
     >();
 
     const [isActive, setIsActive] = useState<boolean>(true);
     const [keyword, setKeyword] = useState<string>("");
     const [toggle, setToggle] = useState(false);
 
-    const [fetchAll, { isFetching, data: dataList }] =
-        useLazyGetEmployeesQuery();
+    const [fetchAll, { isFetching, data: dataList }] = useLazyGetLabelsQuery();
 
     console.log({
         dataList,
@@ -37,7 +37,7 @@ const EmployeePage = () => {
             isActive: isActive,
             keyword: keyword,
         });
-    }, [fetchAll]);
+    }, [fetchAll, isActive]);
 
     const handleSearch = () => {
         fetchAll({
@@ -90,7 +90,7 @@ const EmployeePage = () => {
         );
     };
 
-    const handleEdit = (data: IEmployeeResponse) => {
+    const handleEdit = (data: ILabelResponse) => {
         setSelectedData(data);
         setToggle(true);
     };
@@ -104,35 +104,41 @@ const EmployeePage = () => {
         setToggle(false);
     };
 
-    const columnHelper = createColumnHelper<IEmployeeResponse>();
+    const columnHelper = createColumnHelper<ILabelResponse>();
 
     const columns = [
-        columnHelper.accessor((row) => row.employeeId, {
-            id: "employeeId",
-            cell: (info) => (
-                <div className='font-semibold text-gray-700 dark:text-slate-100'>
-                    {info.renderValue()}
-                </div>
-            ),
-            header: () => <div>Employee ID</div>,
-        }),
-        columnHelper.accessor((row) => row.id, {
+        columnHelper.accessor((row) => row.name, {
             id: "name",
             cell: (info) => (
                 <div className='font-semibold text-gray-700 dark:text-slate-100'>
-                    {info.row.original.firstName} {info.row.original.lastName}
-                </div>
-            ),
-            header: () => <span>First Name</span>,
-        }),
-        columnHelper.accessor((row) => row.email, {
-            id: "email",
-            cell: (info) => (
-                <div className='font-semibold text-gray-700 dark:text-slate-100'>
                     {info.renderValue()}
                 </div>
             ),
-            header: () => <span>Email</span>,
+            header: () => <div>Name</div>,
+        }),
+        columnHelper.accessor((row) => row.description, {
+            id: "description",
+            cell: (info) => (
+                <p className='font-semibold text-gray-700 dark:text-slate-100'>
+                    {info.renderValue()}
+                </p>
+            ),
+            header: () => <span>Description</span>,
+        }),
+        columnHelper.accessor((row) => row.colorCode, {
+            id: "colorCode",
+            cell: (info) => (
+                <div
+                    style={{
+                        backgroundColor: info.getValue(),
+                        width: "120px",
+                    }}
+                    className='font-semibold text-white text-center py-1 px-4'
+                >
+                    {info.renderValue()}
+                </div>
+            ),
+            header: () => <span>Color code</span>,
         }),
         columnHelper.accessor((row) => row.isActive, {
             id: "is_active",
@@ -153,26 +159,18 @@ const EmployeePage = () => {
             header: () => <div>Status</div>,
         }),
 
-        columnHelper.accessor((row) => row.emailVerified, {
-            id: "emailVerified",
+        columnHelper.accessor((row) => row.addedBy, {
+            id: "addedBy",
             cell: (info) => (
-                <div className='font-semibold py-1 px-4'>
-                    {info.renderValue() ? (
-                        <Badge badgeType='success' title='Verified' />
-                    ) : (
-                        <Badge badgeType='error' title='Not Verified' />
-                    )}
+                <div className='flex items-center gap-4'>
+                    <UserAvatar user={info.row.original.addedBy} />
+                    <div className='font-semibold text-gray-700 dark:text-slate-100'>
+                        {info.row.original.addedBy?.firstName}{" "}
+                        {info.row.original?.addedBy.lastName}
+                    </div>
                 </div>
             ),
-            header: () => (
-                <div
-                    style={{
-                        width: "120px",
-                    }}
-                >
-                    Email Verified
-                </div>
-            ),
+            header: () => <span>Added By</span>,
         }),
 
         columnHelper.accessor((row) => row.id, {
@@ -199,10 +197,10 @@ const EmployeePage = () => {
                 <div className='flex flex-col justify-end md:justify-between gap-5 border-b border-gray-200 px-5 py-4 sm:flex-row sm:items-center dark:border-gray-700'>
                     <div>
                         <h3 className='text-lg font-semibold text-gray-800 dark:text-white/90'>
-                            Employee Details
+                            Labels
                         </h3>
                         <p className='text-sm text-gray-500 dark:text-gray-400'>
-                            Track your task progress of booking service.
+                            Add/Edit labels for task.
                         </p>
                     </div>
                     <Button
@@ -211,7 +209,7 @@ const EmployeePage = () => {
                         size='sm'
                     >
                         <PlusIcon />
-                        Add Employee
+                        Add Label
                     </Button>
                 </div>
 
@@ -220,7 +218,6 @@ const EmployeePage = () => {
                         <Switch
                             onChange={() => {
                                 setIsActive(!isActive);
-                                handleSearch();
                             }}
                             label='Active'
                             defaultChecked={isActive}
@@ -268,7 +265,7 @@ const EmployeePage = () => {
                 className='max-w-[700px] mb-4  '
                 isFullscreen={false}
             >
-                <EmployeeModal
+                <TaskLabelModal
                     setSelectedData={setSelectedData}
                     selectedData={selectedData}
                     handleCloseModal={handleCloseModal}
@@ -278,4 +275,4 @@ const EmployeePage = () => {
     );
 };
 
-export default EmployeePage;
+export default LabelPage;

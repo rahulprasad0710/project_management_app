@@ -201,7 +201,7 @@ const TaskPage = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedLabelsIds, selectedPriorityIds, selectedAssigneeIds]);
     return (
-        <div className='rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]'>
+        <div className='rounded-md border border-gray-200 bg-white dark:border-gray-800 dark:bg-slate-800'>
             <div className='flex flex-col justify-end md:justify-between gap-5 border-b border-gray-200 px-5 py-4 sm:flex-row sm:items-center dark:border-gray-800'>
                 <div>
                     <h3 className='text-lg font-semibold text-gray-800 dark:text-white/90'>

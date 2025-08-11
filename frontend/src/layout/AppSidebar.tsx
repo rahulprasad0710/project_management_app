@@ -92,12 +92,12 @@ const AppSidebar: React.FC = () => {
             subItems: [
                 {
                     name: "Sprints",
-                    path: "/admin/other-settings/sprints",
+                    path: "/admin/settings/sprints",
                     pro: false,
                 },
                 {
                     name: "Labels",
-                    path: "/admin/other-settings/sprints",
+                    path: "/admin/settings/labels",
                     pro: false,
                 },
                 {

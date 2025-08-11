@@ -4,11 +4,15 @@ import { User } from "lucide-react";
 
 type Props = {
     user: Partial<IUser>;
-    size?: "sm" | "md";
+    size?: "sm" | "md" | "xs";
 };
 
 const UserAvatar = ({ user, size = "md" }: Props) => {
-    const imageSize = size === "sm" ? 28 : 40;
+    const imageSize = {
+        sm: 18,
+        md: 24,
+        xs: 18,
+    };
     return (
         <div>
             {user?.profilePictureUrl ? (
@@ -19,8 +23,8 @@ const UserAvatar = ({ user, size = "md" }: Props) => {
                             ? `${user?.firstName} ${user?.lastName}`
                             : "user"
                     }
-                    width={imageSize}
-                    height={imageSize}
+                    width={imageSize[size]}
+                    height={imageSize[size]}
                     className='flex items-center justify-center rounded-full bg-gray-200'
                 />
             ) : (

@@ -66,13 +66,13 @@ const ReactTable = <T extends object>({
     };
 
     const btnClass =
-        "inline-flex  items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm font-semibold leading-5 text-neutral-800 hover:border-neutral-300 hover:text-neutral-950 active:border-neutral-200";
+        "inline-flex  items-center justify-center gap-2 rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm font-semibold leading-5 text-neutral-800 hover:border-neutral-300 hover:text-neutral-950 active:border-neutral-200";
 
     return (
-        <div className='min-w-full overflow-x-auto rounded-lg border border-neutral-200 dark:border-neutral-800'>
+        <div className='overflow-hidden rounded-md border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-slate-800'>
             <div className='max-h-[700px]  overflow-y-auto overflow-x-hidden'>
                 <table className='min-w-full table-fixed align-middle text-sm'>
-                    <thead className='sticky top-0 z-10 bg-white'>
+                    <thead className='border-b border-gray-100 dark:border-white/[0.05]'>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <tr
                                 className='border-b-2 border-neutral-100'
@@ -80,7 +80,7 @@ const ReactTable = <T extends object>({
                             >
                                 {headerGroup.headers.map((header) => (
                                     <th
-                                        className='min-w-[140px] px-3 py-3 text-start text-sm font-semibold uppercase tracking-wider text-neutral-700'
+                                        className='min-w-[140px]  px-5 py-3 font-semibold text-gray-600 text-start text-theme-sm dark:text-gray-400'
                                         key={header.id}
                                     >
                                         {header.isPlaceholder
@@ -95,7 +95,7 @@ const ReactTable = <T extends object>({
                             </tr>
                         ))}
                     </thead>
-                    <tbody className='divide-y divide-neutral-200'>
+                    <tbody className='divide-y divide-gray-100 dark:divide-gray-800'>
                         {isFetching
                             ? Array.from({ length: 10 }).map((_, index) => (
                                   <tr
@@ -107,7 +107,7 @@ const ReactTable = <T extends object>({
                                           .map((col, colIndex) => (
                                               <td
                                                   key={`skeleton-td-${colIndex}`}
-                                                  className='p-6 text-start font-semibold text-neutral-600'
+                                                  className='p-6 text-start font-semibold  text-gray-700 dark:text-slate-100'
                                               >
                                                   <div className='h-4 w-full rounded bg-neutral-200'></div>
                                               </td>
@@ -121,7 +121,7 @@ const ReactTable = <T extends object>({
                                   >
                                       {row.getVisibleCells().map((cell) => (
                                           <td
-                                              className='p-3 text-start font-semibold text-neutral-600'
+                                              className='p-3 text-start font-semibold text-gray-700 dark:text-slate-100 '
                                               key={cell.id}
                                           >
                                               {flexRender(
@@ -137,15 +137,15 @@ const ReactTable = <T extends object>({
             </div>
 
             {showPagination && (
-                <div className='flex items-center justify-between border-t border-neutral-200 bg-white'>
-                    <div className='flex items-center justify-between px-4 py-4'>
-                        <p className='mr-4 text-sm text-gray-700'>
+                <div className='flex items-center justify-between bg-white border-t border-gray-200 px-6 py-4 dark:border-gray-800 dark:bg-slate-800'>
+                    <div className='flex items-center justify-between '>
+                        <p className='mr-4 text-sm text-gray-700 dark:text-slate-100'>
                             Total pages :
                             <span className='mx-1 px-1 font-medium'>
                                 {pagination?.totalPages}{" "}
                             </span>
                         </p>
-                        <p className='text-sm text-gray-700'>
+                        <p className='text-sm text-gray-700 dark:text-slate-100'>
                             Showing
                             <span className='mx-1 px-1 font-medium'>
                                 {pagination?.pageSize *

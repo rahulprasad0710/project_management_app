@@ -7,6 +7,7 @@ import type {
 import type {
     ISprintPayload,
     ISprintResponse,
+    ISprintUpdatePayload,
     Response,
     ResponseWithPagination,
     SprintPagination,

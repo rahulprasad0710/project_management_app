@@ -269,7 +269,7 @@ export interface ISprintUpdatePayload extends ISprintPayload {
 export interface ILabelPayload {
     name: string;
     description?: string;
-    addedBy: number; // or User if populated
+    colorCode: string;
 }
 
 export interface ILabelUpdatePayload extends Partial<ILabelPayload> {
@@ -282,7 +282,7 @@ export interface ILabelResponse {
     description?: string;
     isActive: boolean;
     addedAt: string;
-    addedBy: IUser | number;
+    addedBy: IEmployeeResponse;
     colorCode: string;
 }
 

@@ -1,6 +1,20 @@
 import { api } from "../api";
 
-const { useGetSprintsQuery } = api;
+const {
+    useGetSprintsQuery,
+    useLazyGetSprintsQuery,
+    useGetSprintByIdQuery,
+    useCreateSprintMutation,
+    useUpdateSprintMutation,
+    useUpdateSprintStatusMutation,
+} = api;
 
-export { useGetSprintsQuery };
+export {
+    useGetSprintsQuery,
+    useLazyGetSprintsQuery,
+    useGetSprintByIdQuery,
+    useCreateSprintMutation,
+    useUpdateSprintMutation,
+    useUpdateSprintStatusMutation,
+};
 export * from "./useSprint";

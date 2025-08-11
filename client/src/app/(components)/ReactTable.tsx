@@ -112,7 +112,7 @@ const ReactTable = <T extends object>({
                 ))
               : table.getRowModel().rows.map((row) => (
                   <tr
-                    className="border-b border-neutral-100 hover:bg-neutral-50"
+                    className="border-b border-neutral-100 hover:bg-neutral-100 dark:hover:bg-slate-800"
                     key={row.id}
                   >
                     {row.getVisibleCells().map((cell) => (

@@ -6,9 +6,11 @@ import EmailVerify from "@/pages/AuthPages/ EmailVerify";
 import Employee from "@/pages/AdminSettings/Employee";
 import FeatureLayout from "@/layout/FeatureLayout";
 import HomePage from "@/pages/HomePage";
+import LabelPage from "@/pages/settings/LabelPage";
 import Permission from "@/pages/AdminSettings/Permission";
 import Roles from "@/pages/AdminSettings/RolePage";
 import SignIn from "@/pages/AuthPages/SignIn";
+import SprintPage from "@/pages/settings/SprintPage";
 import TaskPage from "@/pages/features/TaskPage";
 import TaskStatusPage from "@/pages/settings/TaskStatusPage";
 
@@ -64,8 +66,12 @@ const router = createBrowserRouter([
                         element: <TaskStatusPage />,
                     },
                     {
-                        path: "roles",
-                        element: <Roles />,
+                        path: "labels",
+                        element: <LabelPage />,
+                    },
+                    {
+                        path: "sprints",
+                        element: <SprintPage />,
                     },
                 ],
             },
