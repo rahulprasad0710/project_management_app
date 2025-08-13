@@ -4,13 +4,13 @@ const {
     useCreateUploadsMutation,
     useGetUploadsQuery,
     useLazyGetUploadsQuery,
-    useGetUploadsByIdQuery,
+    useLazyGetUploadsUrlByIdQuery,
 } = api;
 
 export {
     useCreateUploadsMutation,
     useGetUploadsQuery,
     useLazyGetUploadsQuery,
-    useGetUploadsByIdQuery,
+    useLazyGetUploadsUrlByIdQuery,
 };
 export * from "./useTask";

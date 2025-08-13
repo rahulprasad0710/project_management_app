@@ -48,9 +48,12 @@ export const uploadsEndpoints = (
                   }))
                 : [{ type: "ProjectTasks" as const }],
     }),
-    getUploadsById: build.query<Response<IUploadFile>, { uploadId: number }>({
+    getUploadsUrlById: build.query<
+        Response<{ url: string }>,
+        { uploadId: string }
+    >({
         query: ({ uploadId }) => ({
-            url: `uploads/${uploadId}`,
+            url: `uploads/url/${uploadId}`,
             method: "GET",
         }),
     }),

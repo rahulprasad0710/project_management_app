@@ -14,6 +14,7 @@ import { commentEndpoints } from "./apiRoutes/commentApi";
 import { employeeEndpoints } from "./apiRoutes/employeeApi";
 import { labelEndpoints } from "./apiRoutes/labelApi";
 import { roleEndpoints } from "./apiRoutes/rolesApi";
+import { roomTypeEndpoints } from "./apiRoutes/hotel/roomTypeApi";
 import { sprintEndpoints } from "./apiRoutes/sprintApi";
 import { taskEndpoints } from "./apiRoutes/taskApi";
 import { taskStatusEndpoints } from "./apiRoutes/taskStatusApi";
@@ -53,6 +54,8 @@ export const api = createApi({
         "PermissionGroup",
         "Role",
         "TaskStatus",
+        // hotel
+        "RoomTypes",
     ],
     endpoints: (build) => ({
         createLoginEmployee: build.mutation<
@@ -131,6 +134,8 @@ export const api = createApi({
         ...uploadsEndpoints(build),
         ...sprintEndpoints(build),
         ...commentEndpoints(build),
+        // hotel API
+        ...roomTypeEndpoints(build),
     }),
 });
 

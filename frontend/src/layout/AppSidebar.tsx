@@ -10,7 +10,14 @@ import {
     PlugInIcon,
     UserCircleIcon,
 } from "../icons";
-import { CalendarCog, KanbanSquare } from "lucide-react";
+import {
+    CalendarCog,
+    FilePlus2Icon,
+    HouseIcon,
+    HousePlugIcon,
+    HousePlusIcon,
+    KanbanSquare,
+} from "lucide-react";
 import { Link, useLocation } from "react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -48,6 +55,13 @@ const AppSidebar: React.FC = () => {
             icon: <CalenderIcon />,
             name: "Bookings",
             subItems: [
+                {
+                    name: "Add Booking",
+                    path: `/admin/features/booking/create-booking`,
+                    pro: false,
+                    icon: <FilePlus2Icon />,
+                    new: true,
+                },
                 {
                     name: "Tasks",
                     path: `/admin/features/booking/tasks?assignee=${authenticateEmployee?.id}`,
@@ -111,8 +125,18 @@ const AppSidebar: React.FC = () => {
             icon: <PieChartIcon />,
             name: "Company Settings",
             subItems: [
-                { name: "Line Chart", path: "/line-chart", pro: false },
-                { name: "Bar Chart", path: "/bar-chart", pro: false },
+                {
+                    name: "Rooms",
+                    path: "/admin/company-settings/rooms",
+                    pro: false,
+                    icon: <HousePlusIcon />,
+                },
+                {
+                    name: "Room Types",
+                    path: "/admin/company-settings/room-types",
+                    pro: false,
+                    icon: <HouseIcon />,
+                },
             ],
         },
 
@@ -334,9 +358,9 @@ const AppSidebar: React.FC = () => {
                                                                 isActive(
                                                                     subItem.path
                                                                 )
-                                                                    ? "menu-dropdown-badge-active"
+                                                                    ? "menu-dropdown-badge-active "
                                                                     : "menu-dropdown-badge-inactive"
-                                                            } menu-dropdown-badge`}
+                                                            } menu-dropdown-badge text-green-500`}
                                                         >
                                                             new
                                                         </span>

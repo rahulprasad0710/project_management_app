@@ -9,6 +9,7 @@ import HomePage from "@/pages/HomePage";
 import LabelPage from "@/pages/settings/LabelPage";
 import Permission from "@/pages/AdminSettings/Permission";
 import Roles from "@/pages/AdminSettings/RolePage";
+import RoomTypePage from "@/pages/companySettings/RoomTypePage";
 import SignIn from "@/pages/AuthPages/SignIn";
 import SprintPage from "@/pages/settings/SprintPage";
 import TaskPage from "@/pages/features/TaskPage";
@@ -72,6 +73,20 @@ const router = createBrowserRouter([
                     {
                         path: "sprints",
                         element: <SprintPage />,
+                    },
+                ],
+            },
+            {
+                path: "company-settings",
+                element: <Outlet />,
+                children: [
+                    // {
+                    //     path: "rooms",
+                    //     element: <TaskStatusPage />,
+                    // },
+                    {
+                        path: "room-types",
+                        element: <RoomTypePage />,
                     },
                 ],
             },
