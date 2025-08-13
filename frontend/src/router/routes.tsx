@@ -9,6 +9,7 @@ import HomePage from "@/pages/HomePage";
 import LabelPage from "@/pages/settings/LabelPage";
 import Permission from "@/pages/AdminSettings/Permission";
 import Roles from "@/pages/AdminSettings/RolePage";
+import RoomPage from "@/pages/companySettings/RoomPage";
 import RoomTypePage from "@/pages/companySettings/RoomTypePage";
 import SignIn from "@/pages/AuthPages/SignIn";
 import SprintPage from "@/pages/settings/SprintPage";
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
                         path: "listings",
                         element: <Roles />,
                     },
+                    {
+                        path: "rooms",
+                        element: <RoomPage />,
+                    },
                 ],
             },
             {
@@ -80,10 +85,10 @@ const router = createBrowserRouter([
                 path: "company-settings",
                 element: <Outlet />,
                 children: [
-                    // {
-                    //     path: "rooms",
-                    //     element: <TaskStatusPage />,
-                    // },
+                    {
+                        path: "rooms",
+                        element: <RoomPage routedFrom={"COMPANY_SETTINGS"} />,
+                    },
                     {
                         path: "room-types",
                         element: <RoomTypePage />,

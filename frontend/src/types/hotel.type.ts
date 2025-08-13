@@ -12,6 +12,9 @@ export interface IRoomTypeUpdatePayload extends IRoomTypePayload {
     id: number;
 }
 
+export interface IRoomUpdatePayload extends IRoomPayload {
+    id: number;
+}
 export interface IRoomTypeResponse {
     id: number;
     name: string;
@@ -26,8 +29,9 @@ export interface IRoomTypeResponse {
 
 export interface IRoomPayload {
     roomNumber: string;
-    internal_company_id: number;
+    internalCompanyId: number;
     roomTypeId: number;
+    isActive: boolean;
 }
 
 export interface IRoomResponse {
@@ -35,4 +39,6 @@ export interface IRoomResponse {
     roomNumber: string;
     internal_company_id: number;
     roomTypeId: number;
+    isActive: boolean;
+    roomType: IRoomTypeResponse;
 }

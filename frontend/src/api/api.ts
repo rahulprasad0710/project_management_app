@@ -15,6 +15,7 @@ import { employeeEndpoints } from "./apiRoutes/employeeApi";
 import { labelEndpoints } from "./apiRoutes/labelApi";
 import { roleEndpoints } from "./apiRoutes/rolesApi";
 import { roomTypeEndpoints } from "./apiRoutes/hotel/roomTypeApi";
+import { roomsEndpoints } from "./apiRoutes/hotel/roomApi";
 import { sprintEndpoints } from "./apiRoutes/sprintApi";
 import { taskEndpoints } from "./apiRoutes/taskApi";
 import { taskStatusEndpoints } from "./apiRoutes/taskStatusApi";
@@ -136,6 +137,7 @@ export const api = createApi({
         ...commentEndpoints(build),
         // hotel API
         ...roomTypeEndpoints(build),
+        ...roomsEndpoints(build),
     }),
 });
 

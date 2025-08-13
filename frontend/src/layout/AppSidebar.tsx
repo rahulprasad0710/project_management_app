@@ -63,6 +63,12 @@ const AppSidebar: React.FC = () => {
                     new: true,
                 },
                 {
+                    name: "Rooms",
+                    path: `/admin/features/booking/rooms`,
+                    pro: false,
+                    icon: <HousePlusIcon />,
+                },
+                {
                     name: "Tasks",
                     path: `/admin/features/booking/tasks?assignee=${authenticateEmployee?.id}`,
                     pro: false,

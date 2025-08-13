@@ -1,6 +1,7 @@
 import {
     Column,
     Entity,
+    JoinColumn,
     ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
@@ -18,11 +19,24 @@ export class Room {
     @Column()
     roomNumber: string;
 
-    @ManyToOne(() => InternalCompany, (internal_company) => internal_company.id)
+    @Column({ default: true })
+    isActive: boolean;
+
+    @Column()
+    internal_company_id: number;
+
+    @ManyToOne(
+        () => InternalCompany,
+        (internal_company) => internal_company.id,
+        {
+            eager: false,
+        }
+    )
+    @JoinColumn({ name: "internal_company_id" })
     internal_company: InternalCompany;
 
     @ManyToOne(() => RoomType, (roomType) => roomType.rooms, {
-        eager: false,
+        eager: true,
     })
     roomType: RoomType;
 

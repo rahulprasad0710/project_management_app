@@ -1,12 +1,16 @@
+import { IActivePagination } from "../../types/payload";
+import { ILike } from "typeorm";
 import { InternalCompany } from "../../db/entity/InternalCompany";
 import { Room } from "../../db/entity/hotel/Room";
 import { RoomType } from "../../db/entity/hotel/RoomType";
+import createPagination from "../../utils/createPagination";
 import dataSource from "../../db/data-source";
 
 export interface IRoom {
     roomNumber: string;
     internal_company: number;
-    roomType: RoomType;
+    roomType: number;
+    isActive: boolean;
 }
 
 export class RoomService {
@@ -14,29 +18,58 @@ export class RoomService {
         private readonly roomRepository = dataSource.getRepository(Room),
         private readonly internalCompanyRepository = dataSource.getRepository(
             InternalCompany
-        )
+        ),
+
+        private readonly roomTypeRepository = dataSource.getRepository(RoomType)
     ) {}
 
     async create(room: IRoom) {
+        console.log("LOG: ~ RoomService ~ create ~ room:", room);
         const roomObj = new Room();
 
         const internalCompany = await this.internalCompanyRepository.findOneBy({
             id: room.internal_company,
         });
 
+        const roomTypeData = await this.roomTypeRepository.findOne({
+            where: {
+                id: room.roomType,
+            },
+        });
+
         if (!internalCompany) throw new Error("Internal company not found");
 
+        if (!roomTypeData) throw new Error("Room Type not found");
+
         roomObj.roomNumber = room.roomNumber;
-        roomObj.roomType = room.roomType;
+        roomObj.roomType = roomTypeData;
+        roomObj.isActive = room.isActive;
         roomObj.internal_company = internalCompany;
 
         return await this.roomRepository.save(roomObj);
     }
 
-    async getAll() {
-        return await this.roomRepository.find({
-            relations: ["internal_company", "roomType", "bookingRooms"],
+    async getAll(query: IActivePagination) {
+        const { skip, take, isPaginationEnabled, keyword, isActive } = query;
+
+        const result = await this.roomRepository.find({
+            skip,
+            take,
+            relations: ["roomType"],
+            where: {
+                ...{ isActive: isActive },
+                ...(keyword ? { roomNumber: ILike(`%${keyword}%`) } : {}),
+            },
         });
+        return {
+            result,
+            pagination: createPagination(
+                skip,
+                take,
+                result.length,
+                isPaginationEnabled
+            ),
+        };
     }
 
     async getById(id: number) {
