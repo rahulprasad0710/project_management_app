@@ -23,7 +23,7 @@ const create = async (req: Request, res: Response): Promise<void> => {
 
     if (!file) return;
 
-    const result = await uploadService.create(file, 1);
+    const result = await uploadService.create(file, 48);
     res.status(201).json({
         success: true,
         data: result,
@@ -31,7 +31,22 @@ const create = async (req: Request, res: Response): Promise<void> => {
     });
 };
 
+const getSignedUrlByUploadId = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    const { uploadId } = req.params;
+
+    const result = await uploadService.getSignedUrlByUploadId(String(uploadId));
+    res.status(201).json({
+        success: true,
+        data: result,
+        message: "File fetched successfully.",
+    });
+};
+
 export default {
     create,
     getPresignedUrl,
+    getSignedUrlByUploadId,
 };

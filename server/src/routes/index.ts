@@ -4,6 +4,7 @@ import SettingRoute from "./settings/setting.route"; // Importing Route type fro
 import authRoute from "./auth.route";
 import employeeRoute from "./users.route";
 import featureRoute from "./feature.route";
+import hotelRoute from "./hotel/hotel.route";
 import internalCompanyRoute from "./internalCompany.route";
 import labelRoute from "./label.route";
 import permissionRoute from "./permission.route";
@@ -69,6 +70,10 @@ const routes = [
     {
         path: "/settings",
         route: SettingRoute,
+    },
+    {
+        path: "/hotels",
+        route: hotelRoute,
     },
 ];
 

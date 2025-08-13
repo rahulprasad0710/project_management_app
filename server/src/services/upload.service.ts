@@ -1,4 +1,3 @@
-import { GetObjectCommandOutput } from "@aws-sdk/client-s3";
 import { UploadFile } from "../db/entity/uploads";
 import { User } from "../db/entity/User";
 import awsService from "../aws/s3.server";
@@ -41,6 +40,7 @@ export class UploadService {
     ) {}
 
     async create(uploadFile: IAwsUploadFile, userId: number) {
+        console.log("LOG: ~ UploadService ~ create ~ userId:", userId);
         const id = await generateUniqueId();
         const s3Key = `${id}_${uploadFile.originalname}`;
 
@@ -74,12 +74,10 @@ export class UploadService {
     }
 
     async getPresignedUrl({ bucketKey }: { bucketKey: string }) {
-        console.log({
-            bucketKey,
-        });
         const url = await awsService.getPreSignedUrl({
             bucketKey,
         });
+        console.log("LOG: ~ UploadService ~ getPresignedUrl ~ url:", url);
         return url;
     }
 
@@ -98,6 +96,29 @@ export class UploadService {
             })
         );
         return response;
+    }
+
+    async getSignedUrlByUploadId(uploadId: string) {
+        const uploadResult = await this.uploadRepository.findOne({
+            where: {
+                id: uploadId,
+            },
+        });
+        if (!uploadResult) {
+            return {
+                url: "",
+            };
+        } else {
+            const getUrl = await this.getPresignedUrl({
+                bucketKey: uploadResult?.filename,
+            });
+            console.log({
+                getUrl,
+            });
+            return {
+                url: getUrl,
+            };
+        }
     }
 }
 

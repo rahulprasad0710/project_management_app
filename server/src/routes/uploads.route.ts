@@ -11,6 +11,7 @@ router
         multerUpload.single("file") as RequestHandler,
         uploadController.create
     )
-    .get("/url", uploadController.getPresignedUrl);
+    .get("/url", uploadController.getPresignedUrl)
+    .get("/url/:uploadId", uploadController.getSignedUrlByUploadId);
 
 export default router;
