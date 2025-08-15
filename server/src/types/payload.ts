@@ -70,3 +70,7 @@ export interface ITaskPagination extends IPagination {
 export interface IActivePagination extends IPagination {
     isActive?: boolean | undefined;
 }
+
+export interface IRoomPagination extends IActivePagination {
+    roomTypeId?: number[];
+}

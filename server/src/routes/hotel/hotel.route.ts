@@ -1,4 +1,6 @@
 import { Router as ExpressRouter } from "express";
+import bookingRoute from "./booking.route";
+// ROUTES
 import roomRoute from "./room.route";
 import roomTypeRoute from "./roomType.route";
 
@@ -13,6 +15,10 @@ const routes = [
     {
         path: "/rooms",
         route: roomRoute,
+    },
+    {
+        path: "/bookings",
+        route: bookingRoute,
     },
     {
         path: "/room-types",

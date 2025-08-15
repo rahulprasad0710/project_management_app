@@ -39,7 +39,7 @@ export class Booking {
 
     @ManyToOne(() => Customer, { eager: false })
     @JoinColumn({ name: "customerId" })
-    role: Customer;
+    customer: Customer;
 
     @Column()
     hotelId: number;
@@ -47,6 +47,7 @@ export class Booking {
     @ManyToOne(() => InternalCompany, (hotel) => hotel.id, {
         eager: false,
     })
+    @JoinColumn({ name: "hotelId" })
     hotel: InternalCompany;
 
     @OneToMany(() => BookingRoom, (bookingRoom) => bookingRoom.booking, {

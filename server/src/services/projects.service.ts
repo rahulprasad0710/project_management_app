@@ -91,9 +91,9 @@ export class ProjectService {
 
     async update(id: number, project: IUpdateProjectPayload) {
         const queryRunner = dataSource.createQueryRunner();
-        await queryRunner.connect();
-        await queryRunner.startTransaction();
         try {
+            await queryRunner.connect();
+            await queryRunner.startTransaction();
             const projectObj = new Project();
             projectObj.name = project.name;
             projectObj.description = project.description;

@@ -1,5 +1,6 @@
-import { IActivePagination } from "../../types/payload";
-import { ILike } from "typeorm";
+import { FindOptionsRelations, ILike, In } from "typeorm";
+
+import { IRoomPagination } from "../../types/payload";
 import { InternalCompany } from "../../db/entity/InternalCompany";
 import { Room } from "../../db/entity/hotel/Room";
 import { RoomType } from "../../db/entity/hotel/RoomType";
@@ -49,8 +50,15 @@ export class RoomService {
         return await this.roomRepository.save(roomObj);
     }
 
-    async getAll(query: IActivePagination) {
-        const { skip, take, isPaginationEnabled, keyword, isActive } = query;
+    async getAll(query: IRoomPagination) {
+        const {
+            skip,
+            take,
+            isPaginationEnabled,
+            keyword,
+            isActive,
+            roomTypeId,
+        } = query;
 
         const result = await this.roomRepository.find({
             skip,
@@ -59,6 +67,7 @@ export class RoomService {
             where: {
                 ...{ isActive: isActive },
                 ...(keyword ? { roomNumber: ILike(`%${keyword}%`) } : {}),
+                ...(roomTypeId ? { roomType: In(roomTypeId) } : {}),
             },
         });
         return {
@@ -72,11 +81,24 @@ export class RoomService {
         };
     }
 
-    async getById(id: number) {
-        return await this.roomRepository.findOne({
+    async getById(
+        id: number,
+        relation: FindOptionsRelations<Room> | undefined
+    ) {
+        if (!relation) {
+            relation = {
+                internal_company: true,
+                roomType: true,
+                bookingRooms: true,
+            };
+        }
+
+        const result = await this.roomRepository.findOne({
             where: { id },
-            relations: ["internal_company", "roomType", "bookingRooms"],
+            relations: relation,
         });
+
+        return result;
     }
 
     async update(id: number, updateFields: Partial<IRoom>) {

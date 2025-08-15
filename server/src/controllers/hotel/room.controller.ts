@@ -44,7 +44,7 @@ export class RoomController {
 
     async getById(req: Request, res: Response) {
         const { id } = req.params;
-        const result = await roomService.getById(Number(id));
+        const result = await roomService.getById(Number(id), undefined);
         res.json({
             success: true,
             data: result,
