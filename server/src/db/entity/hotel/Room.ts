@@ -39,7 +39,4 @@ export class Room {
         eager: true,
     })
     roomType: RoomType;
-
-    @OneToMany(() => BookingRoom, (bookingRoom) => bookingRoom.room)
-    bookingRooms: BookingRoom[];
 }

@@ -1,17 +1,16 @@
-import { CustomerService, ICustomerByAdmin } from "../customer.service";
-
 import AppError from "../../utils/AppError";
 import { Booking } from "../../db/entity/hotel/Booking";
 import { BookingRoom } from "../../db/entity/hotel/BookingRoom";
 import { CredentialType } from "../../enums/CredentialType";
 import { Customer } from "../../db/entity/Customer";
 import { ErrorType } from "../../enums/Eums";
+import { ICustomerByAdmin } from "../customer.service";
 import { Room } from "../../db/entity/hotel/Room";
-import RoomService from "./rooms.service";
 import dataSource from "../../db/data-source";
 
-const customerService = new CustomerService();
-const roomService = new RoomService();
+interface BookingFullPayload extends BookingPayload {
+    bookingIdemKey: string | undefined;
+}
 
 interface BookingPayload {
     checkInDate: Date;
@@ -32,6 +31,14 @@ export class BookingService {
             BookingRoom
         )
     ) {}
+
+    async create(fullPayload: BookingFullPayload) {
+        const { bookingIdemKey, ...payload } = fullPayload;
+
+        const bookingResult = this.createBooking(payload);
+
+        return bookingResult;
+    }
 
     async createBooking(payload: BookingPayload) {
         const queryRunner = dataSource.createQueryRunner();

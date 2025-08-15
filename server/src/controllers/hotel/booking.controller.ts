@@ -7,7 +7,9 @@ const bookingService = new BookingService();
 
 export class BookingController {
     async create(req: Request, res: Response) {
-        const result = await bookingService.createBooking({
+        const bookingIdemKey = req.get("bookingIdemKey");
+
+        const result = await bookingService.create({
             checkInDate: req.body.checkInDate,
             checkOutDate: req.body.checkInDate,
             bookingDate: req.body.bookingDate,
@@ -18,6 +20,7 @@ export class BookingController {
                 req.body.associated_internal_company_id,
             roomNumberIds: req.body.roomNumberIds,
             isNewCustomer: req.body.isNewCustomer,
+            bookingIdemKey,
         });
         res.status(200).json({
             success: true,

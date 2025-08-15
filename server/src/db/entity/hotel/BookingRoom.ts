@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+} from "typeorm";
 
 import { Booking } from "./Booking";
 import { Room } from "./Room";
@@ -8,10 +14,22 @@ export class BookingRoom {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => Booking, (booking) => booking.bookingRooms)
+    @Column()
+    bookingId: number;
+
+    @ManyToOne(() => Booking, (booking) => booking.bookingRooms, {
+        eager: false,
+    })
+    @JoinColumn({ name: "bookingId" })
     booking: Booking;
 
-    @ManyToOne(() => Room, (room) => room.bookingRooms)
+    @Column()
+    roomById: number;
+
+    @ManyToOne(() => Room, (room) => room.id, {
+        eager: false,
+    })
+    @JoinColumn({ name: "roomById" })
     room: Room;
 
     @Column()

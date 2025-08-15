@@ -89,7 +89,6 @@ export class RoomService {
             relation = {
                 internal_company: true,
                 roomType: true,
-                bookingRooms: true,
             };
         }
 
