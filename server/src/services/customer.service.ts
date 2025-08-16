@@ -2,7 +2,9 @@ import AppError from "../utils/AppError";
 import { CredentialType } from "../enums/CredentialType";
 import { Customer } from "../db/entity/Customer";
 import { ErrorType } from "../enums/Eums";
+import { IActivePagination } from "../types/payload";
 import { ILike } from "typeorm";
+import createPagination from "../utils/createPagination";
 import dataSource from "../db/data-source";
 
 export interface ICustomerByAdmin {
@@ -56,39 +58,32 @@ export class CustomerService {
     /**
      * Get customers with optional pagination & filters
      */
-    async getAll({
-        skip = 0,
-        take = 10,
-        search,
-        isActive,
-    }: {
-        skip?: number;
-        take?: number;
-        search?: string;
-        isActive?: boolean;
-    }) {
-        const query = this.customerRepository.createQueryBuilder("customer");
+    async getAll(query: IActivePagination) {
+        const { skip, take, isPaginationEnabled, keyword, isActive } = query;
 
-        if (search) {
-            query.andWhere(
-                "(customer.name LIKE :search OR customer.email LIKE :search OR customer.mobileNumber LIKE :search)",
-                { search: `%${search}%` }
-            );
-        }
-
-        if (typeof isActive === "boolean") {
-            query.andWhere("customer.isActive = :isActive", { isActive });
-        }
-
-        query.skip(skip).take(take);
-
-        const [data, total] = await query.getManyAndCount();
-
+        const result = await this.customerRepository.find({
+            skip: skip,
+            take: take,
+            order: {
+                id: "DESC",
+            },
+            where: {
+                ...(keyword ? { name: ILike(`%${keyword}%`) } : {}),
+            },
+        });
+        const totalCount = await this.customerRepository.count({
+            where: {
+                ...(keyword ? { name: ILike(`%${keyword}%`) } : {}),
+            },
+        });
         return {
-            data,
-            total,
-            skip,
-            take,
+            result,
+            pagination: createPagination(
+                skip,
+                take,
+                totalCount,
+                isPaginationEnabled
+            ),
         };
     }
 

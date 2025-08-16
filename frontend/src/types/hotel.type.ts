@@ -1,3 +1,5 @@
+import type { Pagination } from "./config.types";
+
 export interface IRoomTypePayload {
     name: string;
     facilities?: string[];
@@ -41,4 +43,47 @@ export interface IRoomResponse {
     roomTypeId: number;
     isActive: boolean;
     roomType: IRoomTypeResponse;
+}
+
+export interface IBookingPayload {
+    checkInDate: Date;
+    checkOutDate: Date;
+    bookingDate: Date;
+    name: string;
+    email: string;
+    mobileNumber: string;
+    associated_internal_company_id: number;
+    roomNumberIds: number[];
+    isNewCustomer: boolean;
+}
+
+export interface IBookingUpdatePayload extends IBookingPayload {
+    id: number;
+}
+
+export interface IBookingPagination extends Pagination {
+    isActive: boolean;
+    dateProvided?: Date;
+    dateStart?: Date;
+    dateEnd?: Date;
+    customerId?: number;
+}
+
+export interface IBookingResponse {
+    id: number;
+    checkInDate: Date;
+    checkOutDate: Date;
+    bookingDate: Date;
+}
+
+export interface ICustomerResponse {
+    createdAt: string; // ISO date string
+    isActive: boolean;
+    id: number;
+    name: string;
+    email: string;
+    mobileNumber: string;
+    CredentialType: "ADMIN" | "USER" | "SUPER_ADMIN"; // extend if needed
+    associated_internal_company_id: number;
+    profilePictureUrl: string | null;
 }

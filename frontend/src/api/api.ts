@@ -10,7 +10,9 @@ import type {
 } from "../types/config.types";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+import { bookingEndpoints } from "./apiRoutes/hotel/bookingApi";
 import { commentEndpoints } from "./apiRoutes/commentApi";
+import { customerEndpoints } from "./apiRoutes/customerApi";
 import { employeeEndpoints } from "./apiRoutes/employeeApi";
 import { labelEndpoints } from "./apiRoutes/labelApi";
 import { roleEndpoints } from "./apiRoutes/rolesApi";
@@ -57,6 +59,8 @@ export const api = createApi({
         "TaskStatus",
         // hotel
         "RoomTypes",
+        "Room",
+        "Booking",
     ],
     endpoints: (build) => ({
         createLoginEmployee: build.mutation<
@@ -138,6 +142,8 @@ export const api = createApi({
         // hotel API
         ...roomTypeEndpoints(build),
         ...roomsEndpoints(build),
+        ...bookingEndpoints(build),
+        ...customerEndpoints(build),
     }),
 });
 

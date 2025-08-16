@@ -14,7 +14,6 @@ import {
     CalendarCog,
     FilePlus2Icon,
     HouseIcon,
-    HousePlugIcon,
     HousePlusIcon,
     KanbanSquare,
 } from "lucide-react";
@@ -57,7 +56,7 @@ const AppSidebar: React.FC = () => {
             subItems: [
                 {
                     name: "Add Booking",
-                    path: `/admin/features/booking/create-booking`,
+                    path: `/admin/features/booking/bookings`,
                     pro: false,
                     icon: <FilePlus2Icon />,
                     new: true,

@@ -5,6 +5,7 @@ import { CredentialType } from "../../enums/CredentialType";
 import { Customer } from "../../db/entity/Customer";
 import { ErrorType } from "../../enums/Eums";
 import { ICustomerByAdmin } from "../customer.service";
+import { RedisService } from "./../config/redis.service";
 import { Room } from "../../db/entity/hotel/Room";
 import dataSource from "../../db/data-source";
 
@@ -26,18 +27,37 @@ interface BookingPayload {
 
 export class BookingService {
     constructor(
-        private readonly bookingRepository = dataSource.getRepository(Booking),
-        private readonly bookingRoomRepository = dataSource.getRepository(
-            BookingRoom
-        )
+        private readonly bookingRepository = dataSource.getRepository(Booking)
     ) {}
 
     async create(fullPayload: BookingFullPayload) {
         const { bookingIdemKey, ...payload } = fullPayload;
 
-        const bookingResult = this.createBooking(payload);
+        if (!bookingIdemKey || bookingIdemKey === "") {
+            throw new AppError(
+                "Bad Request. Missing Key.",
+                400,
+                ErrorType.BAD_REQUEST_ERROR
+            );
+        } else {
+            const alreadyCachedBookingKey = await RedisService.getValue(
+                `bookingKey:${bookingIdemKey}`
+            );
 
-        return bookingResult;
+            if (alreadyCachedBookingKey) {
+                const data = JSON.parse(alreadyCachedBookingKey as string);
+                return data;
+            } else {
+                const bookingResult = await this.createBooking(payload);
+
+                await RedisService.setValue(
+                    `bookingKey:${bookingIdemKey}`,
+                    JSON.stringify(bookingResult)
+                );
+
+                return bookingResult;
+            }
+        }
     }
 
     async createBooking(payload: BookingPayload) {

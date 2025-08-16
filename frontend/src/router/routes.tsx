@@ -1,6 +1,7 @@
 import { Outlet, createBrowserRouter } from "react-router-dom";
 
 import AppLayout from "@/layout/AppLayout";
+import BookingPage from "@/pages/companySettings/BookingPage";
 import Dashboard from "@/pages/Dashboard";
 import EmailVerify from "@/pages/AuthPages/ EmailVerify";
 import Employee from "@/pages/AdminSettings/Employee";
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
                 element: <FeatureLayout />,
                 children: [
                     {
+                        path: "bookings",
+                        element: <BookingPage />,
+                    },
+                    {
                         path: "tasks",
                         element: <TaskPage />,
                     },
@@ -59,7 +64,7 @@ const router = createBrowserRouter([
                     },
                     {
                         path: "rooms",
-                        element: <RoomPage />,
+                        element: <RoomPage routedFrom={undefined} />,
                     },
                 ],
             },
