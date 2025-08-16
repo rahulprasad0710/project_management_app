@@ -62,8 +62,6 @@ export interface IBookingUpdatePayload extends IBookingPayload {
 }
 
 export interface IBookingPagination extends Pagination {
-    isActive: boolean;
-    dateProvided?: Date;
     dateStart?: Date;
     dateEnd?: Date;
     customerId?: number;
@@ -74,6 +72,9 @@ export interface IBookingResponse {
     checkInDate: Date;
     checkOutDate: Date;
     bookingDate: Date;
+    totalPrice: string;
+    status: string;
+    payment_status: string;
 }
 
 export interface ICustomerResponse {

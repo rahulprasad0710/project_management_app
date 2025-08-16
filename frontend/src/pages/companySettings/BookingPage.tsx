@@ -1,14 +1,11 @@
+import type { IBookingResponse, ICustomerResponse } from "@/types/hotel.type";
 import { useEffect, useState } from "react";
-import {
-    useGetAllCustomerQuery,
-    useLazyGetAllCustomerQuery,
-} from "@apiHooks/useCustomer";
 
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/button/Button";
-import type { ICustomerResponse } from "@/types/hotel.type";
-import type { IRoomTypeResponse } from "@/types/hotel.type";
+import DatePicker from "@/components/ui/DatePicker";
 import InfiniteScrollSelect from "@/components/common/InfiniteLoading";
+import Label from "@/components/form/Label";
 import { Modal } from "@/components/common/Modal";
 import { PlusIcon } from "lucide-react";
 import ReactTable from "@/components/common/ReactTable";
@@ -17,29 +14,25 @@ import SearchBar from "@/components/molecules/SearchBar";
 import { SquarePen } from "lucide-react";
 import Switch from "@/components/form/switch/Switch";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useLazyGetRoomTypesQuery } from "@api/hooks/hotel/useRoomType";
+import { useLazyGetAllCustomerQuery } from "@apiHooks/useCustomer";
+import { useLazyGetBookingQuery } from "@api/hooks/hotel/useBooking";
 
 const BookingPage = () => {
     const [selectedData, setSelectedData] = useState<
-        undefined | IRoomTypeResponse
+        undefined | IBookingResponse
+    >();
+    const [selectedCustomer, setSelectedCustomer] = useState<
+        ICustomerResponse | undefined
     >();
 
-    const { data: customerList } = useGetAllCustomerQuery({
-        isPaginationEnabled: true,
-        page: 1,
-        pageSize: 10,
-        keyword: "",
-    });
-
-    const [fetchCustomerAll, { data, isFetching: isCustomerLoading }] =
-        useLazyGetAllCustomerQuery();
-
-    const [isActive, setIsActive] = useState<boolean>(true);
-    const [keyword, setKeyword] = useState<string>("");
-    const [toggle, setToggle] = useState(false);
-
-    const [fetchAll, { isFetching, data: dataList }] =
-        useLazyGetRoomTypesQuery();
+    const [checkInDateState, setCheckInDateState] = useState<
+        Date[] | undefined
+    >(undefined);
+    const [checkOutDateState, setCheckOutDateState] = useState<
+        Date[] | undefined
+    >(undefined);
+    const [fetchCustomerAll] = useLazyGetAllCustomerQuery();
+    const [fetchAll, { isFetching, data: dataList }] = useLazyGetBookingQuery();
 
     console.log({
         dataList,
@@ -50,18 +43,17 @@ const BookingPage = () => {
             isPaginationEnabled: true,
             page: 1,
             pageSize: 10,
-            isActive: isActive,
-            keyword: keyword,
+            customerId: selectedCustomer?.id,
         });
-    }, [fetchAll, isActive]);
+    }, []);
 
     const handleSearch = () => {
         fetchAll({
             isPaginationEnabled: true,
             page: 1,
             pageSize: 10,
-            isActive: isActive,
-            keyword: keyword,
+
+            customerId: selectedCustomer?.id,
         });
     };
 
@@ -71,8 +63,6 @@ const BookingPage = () => {
             isPaginationEnabled: true,
             page: 1,
             pageSize: 10,
-            isActive: isActive,
-            keyword: "",
         });
     };
 
@@ -88,7 +78,6 @@ const BookingPage = () => {
             page: dataList?.data?.pagination?.currentPage - 1,
             pageSize: dataList?.data?.pagination?.pageSize,
             keyword: "",
-            isActive: true,
         });
     };
 
@@ -100,13 +89,12 @@ const BookingPage = () => {
                 isPaginationEnabled: true,
                 page: dataList?.data?.pagination?.currentPage + 1,
                 pageSize: dataList?.data?.pagination?.pageSize,
-                isActive: true,
             },
             true
         );
     };
 
-    const handleEdit = (data: IRoomTypeResponse) => {
+    const handleEdit = (data: IBookingResponse) => {
         setSelectedData(data);
         setToggle(true);
     };
@@ -120,10 +108,10 @@ const BookingPage = () => {
         setToggle(false);
     };
 
-    const columnHelper = createColumnHelper<IRoomTypeResponse>();
+    const columnHelper = createColumnHelper<IBookingResponse>();
 
     const columns = [
-        columnHelper.accessor((row) => row.name, {
+        columnHelper.accessor((row) => row.totalPrice, {
             id: "name",
             cell: (info) => (
                 <div className='font-semibold text-gray-700 dark:text-slate-100'>
@@ -133,7 +121,7 @@ const BookingPage = () => {
             header: () => <div>Name</div>,
         }),
 
-        columnHelper.accessor((row) => row.isActive, {
+        columnHelper.accessor((row) => row.payment_status, {
             id: "is_active",
             cell: (info) => (
                 <div
@@ -152,17 +140,8 @@ const BookingPage = () => {
             header: () => <div>Status</div>,
         }),
 
-        columnHelper.accessor((row) => row.roomPrice, {
+        columnHelper.accessor((row) => row.payment_status, {
             id: "roomPrice",
-            cell: (info) => (
-                <div className='font-semibold text-gray-700 dark:text-slate-100'>
-                    {info.renderValue()}
-                </div>
-            ),
-            header: () => <div>Room price</div>,
-        }),
-        columnHelper.accessor((row) => row.total_number_of_rooms, {
-            id: "total_number_of_rooms",
             cell: (info) => (
                 <div className='font-semibold text-gray-700 dark:text-slate-100'>
                     {info.renderValue()}
@@ -215,44 +194,45 @@ const BookingPage = () => {
                 <div className='border-b border-gray-200 px-5 py-4 dark:border-gray-800'>
                     <div className='flex items-center  justify-end  gap-4 md:gap-6 flex-wrap'>
                         <div>
-                            <InfiniteScrollSelect<ICustomerResponse>
-                                fetchAll={fetchCustomerAll}
-                                getOptionLabel={(room) => room?.name}
-                                getOptionValue={(room) => room?.id}
-                                preselectedValue={undefined}
-                                onSelect={(room) =>
-                                    console.log("Selected:", room)
-                                }
+                            <DatePicker
+                                label='Check-in Date'
+                                id='date-picker-checking'
+                                mode='single'
+                                placeholder='Check-in Date'
+                                onChange={(date) => {
+                                    setCheckInDateState(date);
+                                }}
+                                // defaultDate={new Date()}
                             />
                         </div>
-                        <div className='relative'>
-                            <select
-                                defaultValue={""}
-                                className='block w-full appearance-none rounded-lg border border-gray-200 bg-white px-4 py-2 pr-8 leading-tight text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none'
-                            >
-                                <option value='' disabled>
-                                    Select customer
-                                </option>
-                                {customerList?.data?.result?.map((role) => (
-                                    <option value={role.id} key={role.id}>
-                                        {role.name}
-                                    </option>
-                                ))}
-                            </select>
+                        <div>
+                            <DatePicker
+                                label='Checkout'
+                                id='date-picker-checkout'
+                                mode='single'
+                                placeholder='Checkout'
+                                onChange={(date) => {
+                                    setCheckOutDateState(date);
+                                }}
+                                // defaultDate={new Date()}
+                            />
                         </div>
-                        <Switch
-                            onChange={() => {
-                                setIsActive(!isActive);
-                            }}
-                            label='TODAY'
-                            defaultChecked={isActive}
-                        />
 
-                        <SearchBar
-                            setKeyword={setKeyword}
-                            onChange={() => handleClearFilter()}
-                            keyword={keyword}
-                        />
+                        <div className='min-w-[300px] relative'>
+                            <Label className='absolute top-[-10px] left-3 bg-white dark:bg-gray-800  z-10 px-1'>
+                                Customer
+                            </Label>
+                            <InfiniteScrollSelect<ICustomerResponse>
+                                fetchAll={fetchCustomerAll}
+                                getOptionLabel={(item) => {
+                                    return `${item?.name} | ${item?.mobileNumber}`;
+                                }}
+                                getOptionValue={(item) => item?.id}
+                                preselectedValue={undefined}
+                                onSelect={(item) => setSelectedCustomer(item)}
+                                placeholder={"Select customer"}
+                            />
+                        </div>
 
                         <Button
                             variant='outline'
@@ -284,7 +264,7 @@ const BookingPage = () => {
                     />
                 </div>
             </div>
-            <Modal
+            {/* <Modal
                 isOpen={toggle}
                 onClose={() => handleCloseModal()}
                 className='max-w-[700px] mb-4  '
@@ -295,7 +275,7 @@ const BookingPage = () => {
                     selectedData={selectedData}
                     handleCloseModal={handleCloseModal}
                 />
-            </Modal>
+            </Modal> */}
         </div>
     );
 };

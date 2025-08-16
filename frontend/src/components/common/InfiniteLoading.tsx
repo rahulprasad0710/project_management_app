@@ -7,8 +7,12 @@ import type {
 } from "@reduxjs/toolkit/query/react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
+import DropDownArrow from "../atoms/DropDownArrow";
 import type { ResponseWithPagination } from "@/types/config.types";
 import type { SerializedError } from "@reduxjs/toolkit";
+import { Spinner } from "../atoms/Spinner";
+import Spinner2 from "../atoms/Spinner2";
+import { X } from "lucide-react";
 
 export interface Pagination {
     currentPage: number;
@@ -41,7 +45,8 @@ interface InfiniteScrollSelectProps<T> {
     getOptionLabel: (item: T) => string;
     getOptionValue: (item: T) => string | number;
     preselectedValue?: T;
-    onSelect?: (value: T) => void;
+    onSelect?: (value: T | undefined) => void;
+    placeholder: string;
 }
 
 export default function InfiniteScrollSelect<T>({
@@ -50,6 +55,7 @@ export default function InfiniteScrollSelect<T>({
     getOptionValue,
     preselectedValue,
     onSelect,
+    placeholder,
 }: InfiniteScrollSelectProps<T>) {
     const [items, setItems] = useState<T[]>([]);
     const [page, setPage] = useState(1);
@@ -125,50 +131,102 @@ export default function InfiniteScrollSelect<T>({
         onSelect?.(item);
     };
 
+    const handleDeSelect = () => {
+        setSelected(undefined);
+        setDropdownOpen(false);
+        onSelect?.(undefined);
+    };
+
     return (
-        <div className='w-64 relative'>
-            {/* Selected value display */}
+        <div className='w-full relative  dark:text-white/90'>
             <div
-                className='border rounded px-2 py-1 cursor-pointer bg-white'
+                className='border dark:text-gray-400 rounded-md px-2 py-1.5 pl-4 cursor-pointer 
+                 bg-white relative dark:border-gray-800 dark:bg-slate-900 dark:text'
                 onClick={() => setDropdownOpen((o) => !o)}
             >
-                {selected ? getOptionLabel(selected) : "Select an option"}
+                <div className='flex items-center justify-between relative'>
+                    <span className='text-gray-800 font-medium'>
+                        {" "}
+                        {selected && getOptionLabel(selected)}
+                    </span>
+                    <span className='text-gray-400'>
+                        {placeholder && !selected && placeholder}
+                    </span>
+
+                    <div className='flex gap-1'>
+                        {selected && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeSelect();
+                                }}
+                                className='bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-full  py-0.5 flex items-center cursor-pointer'
+                            >
+                                <X height={"14"} />
+                            </button>
+                        )}
+
+                        <div className='pointer-events-none  flex items-center px-2 text-gray-700'>
+                            {loading ? <Spinner /> : <DropDownArrow />}
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {dropdownOpen && (
-                <div className='absolute mt-1 w-full border rounded-lg bg-white shadow z-10'>
+                <div className='absolute mt-1 w-full border-2 rounded-lg bg-white shadow z-10  dark:border-gray-800 dark:bg-slate-900'>
                     {/* Search */}
                     <div className='p-2'>
                         <input
                             type='text'
                             placeholder='Search...'
-                            className='w-full border px-2 py-1 rounded'
+                            className='w-full border px-2 py-1  focus:border-brand-300 
+                                                focus:ring-brand-500/10 dark:focus:border-brand-800 rounded-md  border-gray-300
+                                                focus:ring-3 focus:outline-hidden 
+                                                dark:border-gray-700 dark:bg-gray-900 dark:text-white/90
+                                                dark:placeholder:text-white/30'
                             value={keyword}
                             onChange={(e) => setKeyword(e.target.value)}
                         />
                     </div>
 
                     {/* List */}
-                    <div className='max-h-60 overflow-auto'>
+                    <div className='border max-h-60 overflow-auto bg-white dark:bg-slate-800 dark:border-gray-800'>
                         {items.map((item) => (
                             <div
                                 key={getOptionValue(item)}
-                                className={`p-2 cursor-pointer border-b last:border-none hover:bg-gray-100 ${
+                                className={`p-2  flex justify-between items-center cursor-pointer border-b last:border-none dark:hover:bg-gray-600 hover:bg-gray-100 ${
                                     selected &&
                                     getOptionValue(selected) ===
                                         getOptionValue(item)
-                                        ? "bg-blue-100"
+                                        ? "bg-blue-100 dark:bg-blue-950"
                                         : ""
                                 }`}
                                 onClick={() => handleSelect(item)}
                             >
                                 {getOptionLabel(item)}
+                                {selected &&
+                                    getOptionValue(selected) ===
+                                        getOptionValue(item) && (
+                                        <span>
+                                            <svg
+                                                className='size-4 shrink-0 text-blue-600'
+                                                xmlns='http://www.w3.org/2000/svg'
+                                                width='16'
+                                                height='16'
+                                                fill='currentColor'
+                                                viewBox='0 0 16 16'
+                                            >
+                                                <path d='M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z'></path>
+                                            </svg>
+                                        </span>
+                                    )}
                             </div>
                         ))}
 
                         {loading && (
-                            <div className='p-2 text-center text-gray-500'>
-                                Loading...
+                            <div className='flex items-center gap-4 p-2 text-center text-gray-500'>
+                                <span> Loading...</span> <Spinner2 />
                             </div>
                         )}
                         <div ref={observerRef}></div>

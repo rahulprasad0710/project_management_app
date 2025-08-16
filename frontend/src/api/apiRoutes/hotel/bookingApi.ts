@@ -20,8 +20,8 @@ type TApiConstant = {
 };
 
 const apiConstant: TApiConstant = {
-    route: "hotels/rooms",
-    typeTag: "Rooms",
+    route: "hotels/bookings",
+    typeTag: "Booking",
 };
 
 export const bookingEndpoints = (
