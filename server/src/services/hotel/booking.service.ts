@@ -1,3 +1,6 @@
+import { IActivePagination, IRoomPagination } from "../../types/payload";
+import { ILike, In } from "typeorm";
+
 import AppError from "../../utils/AppError";
 import { Booking } from "../../db/entity/hotel/Booking";
 import { BookingRoom } from "../../db/entity/hotel/BookingRoom";
@@ -7,6 +10,7 @@ import { ErrorType } from "../../enums/Eums";
 import { ICustomerByAdmin } from "../customer.service";
 import { RedisService } from "./../config/redis.service";
 import { Room } from "../../db/entity/hotel/Room";
+import createPagination from "../../utils/createPagination";
 import dataSource from "../../db/data-source";
 
 interface BookingFullPayload extends BookingPayload {
@@ -156,8 +160,26 @@ export class BookingService {
         }
     }
 
-    async getAll() {
-        return await this.bookingRepository.find();
+    async getAll(query: IActivePagination) {
+        const { skip, take, isPaginationEnabled, keyword, isActive } = query;
+
+        const result = await this.bookingRepository.find({
+            skip: skip,
+            take: take,
+            order: {
+                id: "DESC",
+            },
+        });
+        const totalCount = await this.bookingRepository.count({});
+        return {
+            result,
+            pagination: createPagination(
+                skip,
+                take,
+                totalCount,
+                isPaginationEnabled
+            ),
+        };
     }
 
     async getById(id: number) {

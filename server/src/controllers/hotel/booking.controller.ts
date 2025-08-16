@@ -33,15 +33,14 @@ export class BookingController {
         const { isActive } = req.query;
         const { skip, take, keyword, isPaginationEnabled }: IPagination =
             req.pagination;
-        // const result = await bookingService.getAll({
-        //     isActive: isActive === "true",
-        //     isPaginationEnabled,
-        //     keyword,
-        //     skip,
-        //     take,
-        // });
+        const result = await bookingService.getAll({
+            isActive: isActive === "true",
+            isPaginationEnabled,
+            keyword,
+            skip,
+            take,
+        });
 
-        const result = await bookingService.getAll();
         res.status(200).json({
             success: true,
             data: result,
