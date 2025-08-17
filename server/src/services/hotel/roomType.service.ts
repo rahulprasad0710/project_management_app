@@ -75,10 +75,21 @@ export class RoomTypeService {
     }
 
     async getById(id: number) {
-        return await this.roomTypeRepository.findOne({
+        const result = await this.roomTypeRepository.findOne({
             where: { id },
             relations: ["rooms"],
         });
+
+        return {
+            ...result,
+            rooms: result?.rooms?.map((room) => {
+                return {
+                    id: room.id,
+                    roomNumber: room.roomNumber,
+                    isActive: room.isActive,
+                };
+            }),
+        };
     }
 
     async update(id: number, updateFields: Partial<IRoomType>) {
