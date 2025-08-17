@@ -6,13 +6,9 @@ import Button from "@/components/ui/button/Button";
 import DatePicker from "@/components/ui/DatePicker";
 import InfiniteScrollSelect from "@/components/common/InfiniteLoading";
 import Label from "@/components/form/Label";
-import { Modal } from "@/components/common/Modal";
 import { PlusIcon } from "lucide-react";
 import ReactTable from "@/components/common/ReactTable";
-import RoomTypeModal from "@/modal/RoomTypeModal";
-import SearchBar from "@/components/molecules/SearchBar";
 import { SquarePen } from "lucide-react";
-import Switch from "@/components/form/switch/Switch";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useLazyGetAllCustomerQuery } from "@apiHooks/useCustomer";
 import { useLazyGetBookingQuery } from "@api/hooks/hotel/useBooking";
@@ -57,15 +53,6 @@ const BookingPage = () => {
         });
     };
 
-    const handleClearFilter = () => {
-        setKeyword("");
-        fetchAll({
-            isPaginationEnabled: true,
-            page: 1,
-            pageSize: 10,
-        });
-    };
-
     const handlePrevious = () => {
         if (
             !dataList?.data?.pagination?.currentPage ||
@@ -96,16 +83,6 @@ const BookingPage = () => {
 
     const handleEdit = (data: IBookingResponse) => {
         setSelectedData(data);
-        setToggle(true);
-    };
-
-    const handleOpenModal = () => {
-        setToggle(true);
-    };
-
-    const handleCloseModal = () => {
-        setSelectedData(undefined);
-        setToggle(false);
     };
 
     const columnHelper = createColumnHelper<IBookingResponse>();
@@ -169,113 +146,98 @@ const BookingPage = () => {
     ];
 
     return (
-        <div>
-            <div className='rounded-md border border-gray-200 bg-white dark:border-gray-800 dark:bg-slate-800'>
-                <div className='flex flex-col justify-end md:justify-between gap-5 border-b border-gray-200 px-5 py-4 sm:flex-row sm:items-center dark:border-gray-700'>
+        <div className='rounded-md border border-gray-200 bg-white dark:border-gray-800 dark:bg-slate-800'>
+            <div className='flex flex-col justify-end md:justify-between gap-5 border-b border-gray-200 px-5 py-4 sm:flex-row sm:items-center dark:border-gray-700'>
+                <div>
+                    <h3 className='text-lg font-semibold text-gray-800 dark:text-white/90'>
+                        Booking List
+                    </h3>
+                    <p className='text-sm text-gray-500 dark:text-gray-400'>
+                        All booking list
+                    </p>
+                </div>
+                <Button
+                    variant='primary'
+                    size='sm'
+                    className='bg-teal-500 hover:bg-teal-400!'
+                >
+                    <PlusIcon />
+                    Add New Booking
+                </Button>
+            </div>
+
+            <div className='border-b border-gray-200 px-5 py-4 dark:border-gray-800'>
+                <div className='flex items-center  justify-end  gap-4 md:gap-6 flex-wrap'>
                     <div>
-                        <h3 className='text-lg font-semibold text-gray-800 dark:text-white/90'>
-                            Booking List
-                        </h3>
-                        <p className='text-sm text-gray-500 dark:text-gray-400'>
-                            All booking list
-                        </p>
+                        <DatePicker
+                            label='Check-in Date'
+                            id='date-picker-checking'
+                            mode='single'
+                            placeholder='Check-in Date'
+                            onChange={(date) => {
+                                setCheckInDateState(date);
+                            }}
+                            // defaultDate={new Date()}
+                        />
                     </div>
+                    <div>
+                        <DatePicker
+                            label='Checkout'
+                            id='date-picker-checkout'
+                            mode='single'
+                            placeholder='Checkout'
+                            onChange={(date) => {
+                                setCheckOutDateState(date);
+                            }}
+                            // defaultDate={new Date()}
+                        />
+                    </div>
+
+                    <div className='min-w-[300px] relative'>
+                        <Label className='absolute top-[-10px] left-3 bg-white dark:bg-gray-800  z-10 px-1'>
+                            Customer
+                        </Label>
+                        <InfiniteScrollSelect<ICustomerResponse>
+                            fetchAll={fetchCustomerAll}
+                            getOptionLabel={(item) => {
+                                return `${item?.name} | ${item?.mobileNumber}`;
+                            }}
+                            getOptionValue={(item) => item?.id}
+                            preselectedValue={undefined}
+                            onSelect={(item) => setSelectedCustomer(item)}
+                            placeholder={"Select customer"}
+                        />
+                    </div>
+
                     <Button
-                        onClick={handleOpenModal}
-                        variant='primary'
-                        size='sm'
-                        className='bg-teal-500 hover:bg-teal-400!'
+                        variant='outline'
+                        size='xs'
+                        onClick={handleSearch}
+                        type='button'
                     >
-                        <PlusIcon />
-                        Add New Booking
+                        Search
                     </Button>
                 </div>
-
-                <div className='border-b border-gray-200 px-5 py-4 dark:border-gray-800'>
-                    <div className='flex items-center  justify-end  gap-4 md:gap-6 flex-wrap'>
-                        <div>
-                            <DatePicker
-                                label='Check-in Date'
-                                id='date-picker-checking'
-                                mode='single'
-                                placeholder='Check-in Date'
-                                onChange={(date) => {
-                                    setCheckInDateState(date);
-                                }}
-                                // defaultDate={new Date()}
-                            />
-                        </div>
-                        <div>
-                            <DatePicker
-                                label='Checkout'
-                                id='date-picker-checkout'
-                                mode='single'
-                                placeholder='Checkout'
-                                onChange={(date) => {
-                                    setCheckOutDateState(date);
-                                }}
-                                // defaultDate={new Date()}
-                            />
-                        </div>
-
-                        <div className='min-w-[300px] relative'>
-                            <Label className='absolute top-[-10px] left-3 bg-white dark:bg-gray-800  z-10 px-1'>
-                                Customer
-                            </Label>
-                            <InfiniteScrollSelect<ICustomerResponse>
-                                fetchAll={fetchCustomerAll}
-                                getOptionLabel={(item) => {
-                                    return `${item?.name} | ${item?.mobileNumber}`;
-                                }}
-                                getOptionValue={(item) => item?.id}
-                                preselectedValue={undefined}
-                                onSelect={(item) => setSelectedCustomer(item)}
-                                placeholder={"Select customer"}
-                            />
-                        </div>
-
-                        <Button
-                            variant='outline'
-                            size='xs'
-                            onClick={handleSearch}
-                            type='button'
-                        >
-                            Search
-                        </Button>
-                    </div>
-                </div>
-
-                <div className='border-t border-gray-100 bg-white p-4 dark:border-gray-800 dark:bg-slate-900 sm:p-6'>
-                    <ReactTable
-                        isFetching={isFetching}
-                        showPagination={true}
-                        columns={columns ?? []}
-                        handleNext={handleNext}
-                        handlePrevious={handlePrevious}
-                        data={dataList?.data.result ?? []}
-                        pagination={
-                            dataList?.data?.pagination ?? {
-                                currentPage: 1,
-                                pageSize: 10,
-                                totalCount: 10,
-                                totalPages: 1,
-                            }
-                        }
-                    />
-                </div>
             </div>
-            {/* <Modal
-                isOpen={toggle}
-                onClose={() => handleCloseModal()}
-                className='max-w-[700px] mb-4  '
-                isFullscreen={false}
-            >
-                <RoomTypeModal
-                    setSelectedData={setSelectedData}
-                    selectedData={selectedData}
-                    handleCloseModal={handleCloseModal}
+
+            <div className='border-t border-gray-100 bg-white p-4 dark:border-gray-800 dark:bg-slate-900 sm:p-6'>
+                <ReactTable
+                    isFetching={isFetching}
+                    showPagination={true}
+                    columns={columns ?? []}
+                    handleNext={handleNext}
+                    handlePrevious={handlePrevious}
+                    data={dataList?.data.result ?? []}
+                    pagination={
+                        dataList?.data?.pagination ?? {
+                            currentPage: 1,
+                            pageSize: 10,
+                            totalCount: 10,
+                            totalPages: 1,
+                        }
+                    }
                 />
-            </Modal> */}
+            </div>
         </div>
     );
 };

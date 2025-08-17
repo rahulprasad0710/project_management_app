@@ -6,6 +6,7 @@ const {
     useCreateRoomTypesMutation,
     useUpdateRoomTypesMutation,
     useUpdateRoomTypesStatusMutation,
+    useLazyGetRoomTypesByIdQuery,
 } = api;
 
 export {
@@ -14,5 +15,6 @@ export {
     useUpdateRoomTypesMutation,
     useUpdateRoomTypesStatusMutation,
     useLazyGetRoomTypesQuery,
+    useLazyGetRoomTypesByIdQuery,
 };
 export * from "./useRoomType";

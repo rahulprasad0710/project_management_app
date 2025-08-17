@@ -1,5 +1,6 @@
 import { Outlet, createBrowserRouter } from "react-router-dom";
 
+import AddBookingPage from "@/pages/companySettings/AddBookingPage";
 import AppLayout from "@/layout/AppLayout";
 import BookingPage from "@/pages/companySettings/BookingPage";
 import Dashboard from "@/pages/Dashboard";
@@ -51,8 +52,8 @@ const router = createBrowserRouter([
                 element: <FeatureLayout />,
                 children: [
                     {
-                        path: "bookings",
-                        element: <BookingPage />,
+                        path: "add",
+                        element: <AddBookingPage />,
                     },
                     {
                         path: "tasks",
@@ -60,7 +61,7 @@ const router = createBrowserRouter([
                     },
                     {
                         path: "listings",
-                        element: <Roles />,
+                        element: <BookingPage />,
                     },
                     {
                         path: "rooms",

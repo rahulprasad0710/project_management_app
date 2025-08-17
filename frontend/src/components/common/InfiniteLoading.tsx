@@ -47,6 +47,7 @@ interface InfiniteScrollSelectProps<T> {
     preselectedValue?: T;
     onSelect?: (value: T | undefined) => void;
     placeholder: string;
+    isSelectDisabled?: boolean;
 }
 
 export default function InfiniteScrollSelect<T>({
@@ -56,6 +57,7 @@ export default function InfiniteScrollSelect<T>({
     preselectedValue,
     onSelect,
     placeholder,
+    isSelectDisabled = false,
 }: InfiniteScrollSelectProps<T>) {
     const [items, setItems] = useState<T[]>([]);
     const [page, setPage] = useState(1);
@@ -140,11 +142,21 @@ export default function InfiniteScrollSelect<T>({
     return (
         <div className='w-full relative  dark:text-white/90'>
             <div
-                className='border dark:text-gray-400 rounded-md px-2 py-1.5 pl-4 cursor-pointer 
-                 bg-white relative dark:border-gray-800 dark:bg-slate-900 dark:text'
-                onClick={() => setDropdownOpen((o) => !o)}
+                className={`border dark:text-gray-400 rounded-md px-2 py-1.5 pl-4 cursor-pointer 
+                  relative dark:border-gray-800  dark:text ${
+                      isSelectDisabled
+                          ? "cursor-not-allowed bg-gray-100 dark:bg-gray-700 "
+                          : "bg-white dark:bg-slate-900"
+                  }  `}
+                onClick={() => {
+                    if (!isSelectDisabled) {
+                        setDropdownOpen((prev) => !prev);
+                    } else {
+                        return;
+                    }
+                }}
             >
-                <div className='flex items-center justify-between relative'>
+                <div className={`flex items-center justify-between relative`}>
                     <span className='text-gray-800 font-medium'>
                         {" "}
                         {selected && getOptionLabel(selected)}

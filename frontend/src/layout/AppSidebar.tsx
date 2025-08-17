@@ -56,10 +56,16 @@ const AppSidebar: React.FC = () => {
             subItems: [
                 {
                     name: "Add Booking",
-                    path: `/admin/features/booking/bookings`,
+                    path: `/admin/features/booking/add`,
                     pro: false,
                     icon: <FilePlus2Icon />,
                     new: true,
+                },
+                {
+                    name: "Listings",
+                    path: "/admin/features/booking/listings",
+                    pro: false,
+                    icon: <ListIcon />,
                 },
                 {
                     name: "Rooms",
@@ -73,12 +79,7 @@ const AppSidebar: React.FC = () => {
                     pro: false,
                     icon: <KanbanSquare />,
                 },
-                {
-                    name: "Listings",
-                    path: "/admin/features/listings?status=NEW",
-                    pro: false,
-                    icon: <ListIcon />,
-                },
+
                 {
                     name: "Settings",
                     path: "/admin/features/settings",

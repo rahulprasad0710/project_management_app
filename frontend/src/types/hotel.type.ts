@@ -27,6 +27,7 @@ export interface IRoomTypeResponse {
     description: string;
     isActive: boolean;
     thumbnailUrlId: string;
+    rooms: IRoomResponse[];
 }
 
 export interface IRoomPayload {
