@@ -12,8 +12,10 @@ import { priorityOptions, projectStatusOptions } from "@/types/config.types";
 import { useEffect, useState } from "react";
 
 import Button from "@/components/ui/button/Button";
+import { Modal } from "@/components/common/Modal";
 import MultiSelect2 from "@components/atoms/MultiSelect2";
 import { PlusIcon } from "lucide-react";
+import ProjectModal from "@/modal/ProjectModal";
 import ProjectTable from "@/components/ProjectTable";
 import SearchBar from "@/components/molecules/SearchBar";
 import { useGetQueryParams } from "@/hooks/useGetQueryParams";
@@ -152,17 +154,21 @@ const ProjectPage = () => {
                         View Event list.
                     </p>
                 </div>
-                <Button variant='primary' size='sm'>
+                <Button
+                    onClick={() => setToggle(true)}
+                    variant='primary'
+                    size='sm'
+                >
                     <PlusIcon size={16} />
                     Add New Event
                 </Button>
             </div>
 
-            <div className='border-t border-gray-100 bg-white p-4 dark:border-gray-800 flex flex-wrap items-center justify-end gap-4 '>
+            <div className='border-t border-gray-100 bg-white dark:bg-slate-800 p-4 dark:border-gray-800 flex flex-wrap items-center justify-end gap-4 '>
                 <button
                     type='button'
                     onClick={handleClearFilter}
-                    className='focus:shadow-outline justify-start rounded bg-gray-100 px-4 py-1 font-bold text-gray-500 hover:text-gray-800'
+                    className='focus:shadow-outline justify-start rounded border border-gray-200 bg-gray-100 dark:bg-slate-800  px-4 py-1 dark:border-gray-700 font-bold text-gray-500 hover:text-gray-800'
                 >
                     Clear filter
                 </button>
@@ -204,28 +210,18 @@ const ProjectPage = () => {
                 isFetching={isFetching}
                 data={data}
             />
-            {/* <Modal
-                modalTitleChildren={
-                    <div className='flex items-center pl-2'>
-                        {selectedData?.id ? (
-                            <FolderPen className='mr-2 h-5 w-5 text-gray-800' />
-                        ) : (
-                            <FolderPlus className='mr-2 h-5 w-5 text-gray-800' />
-                        )}{" "}
-                        <span className='font-semibold text-gray-800'>
-                            {selectedData?.id ? "Edit" : "Add"} new project
-                        </span>
-                    </div>
-                }
+            <Modal
+                isFullscreen={false}
                 isOpen={toggle}
                 onClose={() => setToggle(false)}
+                className='max-w-4xl'
             >
                 <ProjectModal
                     selectedData={selectedData}
                     setSelectedData={setSelectedData}
                     onClose={() => setToggle(false)}
                 />
-            </Modal> */}
+            </Modal>
         </div>
     );
 };

@@ -1,6 +1,18 @@
 import { api } from "../api";
 
-const { useLazyGetProjectsQuery } = api;
+const {
+    useCreateProjectMutation,
+    useCreateUploadsMutation,
+    useLazyGetProjectByIdQuery,
+    useUpdateProjectMutation,
+    useLazyGetProjectsQuery,
+} = api;
 
-export { useLazyGetProjectsQuery };
+export {
+    useCreateProjectMutation,
+    useCreateUploadsMutation,
+    useLazyGetProjectByIdQuery,
+    useUpdateProjectMutation,
+    useLazyGetProjectsQuery,
+};
 export * from "./useComment";

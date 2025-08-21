@@ -75,7 +75,7 @@ const MultiSelect2 = (props: Props) => {
                 onClick={() => setOpenSelect(!openSelect)}
                 className={`py-${
                     size ?? 2
-                } flex w-full justify-between gap-4 rounded border border-gray-200 bg-white px-4 text-left text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none`}
+                } flex w-full justify-between gap-4 rounded border border-gray-200 bg-white dark:bg-gray-900 px-4 dark:border-gray-700 text-left text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none`}
                 type='button'
             >
                 <span className='font-semibold'>
@@ -100,13 +100,13 @@ const MultiSelect2 = (props: Props) => {
             <div
                 className={`${
                     openSelect ? "block" : "hidden"
-                } absolute top-full z-50 mt-2 max-h-72 w-full space-y-0.5 overflow-hidden overflow-y-auto rounded-lg border border-gray-200 bg-white p-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 [&::-webkit-scrollbar]:w-2`}
+                } absolute top-full z-50 mt-2 max-h-72 w-full space-y-0.5  overflow-hidden overflow-y-auto rounded-lg border border-gray-200 dark:bg-slate-900 dark:border-gray-700 bg-white p-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 [&::-webkit-scrollbar]:w-2`}
             >
                 {list.map((item: IMultiList) => (
                     <div
                         onClick={() => handleSelect(item.value)}
                         key={item.value}
-                        className='selected focus:outline-hidden w-full cursor-pointer rounded-lg px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 focus:bg-gray-100'
+                        className='selected focus:outline-hidden w-full cursor-pointer rounded-lg px-4 py-2 text-sm text-gray-800 dark:hover:bg-slate-700 hover:bg-gray-100 focus:bg-gray-100'
                     >
                         <div className='flex items-center'>
                             {item.icon && (
@@ -125,8 +125,8 @@ const MultiSelect2 = (props: Props) => {
                                         (selectedItem) =>
                                             selectedItem.value === item.value
                                     )
-                                        ? "text-md font-semibold text-gray-800"
-                                        : "text-md text-gray-800"
+                                        ? "text-md font-semibold text-gray-800 dark:text-gray-200"
+                                        : "text-md text-gray-800 dark:text-gray-400"
                                 }
                                 data-title=''
                             >
