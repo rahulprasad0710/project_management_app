@@ -5,11 +5,11 @@ import React from "react";
 type IProps = {
     keyword: string;
     setKeyword: React.Dispatch<React.SetStateAction<string>>;
-    onChange?: () => void;
+    onClose?: () => void;
 };
 
 const SearchBar = (props: IProps) => {
-    const { keyword, setKeyword, onChange } = props;
+    const { keyword, setKeyword, onClose } = props;
     return (
         <div className='relative '>
             <span className='absolute top-1/2 left-4 -translate-y-1/2 text-gray-500 dark:text-gray-400'>
@@ -38,7 +38,7 @@ const SearchBar = (props: IProps) => {
             />
             {keyword.length > 0 && (
                 <span
-                    onClick={() => onChange()}
+                    onClick={() => onClose?.()}
                     className='absolute top-1/2 right-4 -translate-y-1/2 text-gray-500  dark:text-gray-400 cursor-pointer rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-800'
                 >
                     <X className='h-4 w-4' />

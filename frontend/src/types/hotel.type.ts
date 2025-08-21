@@ -46,6 +46,10 @@ export interface IRoomResponse {
     roomType: IRoomTypeResponse;
 }
 
+export interface IRoomAvailabilityResponse {
+    roomIdList: number[];
+}
+
 export interface IBookingPayload {
     checkInDate: Date;
     checkOutDate: Date;
@@ -88,4 +92,5 @@ export interface ICustomerResponse {
     CredentialType: "ADMIN" | "USER" | "SUPER_ADMIN"; // extend if needed
     associated_internal_company_id: number;
     profilePictureUrl: string | null;
+    emailVerified: boolean;
 }

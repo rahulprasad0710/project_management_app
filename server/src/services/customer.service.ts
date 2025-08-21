@@ -61,21 +61,22 @@ export class CustomerService {
     async getAll(query: IActivePagination) {
         const { skip, take, isPaginationEnabled, keyword, isActive } = query;
 
-        const result = await this.customerRepository.find({
-            skip: skip,
-            take: take,
-            order: {
-                id: "DESC",
-            },
-            where: {
-                ...(keyword ? { name: ILike(`%${keyword}%`) } : {}),
-            },
-        });
-        const totalCount = await this.customerRepository.count({
-            where: {
-                ...(keyword ? { name: ILike(`%${keyword}%`) } : {}),
-            },
-        });
+        const [result, totalCount] = await this.customerRepository.findAndCount(
+            {
+                skip: skip,
+                take: take,
+                order: {
+                    id: "DESC",
+                },
+                where: {
+                    ...(isActive ? { isActive: isActive } : {}),
+                    ...(keyword ? { name: ILike(`%${keyword}%`) } : {}),
+                    ...(keyword ? { mobileNumber: ILike(`%${keyword}%`) } : {}),
+                    ...(keyword ? { email: ILike(`%${keyword}%`) } : {}),
+                },
+            }
+        );
+
         return {
             result,
             pagination: createPagination(

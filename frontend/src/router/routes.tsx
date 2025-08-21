@@ -3,13 +3,17 @@ import { Outlet, createBrowserRouter } from "react-router-dom";
 import AddBookingPage from "@/pages/companySettings/AddBookingPage";
 import AppLayout from "@/layout/AppLayout";
 import BookingPage from "@/pages/companySettings/BookingPage";
+import Calendar from "@/pages/Calendar";
+import CustomerListPage from "@/pages/CustomerListPage";
 import Dashboard from "@/pages/Dashboard";
 import EmailVerify from "@/pages/AuthPages/ EmailVerify";
 import Employee from "@/pages/AdminSettings/Employee";
 import FeatureLayout from "@/layout/FeatureLayout";
 import HomePage from "@/pages/HomePage";
 import LabelPage from "@/pages/settings/LabelPage";
+import NotFound from "@/pages/NotFound";
 import Permission from "@/pages/AdminSettings/Permission";
+import ProjectPage from "@/pages/EventListPage";
 import Roles from "@/pages/AdminSettings/RolePage";
 import RoomPage from "@/pages/companySettings/RoomPage";
 import RoomTypePage from "@/pages/companySettings/RoomTypePage";
@@ -46,6 +50,18 @@ const router = createBrowserRouter([
             {
                 path: "dashboard",
                 element: <Dashboard />,
+            },
+            {
+                path: "calendar",
+                element: <Calendar />,
+            },
+            {
+                path: "customers",
+                element: <CustomerListPage />,
+            },
+            {
+                path: "events",
+                element: <ProjectPage />,
             },
             {
                 path: "features/:feature-slug",
@@ -120,6 +136,11 @@ const router = createBrowserRouter([
                 ],
             },
         ],
+    },
+
+    {
+        path: "*",
+        element: <NotFound />,
     },
 ]);
 

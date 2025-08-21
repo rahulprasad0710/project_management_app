@@ -11,11 +11,14 @@ import {
     UserCircleIcon,
 } from "../icons";
 import {
+    Calendar,
     CalendarCog,
     FilePlus2Icon,
     HouseIcon,
     HousePlusIcon,
     KanbanSquare,
+    ShieldUserIcon,
+    UserCog,
 } from "lucide-react";
 import { Link, useLocation } from "react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -89,17 +92,22 @@ const AppSidebar: React.FC = () => {
             ],
         },
         {
+            icon: <Calendar />,
+            name: "Calendar",
+            path: "/admin/calendar",
+        },
+        {
             icon: <UserCircleIcon />,
             name: "Clients",
-            path: "/admin/clients",
+            path: "/admin/customers",
         },
         {
             icon: <UserCircleIcon />,
-            name: "Projects",
-            path: "/admin/projects",
+            name: "Events",
+            path: "/admin/events",
         },
         {
-            icon: <UserCircleIcon />,
+            icon: <UserCog />,
             name: "Employees",
             path: "/admin/employees",
         },
@@ -148,7 +156,7 @@ const AppSidebar: React.FC = () => {
 
         {
             // PERMISSION ONLY TO ADMIN
-            icon: <PlugInIcon />,
+            icon: <ShieldUserIcon />,
             name: "Admin Settings",
             subItems: [
                 {

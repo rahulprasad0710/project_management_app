@@ -1,11 +1,5 @@
-import * as yup from "yup";
-
 import { Calendar, Info, PlusCircleIcon, X } from "lucide-react";
 import type { IRoomResponse, IRoomTypeResponse } from "@/types/hotel.type";
-import {
-    useLazyGetRoomTypesByIdQuery,
-    useLazyGetRoomTypesQuery,
-} from "@api/hooks/hotel/useRoomType";
 
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/button/Button";
@@ -14,7 +8,10 @@ import DatePicker from "@/components/ui/DatePicker";
 import Label from "@/components/form/Label";
 import { Modal } from "@/components/common/Modal";
 import RoomTypeInfo from "./RoomTypeInfo";
+import { format } from "date-fns";
 import { useGetRoomTypesQuery } from "@api/hooks/hotel/useRoomType";
+import { useLazyGetRoomTypeAvailabilityRoomByIdQuery } from "@api/hooks/hotel/useRoomAvailability";
+import { useLazyGetRoomTypesByIdQuery } from "@api/hooks/hotel/useRoomType";
 import { useState } from "react";
 
 type TSelectRoom = {
@@ -24,10 +21,13 @@ type TSelectRoom = {
     rooms: IRoomResponse[];
     roomTypeInfo: IRoomTypeResponse | null;
     selectedRoomNumber: string[];
+    notAvailableRooms: number[];
 };
 
 const RoomInformation = () => {
     const [fetchRoomTypeInfoById] = useLazyGetRoomTypesByIdQuery();
+    const [fetchRoomTypeAvailabilityRoomById] =
+        useLazyGetRoomTypeAvailabilityRoomByIdQuery();
 
     const [openRoomTypeInfoModal, setOpenRoomTypeInfoModal] = useState(false);
     const [selectedRoomTypeInfo, setSelectedRoomTypeInfo] = useState<
@@ -37,6 +37,9 @@ const RoomInformation = () => {
     const [selectedRoomList, setSelectedRoomList] = useState<TSelectRoom[]>([]);
 
     const [checkInDateState, setCheckInDateState] = useState<
+        Date[] | undefined
+    >(undefined);
+    const [checkOutDateState, setCheckOutDateState] = useState<
         Date[] | undefined
     >(undefined);
 
@@ -65,6 +68,7 @@ const RoomInformation = () => {
             rooms: [],
             roomTypeInfo: null,
             selectedRoomNumber: [],
+            notAvailableRooms: [],
         };
 
         setSelectedRoomList([...selectedRoomList, payload]);
@@ -79,7 +83,27 @@ const RoomInformation = () => {
         }).unwrap();
 
         console.log({
+            checkInDateState,
+            checkOutDateState,
+        });
+
+        if (checkInDateState === undefined || checkOutDateState === undefined) {
+            return;
+        }
+
+        const notAvailableRoomsResponse =
+            await fetchRoomTypeAvailabilityRoomById({
+                payloadId: Number(roomTypeId),
+                checkInDate: format(checkInDateState[0], "yyyy-MM-dd"),
+                checkOutDate: format(checkOutDateState[0], "yyyy-MM-dd"),
+            }).unwrap();
+
+        console.log({
             response,
+        });
+
+        console.log({
+            notAvailableRoomsResponse,
         });
 
         let updatedSelectedRooms = selectedRoomList;
@@ -99,6 +123,7 @@ const RoomInformation = () => {
                 roomTypeInfo: response?.data,
                 RoomIndex: roomType.RoomIndex,
                 selectedRoomNumber: [],
+                notAvailableRooms: notAvailableRoomsResponse?.data?.roomIdList,
             };
             // replace the old with new
             updatedSelectedRooms = [
@@ -172,9 +197,24 @@ const RoomInformation = () => {
                                     // defaultDate={new Date()}
                                 />
                             </div>
+                            <div>
+                                <DatePicker
+                                    label='Check-out Date'
+                                    id='date-picker-Check-out-date'
+                                    mode='single'
+                                    placeholder='Select check-out date'
+                                    onChange={(date) => {
+                                        setCheckOutDateState(date);
+                                    }}
+                                    // defaultDate={new Date()}
+                                />
+                            </div>
                             <Button
+                                disabled={
+                                    !checkInDateState || !checkOutDateState
+                                }
                                 onClick={handleAddRoomType}
-                                variant='outline'
+                                variant='primary'
                                 size='xs'
                             >
                                 <PlusCircleIcon />
@@ -242,7 +282,7 @@ const RoomInformation = () => {
                                 </div>
                                 <div className='sm:col-span-6  lg:col-span-3'>
                                     <Label>
-                                        Select Rooms
+                                        Available Rooms
                                         <span className='text-error-500'>
                                             *
                                         </span>
@@ -263,6 +303,10 @@ const RoomInformation = () => {
                                                             item2.roomNumber,
                                                         id: String(item2.id),
                                                         key: item.key,
+                                                        disabled:
+                                                            item?.notAvailableRooms?.includes(
+                                                                item2.id
+                                                            ),
                                                     };
                                                 }
                                             )}

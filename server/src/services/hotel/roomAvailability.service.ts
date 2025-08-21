@@ -1,4 +1,4 @@
-import { BookingRoom } from "../../db/entity/hotel//BookingRoom";
+import { BookingRoom } from "../../db/entity/hotel/BookingRoom";
 import { RoomType } from "../../db/entity/hotel/RoomType";
 import dataSource from "../../db/data-source";
 
@@ -184,3 +184,62 @@ async function getRoomTypeCalendar(
 
     return calendar;
 }
+
+async function getRoomTypeAvailability({
+    roomTypeId,
+    checkInDate,
+    checkOutDate,
+}: {
+    roomTypeId: number;
+    checkInDate: string;
+    checkOutDate: string;
+}) {
+    console.log({
+        roomTypeId,
+        checkInDate,
+        checkOutDate,
+    });
+
+    const bookingRoomRepo = dataSource.getRepository(BookingRoom);
+
+    // Get all rooms for this type
+    // const roomType = await roomTypeRepo.findOne({
+    //     where: { id: roomTypeId },
+    //     relations: ["rooms"],
+    // });
+    // if (!roomType) throw new Error("Room type not found");
+
+    // const rooms = roomType.rooms;
+
+    const bookingRooms = await bookingRoomRepo
+        .createQueryBuilder("br")
+        .leftJoinAndSelect("br.booking", "b")
+        .leftJoinAndSelect("br.room", "r")
+        .where("r.roomTypeId = :roomTypeId", { roomTypeId })
+        .andWhere("b.checkOutDate <= :checkOutDate", { checkOutDate })
+        .andWhere("b.checkInDate >= :checkInDate", { checkInDate })
+        .getMany();
+
+    console.log({
+        bookingRooms,
+    });
+
+    return { roomIdList: bookingRooms.map((br) => br.roomById) };
+}
+
+// SELECT br.*,
+//        b.*,
+//        r.*
+// FROM booking_room br
+// LEFT JOIN booking b ON br."bookingId" = b.id
+// LEFT JOIN room r ON br."roomById" = r.id
+// WHERE r."roomTypeId" = 2
+//   AND b."checkInDate" >= '2025-08-20'
+//   AND b."checkOutDate" <= '2025-08-20';
+
+export default {
+    getRoomTypeMonthlyAvailability,
+    getRoomTypeMonthlyAvailabilityOptimized,
+    getRoomTypeCalendar,
+    getRoomTypeAvailability,
+};

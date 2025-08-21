@@ -15,8 +15,10 @@ import { commentEndpoints } from "./apiRoutes/commentApi";
 import { customerEndpoints } from "./apiRoutes/customerApi";
 import { employeeEndpoints } from "./apiRoutes/employeeApi";
 import { labelEndpoints } from "./apiRoutes/labelApi";
+import { projectEndpoints } from "./apiRoutes/projectApi";
 import { roleEndpoints } from "./apiRoutes/rolesApi";
 import { roomTypeEndpoints } from "./apiRoutes/hotel/roomTypeApi";
+import { roomsAvailabilityEndpoints } from "./apiRoutes/hotel/roomsAvailabilityApi";
 import { roomsEndpoints } from "./apiRoutes/hotel/roomApi";
 import { sprintEndpoints } from "./apiRoutes/sprintApi";
 import { taskEndpoints } from "./apiRoutes/taskApi";
@@ -61,6 +63,7 @@ export const api = createApi({
         "RoomTypes",
         "Room",
         "Booking",
+        "RoomAvailability",
     ],
     endpoints: (build) => ({
         createLoginEmployee: build.mutation<
@@ -144,6 +147,8 @@ export const api = createApi({
         ...roomsEndpoints(build),
         ...bookingEndpoints(build),
         ...customerEndpoints(build),
+        ...roomsAvailabilityEndpoints(build),
+        ...projectEndpoints(build),
     }),
 });
 

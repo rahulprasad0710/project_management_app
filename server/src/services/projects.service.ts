@@ -55,7 +55,16 @@ export class ProjectService {
         const { skip, take, isPaginationEnabled, priority, status, keyword } =
             query;
 
-        const result = await this.projectRepository.find({
+        console.log({
+            skip,
+            take,
+            isPaginationEnabled,
+            priority,
+            status,
+            keyword,
+        });
+
+        const [result, totalCount] = await this.projectRepository.findAndCount({
             select: [
                 "id",
                 "name",
@@ -77,7 +86,7 @@ export class ProjectService {
                 ...(keyword ? { name: ILike(`%${keyword}%`) } : {}),
             },
         });
-        const totalCount = await this.projectRepository.count();
+
         return {
             result,
             pagination: createPagination(

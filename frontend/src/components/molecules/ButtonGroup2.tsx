@@ -60,8 +60,13 @@ const ButtonGroup2 = (props: TProps) => {
                         key={item.id}
                         type='button'
                         className={`${getClassName(index, btnList.length)} ${
-                            selectedRoomNumberList.includes(item.id)
+                            selectedRoomNumberList.includes(item.id) &&
+                            !item.disabled
                                 ? "bg-green-500! text-white! "
+                                : ""
+                        }  ${
+                            item.disabled
+                                ? "bg-gray-100! text-gray-300! cursor-not-allowed "
                                 : ""
                         } `}
                         disabled={item.disabled}

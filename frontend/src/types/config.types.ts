@@ -36,8 +36,8 @@ export interface IPaginationWithTaskStatusByFeatureId extends Pagination {
 }
 
 export interface IProjectPagination extends Pagination {
-    status?: ProjectStatus[] | undefined;
-    priority?: Priority | undefined;
+    status?: string[] | undefined;
+    priority?: string[] | undefined;
 }
 
 export interface IProjectTaskPagination extends Pagination {
@@ -205,15 +205,16 @@ export interface IStatusOptions {
 export interface IProjectStatusOptions {
     value: ProjectStatus;
     label: string;
+    id: ProjectStatus;
 }
 
 export const projectStatusOptions: IProjectStatusOptions[] = [
-    { value: "STARTED", label: "Start" },
-    { value: "TODO", label: "To Do" },
-    { value: "IN_PROGRESS", label: "In Progress" },
-    { value: "UNDER_REVIEW", label: "Under Review" },
-    { value: "COMPLETED", label: "Completed" },
-    { value: "BACKLOG", label: "Backlog" },
+    { id: "STARTED", value: "STARTED", label: "Start" },
+    { id: "TODO", value: "TODO", label: "To Do" },
+    { id: "IN_PROGRESS", value: "IN_PROGRESS", label: "In Progress" },
+    { id: "UNDER_REVIEW", value: "UNDER_REVIEW", label: "Under Review" },
+    { id: "COMPLETED", value: "COMPLETED", label: "Completed" },
+    { id: "BACKLOG", value: "BACKLOG", label: "Backlog" },
 ];
 
 export interface ISprintPayload {

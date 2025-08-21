@@ -10,6 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.19",
+    "@fullcalendar/daygrid": "^6.1.19",
+    "@fullcalendar/interaction": "^6.1.19",
+    "@fullcalendar/list": "^6.1.19",
+    "@fullcalendar/react": "^6.1.19",
+    "@fullcalendar/timegrid": "^6.1.15",
     "@hookform/resolvers": "^5.2.0",
     "@reduxjs/toolkit": "^2.6.1",
     "@tailwindcss/vite": "^4.1.11",
@@ -19,6 +25,7 @@
     "@tiptap/extension-text-style": "^3.0.9",
     "@tiptap/react": "^3.0.9",
     "@tiptap/starter-kit": "^3.0.9",
+    "apexcharts": "^5.3.3",
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -26,6 +33,7 @@
     "flatpickr": "^4.6.13",
     "lucide-react": "^0.526.0",
     "react": "^19.1.0",
+    "react-apexcharts": "^1.7.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^19.1.0",
