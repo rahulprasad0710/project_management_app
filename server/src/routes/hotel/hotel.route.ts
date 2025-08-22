@@ -27,7 +27,7 @@ const routes = [
     },
 
     {
-        path: "/room-availability",
+        path: "/availability",
         route: roomAvailabilityRoute,
     },
 ];

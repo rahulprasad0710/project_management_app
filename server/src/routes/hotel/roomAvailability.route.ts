@@ -8,7 +8,7 @@ const roomAvailabilityController = new RoomController();
 const router = express.Router();
 
 router.get(
-    "/:roomTypeId",
+    "/room-types",
     asyncTryCatchFn(roomAvailabilityController.getRoomTypeAvailability)
 );
 

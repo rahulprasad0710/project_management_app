@@ -1,30 +1,15 @@
 import * as yup from "yup";
 
-import { Calendar, Info, PlusCircleIcon } from "lucide-react";
-import type {
-    ICustomerResponse,
-    IRoomResponse,
-    IRoomTypeResponse,
-} from "@/types/hotel.type";
-import {
-    useLazyGetRoomTypesByIdQuery,
-    useLazyGetRoomTypesQuery,
-} from "@api/hooks/hotel/useRoomType";
+import { useEffect, useState } from "react";
 
-import Button from "@/components/ui/button/Button";
-import ButtonGroup2 from "@/components/molecules/ButtonGroup2";
-import CustomerInformation from "./components/CustomerInformation";
+import type { ICustomerResponse } from "@/types/hotel.type";
 import InfiniteScrollSelect from "@/components/common/InfiniteLoading";
 import Label from "@/components/form/Label";
-import { Modal } from "@/components/common/Modal";
 import RoomInformation from "./components/RoomInformation";
-import RoomTypeInfo from "./components/RoomTypeInfo";
 import Switch from "@/components/form/switch/Switch";
 import { inputFieldClass } from "@/utils/style";
-import { useForm } from "react-hook-form";
-import { useGetRoomTypesQuery } from "@api/hooks/hotel/useRoomType";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { useLazyGetAllCustomerQuery } from "@apiHooks/useCustomer";
-import { useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 interface IFormInput {
@@ -39,28 +24,12 @@ const defaultValues: IFormInput = {
     mobileNumber: "",
 };
 
-type TSelectRoom = {
-    roomTypeId: number;
-    RoomIndex: number;
-    rooms: IRoomResponse[];
-    roomTypeInfo: IRoomTypeResponse;
-};
-
 const AddBookingPage = () => {
     const [fetchCustomerAll] = useLazyGetAllCustomerQuery();
-    const [fetchRoomTypeInfoById] = useLazyGetRoomTypesByIdQuery();
-
-    const [selectedRoomList, setSelectedRoomList] = useState<TSelectRoom[]>([]);
 
     const [selectedCustomer, setSelectedCustomer] = useState<
         ICustomerResponse | undefined
     >();
-    const { data: roomList } = useGetRoomTypesQuery({
-        isPaginationEnabled: false,
-        page: 1,
-        pageSize: 10,
-        isActive: true,
-    });
 
     const schema = yup.object().shape({
         name: yup.string().required("Name is required"),
@@ -68,90 +37,105 @@ const AddBookingPage = () => {
         mobileNumber: yup.string().required("Mobile number is required"),
     });
 
-    const [isNewCustomer, setIsNewCustomer] = useState(true);
+    const [alreadyACustomer, setAlreadyACustomer] = useState(false);
 
     const {
         register,
         handleSubmit,
         reset,
         watch,
-        formState: { errors, isSubmitting },
+        formState: { errors },
     } = useForm<IFormInput>({
         defaultValues: defaultValues,
         resolver: yupResolver(schema),
     });
 
-    console.log(watch("roomTypeId"));
-    const handleSelectRoomType = async (
-        roomTypeId: string,
-        roomIndex: number
-    ) => {
-        const response = await fetchRoomTypeInfoById({
-            roomTypesId: Number(roomTypeId),
-        }).unwrap();
+    const newCustomerName = watch("name");
+    const newCustomerMobileNumber = watch("mobileNumber");
 
-        const ifRoomTypePresent = selectedRoomList.findIndex(
-            (item) => Number(item.roomTypeId) === response?.data?.id
-        );
-
-        if (ifRoomTypePresent !== -1) {
-            selectedRoomList.splice(ifRoomTypePresent, 1);
+    useEffect(() => {
+        if (selectedCustomer && alreadyACustomer) {
+            reset({
+                name: selectedCustomer?.name,
+                email: selectedCustomer?.email,
+                mobileNumber: selectedCustomer?.mobileNumber,
+            });
         }
 
-        selectedRoomList.push({
-            roomTypeId: response?.data?.id,
-            RoomIndex: roomIndex,
-            rooms: response?.data?.rooms,
-            roomTypeInfo: response?.data,
-        });
+        if (!alreadyACustomer) {
+            reset({
+                name: "",
+                email: "",
+                mobileNumber: "",
+            });
+        }
 
-        setSelectedRoomList([...selectedRoomList]);
-    };
+        if (selectedCustomer === undefined) {
+            reset({
+                name: "",
+                email: "",
+                mobileNumber: "",
+            });
+        }
+    }, [selectedCustomer, alreadyACustomer]);
 
     return (
         <div className='rounded-md border border-gray-200 bg-white p-5 lg:p-6 dark:border-gray-800 dark:bg-white/[0.03]'>
-            <div className='flex flex-col justify-end md:justify-between gap-5  px-5 py-4 sm:flex-row sm:items-center '>
+            <div className='flex flex-col justify-end md:justify-between gap-5  px-5 pb-4 sm:flex-row sm:items-center '>
                 <div>
                     <h3 className='text-lg font-semibold text-gray-800 dark:text-white/90'>
                         Bookings
                     </h3>
                     <p className='text-sm text-gray-500 dark:text-gray-400'>
-                        Add/Edit bookings
+                        Add New Bookings
                     </p>
                 </div>
                 <div className='flex gap-12 items-center'>
-                    <InfiniteScrollSelect<ICustomerResponse>
-                        fetchAll={fetchCustomerAll}
-                        getOptionLabel={(item) => {
-                            return `${item?.mobileNumber}`;
-                        }}
-                        getOptionValue={(item) => item?.id}
-                        preselectedValue={undefined}
-                        onSelect={(item) => setSelectedCustomer(item)}
-                        placeholder={"Select customer"}
-                        isSelectDisabled={false}
-                    />
+                    <div className='w-[320px]'>
+                        <InfiniteScrollSelect<ICustomerResponse>
+                            fetchAll={fetchCustomerAll}
+                            getOptionLabel={(item) => {
+                                return `${item?.mobileNumber} | ${item?.name}`;
+                            }}
+                            getOptionValue={(item) => item?.id}
+                            preselectedValue={undefined}
+                            onSelect={(item) => setSelectedCustomer(item)}
+                            placeholder={"Select customer"}
+                            isSelectDisabled={!alreadyACustomer}
+                        />
+                    </div>
                     <Switch
-                        onChange={() => setIsNewCustomer((prev) => !prev)}
-                        defaultChecked={isNewCustomer}
-                        label='New Customer'
+                        onChange={() => {
+                            if (alreadyACustomer) {
+                                setSelectedCustomer(undefined);
+                                reset(defaultValues);
+                            }
+                            setAlreadyACustomer((prev) => !prev);
+                        }}
+                        defaultChecked={alreadyACustomer}
+                        label='Already a customer?'
                     />
                 </div>
             </div>
-            <div className='rounded-lg border border-gray-200 p-5 lg:p-6 dark:border-gray-800 mb-8'>
-                {isNewCustomer ? (
-                    <div>
-                        <h4 className='text-lg font-semibold text-gray-800 lg:mb-6 dark:text-white/90'>
-                            Customer Information
-                        </h4>
-                        <div className='grid grid-cols-3 gap-8 mb-4'>
-                            <div>
-                                <Label>
-                                    Customer's Name
-                                    <span className='text-error-500'>*</span>
-                                </Label>
+            <div className='rounded-lg border border-gray-200 p-4 lg:p-4 dark:border-gray-800 mb-6'>
+                <h4 className='text-lg font-semibold text-gray-800 lg:mb-4 dark:text-white/90'>
+                    Customer Information
+                </h4>
+                <form className='bg-white px-4 py-4 dark:bg-slate-800'>
+                    <div className='grid grid-cols-3 gap-8 mb-4'>
+                        <div>
+                            <Label>
+                                Customer's Name
+                                <span className='text-error-500'>*</span>
+                            </Label>
+                            {alreadyACustomer ? (
+                                <p className='text-md font-medium text-gray-800 dark:text-white/90'>
+                                    {selectedCustomer?.name}
+                                </p>
+                            ) : (
                                 <div className='relative'>
                                     <input
+                                        disabled={alreadyACustomer}
                                         className={inputFieldClass({
                                             error: errors.name ? true : false,
                                         })}
@@ -167,14 +151,21 @@ const AddBookingPage = () => {
                                         </p>
                                     )}
                                 </div>
-                            </div>
-                            <div>
-                                <Label>
-                                    Mobile Number
-                                    <span className='text-error-500'>*</span>
-                                </Label>
+                            )}
+                        </div>
+                        <div>
+                            <Label>
+                                Mobile Number
+                                <span className='text-error-500'>*</span>
+                            </Label>
+                            {alreadyACustomer ? (
+                                <p className='text-md font-medium text-gray-800 dark:text-white/90'>
+                                    {selectedCustomer?.mobileNumber}
+                                </p>
+                            ) : (
                                 <div className='relative'>
                                     <input
+                                        disabled={alreadyACustomer}
                                         className={inputFieldClass({
                                             error: errors.mobileNumber
                                                 ? true
@@ -192,14 +183,22 @@ const AddBookingPage = () => {
                                         </p>
                                     )}
                                 </div>
-                            </div>
-                            <div>
-                                <Label>
-                                    Email
-                                    <span className='text-error-500'>*</span>
-                                </Label>
+                            )}
+                        </div>
+                        <div>
+                            <Label>
+                                Email
+                                <span className='text-error-500'>*</span>
+                            </Label>
+
+                            {alreadyACustomer ? (
+                                <p className='text-md font-medium text-gray-800 dark:text-white/90'>
+                                    {selectedCustomer?.email}
+                                </p>
+                            ) : (
                                 <div className='relative'>
                                     <input
+                                        disabled={alreadyACustomer}
                                         className={inputFieldClass({
                                             error: errors.email ? true : false,
                                         })}
@@ -209,25 +208,31 @@ const AddBookingPage = () => {
                                             required: true,
                                         })}
                                     />
-                                    {errors.email ? (
+                                    {errors.email && (
                                         <p className='text-xs italic text-red-500'>
                                             {errors.email?.message}
                                         </p>
-                                    ) : (
+                                    )}
+
+                                    {!errors?.email && !alreadyACustomer && (
                                         <p className='text-semibold text-xs text-blue-500'>
-                                            Email cannot be changed after
-                                            creation.
+                                            Email is required and can't be
+                                            changed after creation.
                                         </p>
                                     )}
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </div>
-                ) : (
-                    <CustomerInformation selectedCustomer={selectedCustomer} />
-                )}
+                </form>
             </div>
-            <RoomInformation />
+            <RoomInformation
+                selectedCustomer={selectedCustomer}
+                newCustomerName={newCustomerName}
+                newCustomerMobileNumber={newCustomerMobileNumber}
+                customerError={errors}
+                handleSubmitCustomerForm={handleSubmit}
+            />
         </div>
     );
 };

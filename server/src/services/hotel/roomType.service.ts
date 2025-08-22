@@ -5,6 +5,7 @@ import { RoomType } from "../../db/entity/hotel/RoomType";
 import { UploadFile } from "../../db/entity/uploads";
 import createPagination from "../../utils/createPagination";
 import dataSource from "../../db/data-source";
+import { sanitizeDBResult } from "../../utils/sanitizeDbResult";
 
 interface IRoomType {
     name: string;
@@ -57,14 +58,27 @@ export class RoomTypeService {
                 "thumbnailUrlId",
                 "roomPrice",
                 "total_number_of_rooms",
+                "facilities",
             ],
+            relations: ["rooms"],
             where: {
                 ...{ isActive: isActive },
                 ...(keyword ? { name: ILike(`%${keyword}%`) } : {}),
             },
         });
+
+        const sanitizeResult = result?.map((item) => {
+            return {
+                ...item,
+                rooms: sanitizeDBResult({
+                    result: item.rooms,
+                    selectFields: ["id", "roomNumber"],
+                }),
+            };
+        });
+
         return {
-            result,
+            result: sanitizeResult,
             pagination: createPagination(
                 skip,
                 take,

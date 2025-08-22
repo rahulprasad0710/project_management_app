@@ -48,6 +48,7 @@ export interface IRoomResponse {
 
 export interface IRoomAvailabilityResponse {
     roomIdList: number[];
+    roomTypeId: number;
 }
 
 export interface IBookingPayload {

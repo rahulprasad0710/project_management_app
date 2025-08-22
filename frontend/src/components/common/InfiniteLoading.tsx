@@ -165,14 +165,14 @@ export default function InfiniteScrollSelect<T>({
                         {placeholder && !selected && placeholder}
                     </span>
 
-                    <div className='flex gap-1'>
+                    <div className='flex gap-1 '>
                         {selected && (
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handleDeSelect();
                                 }}
-                                className='bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-full  py-0.5 flex items-center cursor-pointer'
+                                className='bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-full mx-0.5  py-0.5 flex items-center cursor-pointer'
                             >
                                 <X height={"14"} />
                             </button>

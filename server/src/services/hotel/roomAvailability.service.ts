@@ -190,7 +190,7 @@ async function getRoomTypeAvailability({
     checkInDate,
     checkOutDate,
 }: {
-    roomTypeId: number;
+    roomTypeId: number[];
     checkInDate: string;
     checkOutDate: string;
 }) {
@@ -202,29 +202,25 @@ async function getRoomTypeAvailability({
 
     const bookingRoomRepo = dataSource.getRepository(BookingRoom);
 
-    // Get all rooms for this type
-    // const roomType = await roomTypeRepo.findOne({
-    //     where: { id: roomTypeId },
-    //     relations: ["rooms"],
-    // });
-    // if (!roomType) throw new Error("Room type not found");
+    const response = await Promise.all(
+        roomTypeId?.map(async (item) => {
+            const bookingRooms = await bookingRoomRepo
+                .createQueryBuilder("br")
+                .leftJoinAndSelect("br.booking", "b")
+                .leftJoinAndSelect("br.room", "r")
+                .where("r.roomTypeId = :roomTypeId", { roomTypeId: item })
+                .andWhere("b.checkOutDate <= :checkOutDate", { checkOutDate })
+                .andWhere("b.checkInDate >= :checkInDate", { checkInDate })
+                .getMany();
 
-    // const rooms = roomType.rooms;
+            return {
+                roomTypeId: item,
+                roomIdList: bookingRooms.map((br) => br.roomById),
+            };
+        })
+    );
 
-    const bookingRooms = await bookingRoomRepo
-        .createQueryBuilder("br")
-        .leftJoinAndSelect("br.booking", "b")
-        .leftJoinAndSelect("br.room", "r")
-        .where("r.roomTypeId = :roomTypeId", { roomTypeId })
-        .andWhere("b.checkOutDate <= :checkOutDate", { checkOutDate })
-        .andWhere("b.checkInDate >= :checkInDate", { checkInDate })
-        .getMany();
-
-    console.log({
-        bookingRooms,
-    });
-
-    return { roomIdList: bookingRooms.map((br) => br.roomById) };
+    return response;
 }
 
 // SELECT br.*,

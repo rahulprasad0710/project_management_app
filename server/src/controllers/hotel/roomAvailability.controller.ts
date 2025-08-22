@@ -4,17 +4,15 @@ import roomAvailabilityService from "../../services/hotel/roomAvailability.servi
 
 export class RoomAvailabilityController {
     async getRoomTypeAvailability(req: Request, res: Response) {
-        const { roomTypeId } = req.params;
-        const { checkInDate, checkOutDate } = req.query;
+        const { checkInDate, checkOutDate, roomTypeId } = req.query;
 
-        console.log({
-            Body: "req.body",
-            checkInDate,
-            checkOutDate,
-        });
+        const roomTypeIdsArray: number[] =
+            typeof roomTypeId === "string"
+                ? roomTypeId.split(",").map((id) => Number(id))
+                : [];
 
         const result = await roomAvailabilityService.getRoomTypeAvailability({
-            roomTypeId: Number(roomTypeId),
+            roomTypeId: roomTypeIdsArray,
             checkInDate: checkInDate as string,
             checkOutDate: checkOutDate as string,
         });

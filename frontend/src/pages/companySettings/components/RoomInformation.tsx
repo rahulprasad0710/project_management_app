@@ -1,40 +1,72 @@
-import { Calendar, Info, PlusCircleIcon, X } from "lucide-react";
-import type { IRoomResponse, IRoomTypeResponse } from "@/types/hotel.type";
+import { Calendar, Info } from "lucide-react";
+import type {
+    FieldErrors,
+    SubmitHandler,
+    UseFormHandleSubmit,
+} from "react-hook-form";
+import type { ICustomerResponse, IRoomTypeResponse } from "@/types/hotel.type";
 
 import Badge from "@/components/ui/Badge";
+import BookingInformation from "./BookingInformation";
 import Button from "@/components/ui/button/Button";
 import ButtonGroup2 from "@/components/molecules/ButtonGroup2";
 import DatePicker from "@/components/ui/DatePicker";
-import Label from "@/components/form/Label";
 import { Modal } from "@/components/common/Modal";
 import RoomTypeInfo from "./RoomTypeInfo";
+import Spinner from "@/components/atoms/Spinner2";
 import { format } from "date-fns";
 import { useGetRoomTypesQuery } from "@api/hooks/hotel/useRoomType";
 import { useLazyGetRoomTypeAvailabilityRoomByIdQuery } from "@api/hooks/hotel/useRoomAvailability";
-import { useLazyGetRoomTypesByIdQuery } from "@api/hooks/hotel/useRoomType";
 import { useState } from "react";
 
-type TSelectRoom = {
-    key: string;
-    roomTypeId: string;
-    RoomIndex: number;
-    rooms: IRoomResponse[];
-    roomTypeInfo: IRoomTypeResponse | null;
-    selectedRoomNumber: string[];
+interface IRoomTypeWithAv extends IRoomTypeResponse {
     notAvailableRooms: number[];
-};
+    selectedRoomNumberId: string[];
+}
 
-const RoomInformation = () => {
-    const [fetchRoomTypeInfoById] = useLazyGetRoomTypesByIdQuery();
+interface IFormInput {
+    name: string;
+    email: string;
+    mobileNumber: string;
+}
+
+interface IBookingInformation extends IRoomTypeResponse {
+    roomNumberId: string;
+    roomNumber: string;
+}
+
+interface IProps {
+    selectedCustomer: ICustomerResponse | undefined;
+    newCustomerName: string;
+    newCustomerMobileNumber: string;
+    handleSubmitCustomerForm: UseFormHandleSubmit<IFormInput, IFormInput>;
+    customerError: FieldErrors<IFormInput>;
+}
+
+const RoomInformation = ({
+    handleSubmitCustomerForm,
+    customerError,
+
+    selectedCustomer,
+    newCustomerMobileNumber,
+    newCustomerName,
+}: IProps) => {
     const [fetchRoomTypeAvailabilityRoomById] =
         useLazyGetRoomTypeAvailabilityRoomByIdQuery();
 
+    const [isCheckingAv, setIsCheckingAv] = useState(false);
+
+    const [bookingInformationState, setBookingInformationState] = useState<
+        IBookingInformation[] | []
+    >([]);
     const [openRoomTypeInfoModal, setOpenRoomTypeInfoModal] = useState(false);
     const [selectedRoomTypeInfo, setSelectedRoomTypeInfo] = useState<
         IRoomTypeResponse | undefined
     >();
 
-    const [selectedRoomList, setSelectedRoomList] = useState<TSelectRoom[]>([]);
+    const [selectedRoomTypeListState, setSelectedRoomTypeListState] = useState<
+        IRoomTypeWithAv[] | undefined
+    >([]);
 
     const [checkInDateState, setCheckInDateState] = useState<
         Date[] | undefined
@@ -59,250 +91,219 @@ const RoomInformation = () => {
         setOpenRoomTypeInfoModal(true);
     };
 
-    const handleAddRoomType = () => {
-        const temKey = (Math.random() * 10000).toFixed(0);
-        const payload: TSelectRoom = {
-            key: temKey,
-            roomTypeId: "",
-            RoomIndex: selectedRoomList.length + 1,
-            rooms: [],
-            roomTypeInfo: null,
-            selectedRoomNumber: [],
-            notAvailableRooms: [],
-        };
-
-        setSelectedRoomList([...selectedRoomList, payload]);
-    };
-
-    const handleSelectRoomType = async (
-        roomTypeId: string,
-        selectedKey: string
-    ) => {
-        const response = await fetchRoomTypeInfoById({
-            roomTypesId: Number(roomTypeId),
-        }).unwrap();
-
-        console.log({
-            checkInDateState,
-            checkOutDateState,
-        });
+    const handleCheckAvailability = async () => {
+        setIsCheckingAv(true);
+        const roomIds = roomList?.data?.result?.map((items) =>
+            Number(items.id)
+        );
 
         if (checkInDateState === undefined || checkOutDateState === undefined) {
             return;
         }
 
+        if (!roomIds?.length) {
+            return;
+        }
         const notAvailableRoomsResponse =
             await fetchRoomTypeAvailabilityRoomById({
-                payloadId: Number(roomTypeId),
+                roomTypeId: roomIds,
                 checkInDate: format(checkInDateState[0], "yyyy-MM-dd"),
                 checkOutDate: format(checkOutDateState[0], "yyyy-MM-dd"),
             }).unwrap();
 
-        console.log({
-            response,
-        });
+        //
 
-        console.log({
-            notAvailableRoomsResponse,
-        });
+        const roomTypeIds = roomList?.data?.result?.map((items) => {
+            let notAvailableRoomIds: number[] = [];
 
-        let updatedSelectedRooms = selectedRoomList;
-        const ifRoomTypeIndexPresent = selectedRoomList.findIndex(
-            (item) => item.key === selectedKey
-        );
-
-        const roomType = selectedRoomList.find(
-            (item) => item.key === selectedKey
-        );
-
-        if (ifRoomTypeIndexPresent !== -1 && roomType) {
-            const temp: TSelectRoom = {
-                key: roomType.key,
-                roomTypeId: String(response?.data?.id),
-                rooms: response?.data?.rooms,
-                roomTypeInfo: response?.data,
-                RoomIndex: roomType.RoomIndex,
-                selectedRoomNumber: [],
-                notAvailableRooms: notAvailableRoomsResponse?.data?.roomIdList,
-            };
-            // replace the old with new
-            updatedSelectedRooms = [
-                ...selectedRoomList.slice(0, ifRoomTypeIndexPresent),
-                temp,
-                ...selectedRoomList.slice(ifRoomTypeIndexPresent + 1),
-            ];
-        }
-
-        setSelectedRoomList([...updatedSelectedRooms]);
-    };
-
-    const handleSelectRoomNumber = async (
-        roomId: string,
-        selectedKey: string
-    ) => {
-        let updatedSelectedRooms = selectedRoomList;
-        const ifRoomTypeIndexPresent = selectedRoomList.findIndex(
-            (item) => item.key === selectedKey
-        );
-
-        const roomType = selectedRoomList.find(
-            (item) => item.key === selectedKey
-        );
-
-        if (ifRoomTypeIndexPresent !== -1 && roomType) {
-            const ifRoomTypePresent = roomType?.selectedRoomNumber.findIndex(
-                (item) => item === roomId
+            const notAvailable = notAvailableRoomsResponse?.data.find(
+                (item) => item.roomTypeId === items.id
             );
 
-            const currentRoomNumber = roomType?.selectedRoomNumber;
-
-            if (ifRoomTypePresent !== -1) {
-                currentRoomNumber.splice(ifRoomTypePresent, 1);
-            } else {
-                currentRoomNumber.push(roomId);
+            if (notAvailable?.roomIdList?.length) {
+                notAvailableRoomIds = notAvailable?.roomIdList;
             }
-
-            const temp: TSelectRoom = {
-                ...roomType,
-                selectedRoomNumber: [...currentRoomNumber],
+            return {
+                ...items,
+                notAvailableRooms: notAvailableRoomIds,
+                selectedRoomNumberId: [],
             };
-            updatedSelectedRooms = [
-                ...selectedRoomList.slice(0, ifRoomTypeIndexPresent),
-                temp,
-                ...selectedRoomList.slice(ifRoomTypeIndexPresent + 1),
-            ];
+        });
+
+        setSelectedRoomTypeListState(roomTypeIds);
+        setIsCheckingAv(false);
+    };
+
+    const handleSelectRoomNumber = (
+        roomTypeId: string,
+        roomNumberId: string,
+        roomNumber: string
+    ) => {
+        if (!selectedRoomTypeListState) {
+            return;
         }
 
-        setSelectedRoomList([...updatedSelectedRooms]);
+        const temp = selectedRoomTypeListState.map((item) => {
+            if (String(item.id) === roomTypeId) {
+                const ifRoomNumberAlreadyPresent =
+                    item.selectedRoomNumberId.find(
+                        (item2) => item2 === roomNumberId
+                    );
+
+                if (ifRoomNumberAlreadyPresent) {
+                    const tempBookingInfo = bookingInformationState.filter(
+                        (item2) => item2.roomNumberId !== roomNumberId
+                    );
+
+                    setBookingInformationState(tempBookingInfo);
+
+                    return {
+                        ...item,
+                        selectedRoomNumberId: item.selectedRoomNumberId.filter(
+                            (item2) => item2 !== roomNumberId
+                        ),
+                    };
+                } else {
+                    const tempBookingInfo = [
+                        ...bookingInformationState,
+                        {
+                            ...item,
+                            roomNumberId,
+                            roomNumber,
+                        },
+                    ];
+
+                    setBookingInformationState(tempBookingInfo);
+
+                    return {
+                        ...item,
+                        selectedRoomNumberId: [
+                            ...item.selectedRoomNumberId,
+                            roomNumberId,
+                        ],
+                    };
+                }
+            }
+            return item;
+        });
+
+        setSelectedRoomTypeListState(temp);
     };
 
     return (
         <div>
             <div className='rounded-lg border border-gray-200 p-5 lg:p-6 dark:border-gray-800'>
-                <div className='flex items-center justify-between mb-6'>
-                    <div>
-                        <h4 className='text-lg font-semibold text-gray-800 lg:mb-4 dark:text-white/90'>
-                            Room Information
-                        </h4>
-                        <div className='flex gap-6 '>
-                            <div>
-                                <DatePicker
-                                    label='Check-in Date'
-                                    id='date-picker-Check-in-date'
-                                    mode='single'
-                                    placeholder='Select check-in date'
-                                    onChange={(date) => {
-                                        setCheckInDateState(date);
-                                    }}
-                                    // defaultDate={new Date()}
-                                />
-                            </div>
-                            <div>
-                                <DatePicker
-                                    label='Check-out Date'
-                                    id='date-picker-Check-out-date'
-                                    mode='single'
-                                    placeholder='Select check-out date'
-                                    onChange={(date) => {
-                                        setCheckOutDateState(date);
-                                    }}
-                                    // defaultDate={new Date()}
-                                />
-                            </div>
-                            <Button
-                                disabled={
-                                    !checkInDateState || !checkOutDateState
-                                }
-                                onClick={handleAddRoomType}
-                                variant='primary'
-                                size='xs'
-                            >
-                                <PlusCircleIcon />
-                                Add Room Types
-                            </Button>
-                        </div>
-                    </div>
-                    <div>
-                        <p className='text-md font-semibold text-gray-800 lg:mb-2 dark:text-white/90'>
-                            Total Room Selected: {selectedRoomList.length}
-                        </p>
-                        <h3 className='text-md font-semibold text-gray-800 lg:mb-2 dark:text-white/90'>
-                            Total Price: {selectedRoomList.length}
-                        </h3>
-                    </div>
-                </div>
-
-                {selectedRoomList.map((item, index) => (
-                    <div key={item.key} className='flex gap-6 w-full mb-4'>
+                <div className=' flex items-center justify-between mb-6'>
+                    <h4 className='text-lg font-semibold text-gray-800 lg:mb-4 dark:text-white/90'>
+                        Room Information{" "}
+                        {isCheckingAv && (
+                            <span className='ml-2'>
+                                <Spinner />
+                            </span>
+                        )}
+                    </h4>
+                    <div className='flex gap-8  justify-end items-center '>
                         <div>
-                            <Badge
-                                badgeType='primary'
-                                title={String(index + 1)}
+                            <DatePicker
+                                label='Check-in Date'
+                                id='date-picker-Check-in-date'
+                                mode='single'
+                                placeholder='Select check-in date'
+                                onChange={(date) => {
+                                    setCheckInDateState(date);
+                                }}
+                                // defaultDate={new Date()}
+                            />
+                        </div>
+                        <div>
+                            <DatePicker
+                                label='Check-out Date'
+                                id='date-picker-Check-out-date'
+                                mode='single'
+                                placeholder='Select check-out date'
+                                onChange={(date) => {
+                                    setCheckOutDateState(date);
+                                }}
+                                // defaultDate={new Date()}
                             />
                         </div>
 
-                        <div className='rounded-lg border border-gray-200 p-4 lg:p-4 dark:border-gray-800 w-full'>
-                            <div className='grid grid-cols-8 gap-12 items-end'>
-                                <div className='sm:col-span-2  lg:col-span-2'>
-                                    <Label>
-                                        Room Type
-                                        <span className='text-error-500'>
-                                            *
-                                        </span>
-                                    </Label>
-                                    <select
-                                        value={item.roomTypeId}
-                                        onChange={(e) =>
-                                            handleSelectRoomType(
-                                                e.target.value,
-                                                item.key
-                                            )
-                                        }
-                                        className={`h-9 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-1.5 pr-11 text-sm shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800  `}
-                                    >
-                                        <option
-                                            value=''
-                                            disabled
-                                            className='text-gray-700 dark:bg-gray-900 dark:text-gray-400'
-                                        >
-                                            select room type
-                                        </option>
-                                        {roomList?.data?.result?.map((item) => {
-                                            return (
-                                                <option
-                                                    className='text-gray-700 dark:bg-gray-900 dark:text-gray-400'
-                                                    key={item.id}
-                                                    value={item.id}
-                                                >
-                                                    {item.name}
-                                                </option>
-                                            );
-                                        })}
-                                    </select>
+                        <Button
+                            disabled={!checkInDateState || !checkOutDateState}
+                            onClick={handleCheckAvailability}
+                            size='xs'
+                            variant='primary'
+                        >
+                            <Calendar className='h-4 w-4 text-white' />
+                            <span>Check Availability</span>
+                        </Button>
+                    </div>
+                </div>
+
+                <div className='grid grid-cols-2   gap-8'>
+                    <div className='col-span-1'>
+                        {selectedRoomTypeListState?.map((item, index) => (
+                            <div
+                                key={item.id}
+                                className='flex gap-6 w-full mb-4'
+                            >
+                                <div>
+                                    <Badge
+                                        badgeType='primary'
+                                        title={String(index + 1)}
+                                    />
                                 </div>
-                                <div className='sm:col-span-6  lg:col-span-3'>
-                                    <Label>
-                                        Available Rooms
-                                        <span className='text-error-500'>
-                                            *
-                                        </span>
-                                    </Label>
+
+                                <div className='rounded-lg border border-gray-200 p-4 lg:p-4 dark:border-gray-800 w-full'>
+                                    <div className='flex gap-2 items-center mb-2'>
+                                        <h4 className='text-lg font-semibold text-gray-800 lg:mb-2 dark:text-white/90'>
+                                            Room Type : {item.name}
+                                        </h4>
+                                        <button
+                                            className='mb-4'
+                                            onClick={() => {
+                                                if (item?.id) {
+                                                    handleOpenRoomInfoModal(
+                                                        item
+                                                    );
+                                                }
+                                            }}
+                                            title='Room Info'
+                                        >
+                                            <Info className='h-4 w-4 text-brand-500' />
+                                        </button>
+                                    </div>
                                     <div>
+                                        <h3 className='mb-2'>
+                                            Available Rooms
+                                        </h3>
                                         <ButtonGroup2
                                             selectedRoomNumberList={
-                                                item.selectedRoomNumber
+                                                item.selectedRoomNumberId
                                             }
                                             isBtnPresent={
                                                 item?.rooms?.length > 0
                                             }
-                                            handleClick={handleSelectRoomNumber}
                                             btnList={item?.rooms?.map(
                                                 (item2) => {
                                                     return {
                                                         btnText:
                                                             item2.roomNumber,
                                                         id: String(item2.id),
-                                                        key: item.key,
+                                                        roomNumber:
+                                                            item2.roomNumber,
+                                                        key: String(item.id),
+                                                        handleClick(
+                                                            roomTypeId,
+                                                            key,
+                                                            roomNumber
+                                                        ) {
+                                                            handleSelectRoomNumber(
+                                                                roomTypeId,
+                                                                key,
+                                                                roomNumber
+                                                            );
+                                                        },
                                                         disabled:
                                                             item?.notAvailableRooms?.includes(
                                                                 item2.id
@@ -318,42 +319,57 @@ const RoomInformation = () => {
                                         </ButtonGroup2>
                                     </div>
                                 </div>
-                                <div className='sm:col-span-8  lg:col-span-3 flex items-center justify-between gap-4'>
-                                    <Button
-                                        onClick={() => {
-                                            if (item?.roomTypeInfo) {
-                                                handleOpenRoomInfoModal(
-                                                    item?.roomTypeInfo
-                                                );
-                                            }
-                                        }}
-                                        size='xs'
-                                        disabled={!item.roomTypeId}
-                                        variant='outline'
-                                    >
-                                        <Info className='h-4 w-4 text-brand-500' />
-                                        <span>See room type info</span>
-                                    </Button>
-                                    <Button
-                                        disabled={!item.roomTypeId}
-                                        size='xs'
-                                        variant='primary'
-                                    >
-                                        <Calendar className='h-4 w-4 text-white' />
-                                        <span>Check Availability</span>
-                                    </Button>
-                                    <Button
-                                        size='xs'
-                                        className='bg-orange-400 hover:bg-orange-300! '
-                                    >
-                                        <X className='h-4 w-4 text-white' />
-                                        <span>Remove</span>
-                                    </Button>
-                                </div>
                             </div>
-                        </div>
+                        ))}
+                        {selectedRoomTypeListState?.length === 0 &&
+                            roomList?.data?.result?.map((item, index) => (
+                                <div
+                                    key={item.id}
+                                    className='flex gap-6 w-full mb-4'
+                                >
+                                    <div>
+                                        <Badge
+                                            badgeType='primary'
+                                            title={String(index + 1)}
+                                        />
+                                    </div>
+
+                                    <div className='rounded-lg border border-gray-200 p-4 lg:p-4 dark:border-gray-800 w-full'>
+                                        <div className='flex gap-2 items-center mb-2'>
+                                            <h4 className='text-lg font-semibold text-gray-800 lg:mb-2 dark:text-white/90'>
+                                                Room Type : {item.name}
+                                            </h4>
+                                            <button
+                                                className='mb-4'
+                                                onClick={() => {
+                                                    if (item?.id) {
+                                                        handleOpenRoomInfoModal(
+                                                            item
+                                                        );
+                                                    }
+                                                }}
+                                                title='Room Info'
+                                            >
+                                                <Info className='h-4 w-4 text-brand-500' />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
                     </div>
-                ))}
+                    <div className='col-span-1 rounded-lg border border-gray-200 p-4 lg:p-4 dark:border-gray-800 w-full'>
+                        <BookingInformation
+                            selectedCustomer={selectedCustomer}
+                            checkInDateState={checkInDateState}
+                            checkOutDateState={checkOutDateState}
+                            bookingInformation={bookingInformationState}
+                            newCustomerName={newCustomerName}
+                            newCustomerMobileNumber={newCustomerMobileNumber}
+                            customerError={customerError}
+                            handleSubmitCustomerForm={handleSubmitCustomerForm}
+                        />
+                    </div>
+                </div>
             </div>
             <Modal
                 onClose={handleCloseRoomInfoModal}

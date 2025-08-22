@@ -66,7 +66,7 @@ export class TaskService {
             sprintId,
         } = query;
 
-        const result = await this.taskRepository.find({
+        const [result, totalCount] = await this.taskRepository.findAndCount({
             skip: skip,
             take: take,
             order: {
@@ -85,23 +85,12 @@ export class TaskService {
             },
         });
 
-        const totalCount = await this.taskRepository.find({
-            where: {
-                ...(sprintId ? { sprint: { id: sprintId } } : {}),
-                ...(projectId ? { project: { id: projectId } } : {}),
-                ...(featureId ? { feature: { id: featureId } } : {}),
-                ...(keyword ? { taskNumber: ILike(`%${keyword}%`) } : {}),
-                ...(priority ? { priority: In(priority) } : {}),
-                ...(labels ? { taskLabel: In(labels) } : {}),
-                ...(assignedTo ? { assignedTo: In(assignedTo) } : {}),
-            },
-        });
         return {
             result,
             pagination: createPagination(
                 skip,
                 take,
-                totalCount.length,
+                totalCount,
                 isPaginationEnabled
             ),
         };

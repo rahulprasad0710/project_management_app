@@ -6,21 +6,20 @@ type TProps = {
         id: string;
         disabled?: boolean;
         key: string;
+        roomNumber: string;
+        handleClick?: (
+            roomTypeId: string,
+            key: string,
+            roomNumber: string
+        ) => void;
     }[];
     isBtnPresent: boolean;
     children: React.ReactNode;
-    handleClick?: (id: string, key: string) => void;
     selectedRoomNumberList: string[];
 };
 
 const ButtonGroup2 = (props: TProps) => {
-    const {
-        btnList,
-        isBtnPresent,
-        handleClick,
-        children,
-        selectedRoomNumberList,
-    } = props;
+    const { btnList, isBtnPresent, children, selectedRoomNumberList } = props;
 
     const classNameFirst =
         "inline-flex items-center gap-2 bg-transparent px-4 py-3 text-sm font-medium text-gray-800 ring-1 ring-inset ring-gray-300 transition first:rounded-l-lg last:rounded-r-lg hover:bg-gray-50 dark:bg-white/[0.03] dark:text-gray-200 dark:ring-gray-700 dark:hover:bg-white/[0.03]";
@@ -70,7 +69,13 @@ const ButtonGroup2 = (props: TProps) => {
                                 : ""
                         } `}
                         disabled={item.disabled}
-                        onClick={() => handleClick?.(item.id, item.key)}
+                        onClick={() =>
+                            item.handleClick?.(
+                                item.key,
+                                item.id,
+                                item.roomNumber
+                            )
+                        }
                     >
                         {item.btnText}
                     </button>

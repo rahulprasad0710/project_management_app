@@ -6,6 +6,7 @@ import { IActivePagination } from "../types/payload";
 import { ILike } from "typeorm";
 import createPagination from "../utils/createPagination";
 import dataSource from "../db/data-source";
+import { sanitizeDBResult } from "../utils/sanitizeDbResult";
 
 export interface ICustomerByAdmin {
     name: string;
@@ -61,24 +62,43 @@ export class CustomerService {
     async getAll(query: IActivePagination) {
         const { skip, take, isPaginationEnabled, keyword, isActive } = query;
 
+        console.log({
+            skip,
+            take,
+            isPaginationEnabled,
+            keyword,
+            isActive,
+        });
+
+        const whereCondition = keyword
+            ? [
+                  { name: ILike(`%${keyword}%`), isActive },
+                  { mobileNumber: ILike(`%${keyword}%`), isActive },
+                  { email: ILike(`%${keyword}%`), isActive },
+              ]
+            : { isActive };
+
         const [result, totalCount] = await this.customerRepository.findAndCount(
             {
-                skip: skip,
-                take: take,
-                order: {
-                    id: "DESC",
-                },
-                where: {
-                    ...(isActive ? { isActive: isActive } : {}),
-                    ...(keyword ? { name: ILike(`%${keyword}%`) } : {}),
-                    ...(keyword ? { mobileNumber: ILike(`%${keyword}%`) } : {}),
-                    ...(keyword ? { email: ILike(`%${keyword}%`) } : {}),
-                },
+                skip,
+                take,
+                order: { id: "DESC" },
+                where: whereCondition,
             }
         );
 
         return {
-            result,
+            result: sanitizeDBResult({
+                selectFields: [
+                    "id",
+                    "name",
+                    "email",
+                    "mobileNumber",
+                    "emailVerified",
+                    "isActive",
+                ],
+                result,
+            }),
             pagination: createPagination(
                 skip,
                 take,

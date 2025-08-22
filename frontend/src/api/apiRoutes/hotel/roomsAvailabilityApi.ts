@@ -15,7 +15,7 @@ type TApiConstant = {
 };
 
 const apiConstant: TApiConstant = {
-    route: "hotels/room-availability",
+    route: "hotels/availability",
     typeTag: "Rooms",
 };
 
@@ -31,15 +31,16 @@ export const roomsAvailabilityEndpoints = (
     >
 ) => ({
     getRoomTypeAvailabilityRoomById: build.query<
-        Response<IRoomAvailabilityResponse>,
-        { payloadId: number; checkInDate: string; checkOutDate: string }
+        Response<IRoomAvailabilityResponse[]>,
+        { roomTypeId: number[]; checkInDate: string; checkOutDate: string }
     >({
-        query: ({ payloadId, checkInDate, checkOutDate }) => ({
-            url: `${apiConstant.route}/${payloadId}`,
+        query: ({ roomTypeId, checkInDate, checkOutDate }) => ({
+            url: `${apiConstant.route}/room-types`,
             method: "GET",
             params: {
                 checkInDate,
                 checkOutDate,
+                roomTypeId,
             },
         }),
     }),
