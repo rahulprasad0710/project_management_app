@@ -74,3 +74,10 @@ export interface IActivePagination extends IPagination {
 export interface IRoomPagination extends IActivePagination {
     roomTypeId?: number[];
 }
+
+export interface IBookingPagination extends IPagination {
+    customerId: number | undefined;
+    bookingDate: Date | undefined;
+    dateStart: Date | undefined;
+    dateEnd: Date | undefined;
+}

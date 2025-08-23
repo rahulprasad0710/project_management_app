@@ -45,7 +45,6 @@ export const bookingEndpoints = (
             pageSize = 10,
             keyword,
             customerId,
-            dateProvided,
             dateStart,
             dateEnd,
         }) => ({
@@ -57,7 +56,6 @@ export const bookingEndpoints = (
                 pageSize,
                 keyword,
                 customerId,
-                dateProvided,
                 dateStart,
                 dateEnd,
             },
@@ -85,10 +83,13 @@ export const bookingEndpoints = (
     }),
 
     createBooking: build.mutation<Response<IBookingResponse>, IBookingPayload>({
-        query: (payload) => ({
+        query: ({ bookingIdemKey, ...payload }) => ({
             url: apiConstant.route,
             method: "POST",
             body: payload,
+            headers: {
+                bookingIdemKey: bookingIdemKey ?? crypto.randomUUID(),
+            },
         }),
         invalidatesTags: [{ type: "Booking", id: "LIST" }],
     }),

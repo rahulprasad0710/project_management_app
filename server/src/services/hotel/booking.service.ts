@@ -1,4 +1,8 @@
-import { IActivePagination, IRoomPagination } from "../../types/payload";
+import {
+    IActivePagination,
+    IBookingPagination,
+    IRoomPagination,
+} from "../../types/payload";
 import { ILike, In } from "typeorm";
 
 import AppError from "../../utils/AppError";
@@ -12,6 +16,7 @@ import { RedisService } from "./../config/redis.service";
 import { Room } from "../../db/entity/hotel/Room";
 import createPagination from "../../utils/createPagination";
 import dataSource from "../../db/data-source";
+import { sanitizeDBResult } from "../../utils/sanitizeDbResult";
 
 interface BookingFullPayload extends BookingPayload {
     bookingIdemKey: string | undefined;
@@ -160,19 +165,45 @@ export class BookingService {
         }
     }
 
-    async getAll(query: IActivePagination) {
-        const { skip, take, isPaginationEnabled, keyword, isActive } = query;
+    async getAll(query: IBookingPagination) {
+        const {
+            skip,
+            take,
+            isPaginationEnabled,
+            dateStart,
+            dateEnd,
+            customerId,
+            bookingDate,
+        } = query;
 
-        const result = await this.bookingRepository.find({
+        const [result, totalCount] = await this.bookingRepository.findAndCount({
             skip: skip,
             take: take,
             order: {
                 id: "DESC",
             },
+            relations: ["customer"],
+            where: {
+                ...(dateStart ? { checkInDate: dateStart } : {}),
+                ...(dateEnd ? { checkOutDate: dateEnd } : {}),
+                ...(customerId ? { customerId: customerId } : {}),
+                ...(bookingDate ? { bookingDate: bookingDate } : {}),
+            },
         });
-        const totalCount = await this.bookingRepository.count({});
         return {
-            result,
+            result: result.map((item) => {
+                return {
+                    ...item,
+                    customer: {
+                        id: item.customer.id,
+                        name: item.customer.name,
+                        email: item.customer.email,
+                        mobileNumber: item.customer.mobileNumber,
+                        associated_internal_company_id:
+                            item.customer.associated_internal_company_id,
+                    },
+                };
+            }),
             pagination: createPagination(
                 skip,
                 take,

@@ -10,6 +10,7 @@ import Badge from "@/components/ui/Badge";
 import BookingInformation from "./BookingInformation";
 import Button from "@/components/ui/button/Button";
 import ButtonGroup2 from "@/components/molecules/ButtonGroup2";
+import { C } from "node_modules/@fullcalendar/core/internal-common";
 import DatePicker from "@/components/ui/DatePicker";
 import { Modal } from "@/components/common/Modal";
 import RoomTypeInfo from "./RoomTypeInfo";
@@ -70,7 +71,7 @@ const RoomInformation = ({
 
     const [checkInDateState, setCheckInDateState] = useState<
         Date[] | undefined
-    >(undefined);
+    >([new Date()]);
     const [checkOutDateState, setCheckOutDateState] = useState<
         Date[] | undefined
     >(undefined);
@@ -194,14 +195,22 @@ const RoomInformation = ({
         <div>
             <div className='rounded-lg border border-gray-200 p-5 lg:p-6 dark:border-gray-800'>
                 <div className=' flex items-center justify-between mb-6'>
-                    <h4 className='text-lg font-semibold text-gray-800 lg:mb-4 dark:text-white/90'>
-                        Room Information{" "}
-                        {isCheckingAv && (
-                            <span className='ml-2'>
-                                <Spinner />
-                            </span>
+                    <div className='lg:mb-4'>
+                        <h4 className='text-lg font-semibold text-gray-800  dark:text-white/90'>
+                            Room Information{" "}
+                            {isCheckingAv && (
+                                <span className='ml-2'>
+                                    <Spinner />
+                                </span>
+                            )}
+                        </h4>
+                        {!checkOutDateState?.length && (
+                            <p className='text-sm text-red-300'>
+                                Select Check-in and Check-out date to see
+                                available rooms
+                            </p>
                         )}
-                    </h4>
+                    </div>
                     <div className='flex gap-8  justify-end items-center '>
                         <div>
                             <DatePicker
@@ -212,7 +221,14 @@ const RoomInformation = ({
                                 onChange={(date) => {
                                     setCheckInDateState(date);
                                 }}
-                                // defaultDate={new Date()}
+                                minDate={"today"}
+                                defaultDate={
+                                    checkInDateState &&
+                                    checkInDateState?.length > 0 &&
+                                    checkInDateState[0] !== undefined
+                                        ? checkInDateState[0]
+                                        : undefined
+                                }
                             />
                         </div>
                         <div>
@@ -221,6 +237,7 @@ const RoomInformation = ({
                                 id='date-picker-Check-out-date'
                                 mode='single'
                                 placeholder='Select check-out date'
+                                minDate={"today"}
                                 onChange={(date) => {
                                     setCheckOutDateState(date);
                                 }}

@@ -51,21 +51,35 @@ export interface IRoomAvailabilityResponse {
     roomTypeId: number;
 }
 
-export interface IBookingPayload {
-    checkInDate: Date;
-    checkOutDate: Date;
-    bookingDate: Date;
-    name: string;
-    email: string;
-    mobileNumber: string;
-    associated_internal_company_id: number;
-    roomNumberIds: number[];
-    isNewCustomer: boolean;
-}
+export type IBookingPayload =
+    | {
+          checkInDate: Date;
+          checkOutDate: Date;
+          bookingDate: Date;
+          associated_internal_company_id: number;
+          roomNumberIds: number[];
+          isNewCustomer: true;
+          // required if new customer
+          name: string;
+          email: string;
+          mobileNumber: string;
+          bookingIdemKey: string;
+      }
+    | {
+          checkInDate: Date;
+          checkOutDate: Date;
+          bookingDate: Date;
+          associated_internal_company_id: number;
+          roomNumberIds: number[];
+          isNewCustomer: false;
+          // required if existing customer
+          customerId: number;
+          bookingIdemKey: string;
+      };
 
-export interface IBookingUpdatePayload extends IBookingPayload {
-    id: number;
-}
+export type IBookingUpdatePayload =
+    | (Extract<IBookingPayload, { isNewCustomer: true }> & { id: number })
+    | (Extract<IBookingPayload, { isNewCustomer: false }> & { id: number });
 
 export interface IBookingPagination extends Pagination {
     dateStart?: Date;
@@ -81,6 +95,9 @@ export interface IBookingResponse {
     totalPrice: string;
     status: string;
     payment_status: string;
+    customer: Partial<ICustomerResponse>;
+    hotelId: number;
+    customerId: number;
 }
 
 export interface ICustomerResponse {

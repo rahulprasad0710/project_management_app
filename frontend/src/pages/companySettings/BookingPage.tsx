@@ -10,6 +10,7 @@ import { PlusIcon } from "lucide-react";
 import ReactTable from "@/components/common/ReactTable";
 import { SquarePen } from "lucide-react";
 import { createColumnHelper } from "@tanstack/react-table";
+import { format } from "date-fns";
 import { useLazyGetAllCustomerQuery } from "@apiHooks/useCustomer";
 import { useLazyGetBookingQuery } from "@api/hooks/hotel/useBooking";
 
@@ -39,7 +40,7 @@ const BookingPage = () => {
             isPaginationEnabled: true,
             page: 1,
             pageSize: 10,
-            customerId: selectedCustomer?.id,
+            customerId: undefined,
         });
     }, []);
 
@@ -48,7 +49,8 @@ const BookingPage = () => {
             isPaginationEnabled: true,
             page: 1,
             pageSize: 10,
-
+            dateStart: checkInDateState?.[0],
+            dateEnd: checkOutDateState?.[0],
             customerId: selectedCustomer?.id,
         });
     };
@@ -88,18 +90,46 @@ const BookingPage = () => {
     const columnHelper = createColumnHelper<IBookingResponse>();
 
     const columns = [
-        columnHelper.accessor((row) => row.totalPrice, {
+        columnHelper.accessor((row) => row.customer, {
             id: "name",
             cell: (info) => (
                 <div className='font-semibold text-gray-700 dark:text-slate-100'>
-                    {info.renderValue()}
+                    {info.renderValue()?.name}
                 </div>
             ),
-            header: () => <div>Name</div>,
+            header: () => <div>Customer's Name</div>,
+        }),
+        columnHelper.accessor((row) => row.customer, {
+            id: "mobileNumber",
+            cell: (info) => (
+                <div className='font-semibold text-gray-700 dark:text-slate-100'>
+                    {info.renderValue()?.mobileNumber}
+                </div>
+            ),
+            header: () => <div>Mobile Number</div>,
         }),
 
-        columnHelper.accessor((row) => row.payment_status, {
-            id: "is_active",
+        columnHelper.accessor((row) => row.checkInDate, {
+            id: "checkInDate",
+            cell: (info) => (
+                <div className='font-semibold text-gray-700 dark:text-slate-100'>
+                    {format(info.renderValue() ?? new Date(), "dd-MM-yyyy")}
+                </div>
+            ),
+            header: () => <div>Check-in Date</div>,
+        }),
+        columnHelper.accessor((row) => row.checkOutDate, {
+            id: "checkOutDate",
+            cell: (info) => (
+                <div className='font-semibold text-gray-700 dark:text-slate-100'>
+                    {format(info.renderValue() ?? new Date(), "dd-MM-yyyy")}
+                </div>
+            ),
+            header: () => <div>Check-out Date</div>,
+        }),
+
+        columnHelper.accessor((row) => row.status, {
+            id: "status",
             cell: (info) => (
                 <div
                     style={{
@@ -117,14 +147,14 @@ const BookingPage = () => {
             header: () => <div>Status</div>,
         }),
 
-        columnHelper.accessor((row) => row.payment_status, {
-            id: "roomPrice",
+        columnHelper.accessor((row) => row.totalPrice, {
+            id: "totalPrice",
             cell: (info) => (
                 <div className='font-semibold text-gray-700 dark:text-slate-100'>
                     {info.renderValue()}
                 </div>
             ),
-            header: () => <div>Room price</div>,
+            header: () => <div>Total Price</div>,
         }),
 
         columnHelper.accessor((row) => row.id, {
@@ -138,6 +168,16 @@ const BookingPage = () => {
                     >
                         <SquarePen className='h-5 w-5 text-blue-400' />
                         <span>Edit</span>
+                    </Button>
+                    <Button
+                        size='sm'
+                        variant='primary'
+                        onClick={() => handleEdit(info.row.original)}
+                    >
+                        <SquarePen className='h-5 w-5 text-white dark:text-slate-700' />
+                        <span className='text-white dark:text-slate-700'>
+                            Invoice
+                        </span>
                     </Button>
                 </div>
             ),

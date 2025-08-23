@@ -1,10 +1,17 @@
 import type { FieldErrors, UseFormHandleSubmit } from "react-hook-form";
-import type { ICustomerResponse, IRoomTypeResponse } from "@/types/hotel.type";
+import type {
+    IBookingPayload,
+    ICustomerResponse,
+    IRoomTypeResponse,
+} from "@/types/hotel.type";
+import { useEffect, useMemo, useState } from "react";
 
 import Button from "@/components/ui/button/Button";
 import ReactTable from "@/components/common/ReactTable";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useMemo } from "react";
+import { getCustomerError } from "@/utils/customError";
+import { toast } from "react-toastify";
+import { useCreateBookingMutation } from "@apiHooks/hotel/useBooking";
 
 interface IBookingInformation extends IRoomTypeResponse {
     roomNumberId: string;
@@ -37,11 +44,26 @@ const BookingInformation = (props: IProps) => {
         newCustomerName,
         handleSubmitCustomerForm,
     } = props;
+    const [allowBookingBtn, setAllowBookingBtn] = useState<boolean>(false);
+    const [createBooking] = useCreateBookingMutation();
 
     console.log({
         checkInDateState,
         checkOutDateState,
     });
+
+    useEffect(() => {
+        if (
+            checkInDateState &&
+            checkInDateState?.length > 0 &&
+            checkInDateState[0] !== undefined &&
+            checkOutDateState &&
+            checkOutDateState?.length > 0 &&
+            checkOutDateState[0] !== undefined
+        ) {
+            setAllowBookingBtn(true);
+        }
+    }, [checkInDateState, checkOutDateState]);
 
     const columnHelper = createColumnHelper<IBookingInformation>();
 
@@ -109,12 +131,10 @@ const BookingInformation = (props: IProps) => {
         return new Promise<IFormInput>((resolve, reject) => {
             const customerFormHandler = handleSubmitCustomerForm(
                 (data) => {
-                    console.log("Form submitted with:", data);
-                    resolve(data); // <-- resolve with the form data
+                    resolve(data as IFormInput);
                 },
-                (errors) => {
-                    console.error("Form validation errors:", errors);
-                    reject(errors);
+                () => {
+                    reject(new Error("Invalid Form."));
                 }
             );
 
@@ -124,13 +144,53 @@ const BookingInformation = (props: IProps) => {
 
     const handleSubmitToBackend = async () => {
         try {
-            const customerPayload = await handleGetCustomerPayload();
-            console.log(
-                "LOG: ~ handleSubmitToBackend ~ customerPayload:",
-                customerPayload
+            const roomNumberIds = bookingInformation.map((room) =>
+                Number(room.roomNumberId)
             );
+
+            if (roomNumberIds?.length === 0) {
+                toast.error("Please select at least one room.");
+                return;
+            }
+            let payload: IBookingPayload;
+            if (selectedCustomer) {
+                payload = {
+                    checkInDate: checkInDateState?.[0] ?? new Date(),
+                    checkOutDate: checkOutDateState?.[0] ?? new Date(),
+                    bookingDate: new Date(),
+                    associated_internal_company_id: 4,
+                    roomNumberIds: roomNumberIds,
+                    isNewCustomer: false,
+                    customerId: selectedCustomer.id,
+                    bookingIdemKey: crypto.randomUUID(),
+                };
+            } else {
+                const customerPayload = await handleGetCustomerPayload();
+
+                payload = {
+                    isNewCustomer: true,
+                    checkInDate: checkInDateState?.[0] ?? new Date(),
+                    checkOutDate: checkOutDateState?.[0] ?? new Date(),
+                    bookingDate: new Date(),
+                    name: customerPayload.name,
+                    email: customerPayload.email,
+                    mobileNumber: customerPayload.mobileNumber,
+                    associated_internal_company_id: 4,
+                    roomNumberIds: roomNumberIds,
+                    bookingIdemKey: crypto.randomUUID(),
+                };
+            }
+
+            const response = await createBooking(payload).unwrap();
+            console.log("response", response);
         } catch (error) {
             console.log(error);
+            if (error instanceof Error && error.message === "Invalid Form.") {
+                toast.error(error.message);
+            } else {
+                const err = getCustomerError(error);
+                toast.error(err?.message ?? "Something went wrong.");
+            }
         }
     };
 
@@ -263,6 +323,8 @@ const BookingInformation = (props: IProps) => {
                     <Button
                         variant='primary'
                         size='md'
+                        title={!allowBookingBtn ? "Select Dates" : ""}
+                        disabled={!allowBookingBtn}
                         onClick={() => {
                             handleSubmitToBackend();
                         }}

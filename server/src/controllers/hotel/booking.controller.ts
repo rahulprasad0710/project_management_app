@@ -30,15 +30,22 @@ export class BookingController {
     }
 
     async getAll(req: Request, res: Response) {
-        const { isActive } = req.query;
+        const { dateStart, dateEnd, customerId, bookingDate } = req.query;
         const { skip, take, keyword, isPaginationEnabled }: IPagination =
             req.pagination;
         const result = await bookingService.getAll({
-            isActive: isActive === "true",
             isPaginationEnabled,
             keyword,
             skip,
             take,
+            dateStart: dateStart ? new Date(dateStart as string) : undefined,
+            dateEnd: dateEnd ? new Date(dateEnd as string) : undefined,
+            bookingDate: bookingDate
+                ? new Date(bookingDate as string)
+                : undefined,
+            customerId: req.query.customerId
+                ? Number(req.query.customerId)
+                : undefined,
         });
 
         res.status(200).json({
