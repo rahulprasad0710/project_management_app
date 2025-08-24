@@ -18,7 +18,9 @@ const emailService = new EmailService();
 // 1. Email subscriber
 eventBus.on(BOOKING_EMAIL, async (booking: IBookingResponse) => {
     try {
-        const response = emailService.sendBookingConfirmationEmail(booking);
+        const response = await emailService.sendBookingConfirmationEmail(
+            booking
+        );
         console.log("LOG: ~ BOOKING_EMAIL response:", response);
         return response;
     } catch (err) {

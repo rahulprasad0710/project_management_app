@@ -26,6 +26,9 @@ export class EmailService {
     }
 
     async sendBookingConfirmationEmail(booking: IBookingResponse) {
+        console.log(
+            "LOG: ~ EmailService ~ sendBookingConfirmationEmail ~ sendBookingConfirmationEmail:"
+        );
         const customer = booking.customer;
 
         const roomsList = booking.bookedRoomResult
@@ -94,7 +97,11 @@ export class EmailService {
                 `,
         };
 
-        await addEmailToQueue(emailObj);
+        const addEmailToQueueResponse = await addEmailToQueue(emailObj);
+        console.log(
+            "LOG: ~ EmailService ~ sendBookingConfirmationEmail ~ addEmailToQueueResponse:",
+            addEmailToQueueResponse
+        );
         return booking.id;
     }
 }

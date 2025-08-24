@@ -35,7 +35,7 @@ export class BookingController {
 
         if (result) {
             // 3. Fire side-events independently
-            // eventBus.emit(BOOKING_EMAIL, result);
+            eventBus.emit(BOOKING_EMAIL, result);
             eventBus.emit(BOOKING_LOGS, result);
         }
 

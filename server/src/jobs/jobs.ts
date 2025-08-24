@@ -6,10 +6,7 @@ async function startQueue() {
     // Process jobs from the queue
     const emailQueue = await getEmailQueue(); // ensure queue is ready
     emailQueue.process("email-queue", async (job) => {
-        console.log("Processing job:", job.data);
-
         const emailTemplate: TEmail = job.data;
-        console.log("LOG: ~ startQueue ~ emailTemplate:", emailTemplate);
 
         const response = await sendEmail(emailTemplate);
         return response;
