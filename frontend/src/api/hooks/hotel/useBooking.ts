@@ -5,6 +5,7 @@ const {
     useLazyGetBookingQuery,
     useCreateBookingMutation,
     useUpdateBookingMutation,
+    useLazyGetBookingByIdQuery,
 } = api;
 
 export {
@@ -12,6 +13,7 @@ export {
     useLazyGetBookingQuery,
     useCreateBookingMutation,
     useUpdateBookingMutation,
+    useLazyGetBookingByIdQuery,
 };
 
 export * from "./useBooking";

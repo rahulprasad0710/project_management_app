@@ -13,8 +13,10 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { useLazyGetAllCustomerQuery } from "@apiHooks/useCustomer";
 import { useLazyGetBookingQuery } from "@api/hooks/hotel/useBooking";
+import { useNavigate } from "react-router-dom";
 
 const BookingPage = () => {
+    const navigate = useNavigate();
     const [selectedData, setSelectedData] = useState<
         undefined | IBookingResponse
     >();
@@ -85,6 +87,11 @@ const BookingPage = () => {
 
     const handleEdit = (data: IBookingResponse) => {
         setSelectedData(data);
+    };
+
+    const handleNavigate = (data: IBookingResponse) => {
+        console.log("LOG: ~ handleNavigate ~ data:", data);
+        navigate(`/admin/features/booking/details/${data.id}`);
     };
 
     const columnHelper = createColumnHelper<IBookingResponse>();
@@ -172,7 +179,7 @@ const BookingPage = () => {
                     <Button
                         size='sm'
                         variant='primary'
-                        onClick={() => handleEdit(info.row.original)}
+                        onClick={() => handleNavigate(info.row.original)}
                     >
                         <SquarePen className='h-5 w-5 text-white dark:text-slate-700' />
                         <span className='text-white dark:text-slate-700'>

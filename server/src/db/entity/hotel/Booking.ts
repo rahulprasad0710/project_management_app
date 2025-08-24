@@ -16,6 +16,9 @@ export class Booking {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Column({ nullable: true })
+    userBookingId: string;
+
     @Column()
     checkInDate: Date;
 
@@ -33,6 +36,15 @@ export class Booking {
 
     @Column()
     bookingDate: Date;
+
+    // @Column()
+    // booking_customer_name: string;
+
+    // @Column()
+    // booking_customer_email: string;
+
+    // @Column()
+    // booking_customer_email_mobile: string;
 
     @Column()
     customerId: number;

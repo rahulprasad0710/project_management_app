@@ -1,7 +1,10 @@
+import { BOOKING_EMAIL, BOOKING_LOGS } from "../../events/bookingEvents";
 import { Request, Response } from "express";
 
 import { BookingService } from "../../services/hotel/booking.service";
+import { IBookingResponse } from "../../types/payload";
 import { IPagination } from "../../types/express";
+import { eventBus } from "../../events/eventBus";
 
 const bookingService = new BookingService();
 
@@ -9,7 +12,7 @@ export class BookingController {
     async create(req: Request, res: Response) {
         const bookingIdemKey = req.get("bookingIdemKey");
 
-        const result = await bookingService.create({
+        const result: IBookingResponse = await bookingService.create({
             checkInDate: req.body.checkInDate,
             checkOutDate: req.body.checkInDate,
             bookingDate: req.body.bookingDate,
@@ -21,7 +24,17 @@ export class BookingController {
             roomNumberIds: req.body.roomNumberIds,
             isNewCustomer: req.body.isNewCustomer,
             bookingIdemKey,
+            feature_id: req.body.feature_id,
         });
+
+        // 2. Fire side-events
+
+        if (result?.id) {
+            // 3. Fire side-events independently
+            eventBus.emit(BOOKING_EMAIL, result);
+            eventBus.emit(BOOKING_LOGS, result);
+        }
+
         res.status(200).json({
             success: true,
             data: result,

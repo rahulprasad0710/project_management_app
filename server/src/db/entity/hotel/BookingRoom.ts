@@ -14,6 +14,9 @@ export class BookingRoom {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Column({ nullable: true })
+    userBookingRoomId: string;
+
     @Column()
     bookingId: number;
 

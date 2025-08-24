@@ -1,3 +1,8 @@
+import {
+    BookingLogs,
+    BookingServiceFailures,
+} from "./entity/hotel/BookingServiceFailure";
+
 import { Activity } from "./entity/activity";
 import { AdminAudit } from "./entity/AdminAudit";
 import { BaseEntityWithAudit } from "./entity/Audit";
@@ -59,4 +64,6 @@ export default [
     BookingRoom,
     Room,
     RoomType,
+    BookingServiceFailures,
+    BookingLogs,
 ];

@@ -89,6 +89,7 @@ export interface IBookingPagination extends Pagination {
 
 export interface IBookingResponse {
     id: number;
+    bookingId: string;
     checkInDate: Date;
     checkOutDate: Date;
     bookingDate: Date;

@@ -1,5 +1,7 @@
 import { Priority, ProjectStatus, TaskStatusEnum } from "../enums/Priority";
 
+import { Booking } from "../db/entity/hotel/Booking";
+import { BookingRoom } from "../db/entity/hotel/BookingRoom";
 import { Feature } from "../db/entity/Feature";
 import { IPagination } from "./express";
 import { Label } from "../db/entity/taskLabel";
@@ -40,6 +42,9 @@ export interface ITask {
     sprint: Sprint;
 }
 
+export interface IBookingResponse extends Booking {
+    bookedRoomResult: BookingRoom[];
+}
 export interface IUpdateTaskPayload extends ITask {
     updatedTaskUploads: string[];
 }

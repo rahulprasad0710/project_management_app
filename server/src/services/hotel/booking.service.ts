@@ -1,13 +1,18 @@
 import {
-    IActivePagination,
-    IBookingPagination,
-    IRoomPagination,
-} from "../../types/payload";
-import { ILike, In } from "typeorm";
+    BookingFullPayload,
+    BookingPayload,
+    IBookingLogPayload,
+    IBookingServiceFailuresPayload,
+} from "../../types/Booking";
+import {
+    BookingLogs,
+    BookingServiceFailures,
+} from "../../db/entity/hotel/BookingServiceFailure";
+import { IBookingPagination, IBookingResponse } from "../../types/payload";
 
 import AppError from "../../utils/AppError";
 import { Booking } from "../../db/entity/hotel/Booking";
-import { BookingRoom } from "../../db/entity/hotel/BookingRoom";
+import { BookingRoom } from "./../../db/entity/hotel/BookingRoom";
 import { CredentialType } from "../../enums/CredentialType";
 import { Customer } from "../../db/entity/Customer";
 import { ErrorType } from "../../enums/Eums";
@@ -16,27 +21,21 @@ import { RedisService } from "./../config/redis.service";
 import { Room } from "../../db/entity/hotel/Room";
 import createPagination from "../../utils/createPagination";
 import dataSource from "../../db/data-source";
-import { sanitizeDBResult } from "../../utils/sanitizeDbResult";
-
-interface BookingFullPayload extends BookingPayload {
-    bookingIdemKey: string | undefined;
-}
-
-interface BookingPayload {
-    checkInDate: Date;
-    checkOutDate: Date;
-    bookingDate: Date;
-    name: string;
-    email: string;
-    mobileNumber: string;
-    associated_internal_company_id: number;
-    roomNumberIds: number[];
-    isNewCustomer: boolean;
-}
+import { sanitizeCustomerResult } from "../../utils/sanitizeCustomer";
 
 export class BookingService {
     constructor(
-        private readonly bookingRepository = dataSource.getRepository(Booking)
+        private readonly bookingRepository = dataSource.getRepository(Booking),
+        private readonly bookingRoomRepository = dataSource.getRepository(
+            BookingRoom
+        ),
+        private readonly bookingServiceFailuresRepository = dataSource.getRepository(
+            BookingServiceFailures
+        ),
+
+        private readonly bookingLogsRepository = dataSource.getRepository(
+            BookingLogs
+        )
     ) {}
 
     async create(fullPayload: BookingFullPayload) {
@@ -119,8 +118,18 @@ export class BookingService {
                 );
             }
 
+            const totalBookingCount = await queryRunner.manager
+                .getRepository(Booking)
+                .count();
+
+            const userBookingNumber = String(totalBookingCount + 1).padStart(
+                4,
+                "0"
+            );
+
             const newBooking = queryRunner.manager.create(Booking, {
                 customer: newCustomerResult,
+                userBookingId: `BID-${userBookingNumber}`,
                 checkInDate: payload.checkInDate,
                 checkOutDate: payload.checkOutDate,
                 bookingDate: payload.bookingDate,
@@ -135,13 +144,22 @@ export class BookingService {
                 .save(newBooking);
 
             const bookedRoomResult = await Promise.all(
-                roomList.map(async (room) => {
+                roomList.map(async (room, index) => {
+                    const totalBookingRoomCount = await queryRunner.manager
+                        .getRepository(BookingRoom)
+                        .count();
+
+                    const userBookingRoomNumber = String(
+                        totalBookingRoomCount + index + 1
+                    ).padStart(4, "0");
+
                     const newBookingRoom = queryRunner.manager.create(
                         BookingRoom,
                         {
                             booking: newBookingResult,
                             room_status: "BOOKED",
                             room,
+                            userBookingRoomId: `BRID-${userBookingRoomNumber}`,
                         }
                     );
 
@@ -153,10 +171,12 @@ export class BookingService {
 
             await queryRunner.commitTransaction();
 
-            return {
+            const bookingResponse: IBookingResponse = {
                 ...newBookingResult,
                 bookedRoomResult,
             };
+
+            return bookingResponse;
         } catch (error) {
             await queryRunner.rollbackTransaction();
             throw error;
@@ -214,6 +234,68 @@ export class BookingService {
     }
 
     async getById(id: number) {
-        return await this.bookingRepository.findOneBy({ id });
+        const result = await this.bookingRepository.findOne({
+            where: { id: id },
+            relations: ["customer"],
+        });
+
+        if (!result) {
+            throw new AppError(
+                "Booking not found.",
+                404,
+                ErrorType.NOT_FOUND_ERROR
+            );
+        }
+
+        const bookingRoomResult = await this.bookingRoomRepository.find({
+            where: { bookingId: id },
+            relations: ["room"],
+        });
+
+        return {
+            ...result,
+            customer: sanitizeCustomerResult({ customer: result?.customer }),
+            bookingRooms: bookingRoomResult,
+        };
+    }
+
+    async createBookingServiceFailures({
+        bookingId,
+        serviceName,
+        error,
+        status,
+        retry,
+    }: IBookingServiceFailuresPayload) {
+        const payload = new BookingServiceFailures();
+        payload.booking_id = bookingId;
+        payload.service_name = serviceName;
+        payload.error_message = error;
+        payload.created_at = new Date();
+        payload.status = status;
+        payload.retries = retry;
+
+        const result = await this.bookingServiceFailuresRepository.save(
+            payload
+        );
+        return result;
+    }
+
+    async createBookingLog({
+        bookingId,
+        serviceName,
+        action,
+        details,
+    }: IBookingLogPayload) {
+        const payload = new BookingLogs();
+        payload.booking_id = bookingId;
+        payload.service_name = serviceName;
+        payload.action = action;
+        payload.details = details;
+        payload.log_time = new Date();
+
+        const result = await this.bookingServiceFailuresRepository.save(
+            payload
+        );
+        return result;
     }
 }

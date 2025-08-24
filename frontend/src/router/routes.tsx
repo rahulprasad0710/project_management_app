@@ -2,6 +2,8 @@ import { Outlet, createBrowserRouter } from "react-router-dom";
 
 import AddBookingPage from "@/pages/companySettings/AddBookingPage";
 import AppLayout from "@/layout/AppLayout";
+import BookingDetailsPage from "@/pages/features/BookingDetailsPage";
+import BookingInvoicePage from "@/pages/features/BookingInvoicePage";
 import BookingPage from "@/pages/companySettings/BookingPage";
 import Calendar from "@/pages/Calendar";
 import CustomerListPage from "@/pages/CustomerListPage";
@@ -74,6 +76,11 @@ const router = createBrowserRouter([
                     {
                         path: "tasks",
                         element: <TaskPage />,
+                    },
+
+                    {
+                        path: "details/:bookingId",
+                        element: <BookingDetailsPage />,
                     },
                     {
                         path: "listings",

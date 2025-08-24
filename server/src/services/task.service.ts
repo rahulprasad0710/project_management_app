@@ -1,7 +1,12 @@
+import {
+    IBookingResponse,
+    ITask,
+    ITaskPagination,
+    IUpdateTaskPayload,
+} from "../types/payload";
 import { ILike, In } from "typeorm";
-import { ITask, ITaskPagination, IUpdateTaskPayload } from "../types/payload";
+import { Priority, TaskStatusEnum } from "../enums/Priority";
 
-import { Priority } from "../enums/Priority";
 import { Task } from "../db/entity/task";
 import { TaskStatus } from "../db/entity/taskStatus";
 import { UploadFile } from "../db/entity/uploads";
@@ -50,6 +55,35 @@ export class TaskService {
         }
 
         return await this.taskRepository.save(taskObj);
+    }
+
+    async createTaskForBooking(booking: IBookingResponse) {
+        const payload = new Task();
+
+        payload.taskNumber = `JT-${booking.userBookingId}`;
+        payload.title = `New Booking ${booking.userBookingId}: ${booking.customer.name}`;
+        payload.description = `
+                                Booking ID: ${booking.userBookingId}
+                                Customer: ${booking.customer.name} (${
+            booking.customer.email
+        }, ${booking.customer.mobileNumber})
+                                Check-in: ${booking.checkInDate}
+                                Check-out: ${booking.checkOutDate}
+                                Total Price: $${booking.totalPrice}
+                                Payment: ${booking.payment_status}
+                                Rooms:
+                                ${booking.bookedRoomResult
+                                    .map(
+                                        (r) =>
+                                            `Room ${r.room.roomNumber} - ${
+                                                r.room.roomType.name
+                                            } [${r.room.roomType.facilities.join(
+                                                ", "
+                                            )}]`
+                                    )
+                                    .join("\n")} `;
+        payload.addedDate = new Date(booking.bookingDate);
+        payload.priority = Priority.MEDIUM;
     }
 
     async getAll(query: ITaskPagination) {
