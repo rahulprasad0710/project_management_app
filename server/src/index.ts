@@ -1,3 +1,5 @@
+import "./subscribers";
+
 //
 import { connectToDatabase } from "./db/data-source";
 import cors from "cors";
@@ -14,7 +16,7 @@ const app = express();
 const port = Number(process.env.PORT) || 3000;
 
 connectToDatabase();
-startJobs();
+// startJobs();
 
 app.use(express.json());
 app.use(

@@ -59,7 +59,7 @@ export class RedisConfig {
             console.warn("Redis connection ended.");
         });
 
-        await client.connect();
+        // await client.connect();
 
         // Optional: Log number of connected clients
         try {

@@ -27,11 +27,15 @@ export class BookingController {
             feature_id: req.body.feature_id,
         });
 
+        console.log({
+            result: result?.id,
+        });
+
         // 2. Fire side-events
 
-        if (result?.id) {
+        if (result) {
             // 3. Fire side-events independently
-            eventBus.emit(BOOKING_EMAIL, result);
+            // eventBus.emit(BOOKING_EMAIL, result);
             eventBus.emit(BOOKING_LOGS, result);
         }
 

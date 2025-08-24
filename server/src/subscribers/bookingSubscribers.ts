@@ -36,10 +36,24 @@ eventBus.on(BOOKING_EMAIL, async (booking: IBookingResponse) => {
 // 3. Booking logs subscriber
 eventBus.on(BOOKING_LOGS, async (booking: IBookingResponse) => {
     try {
+        console.log({
+            BOOKING_LOGS,
+        });
+
+        const { customer: _customer, hotel: _hotel, ...payload } = booking;
+
+        const logPayload = {
+            ...payload,
+            bookedRoomResult: payload?.bookedRoomResult?.map((item) => {
+                const { booking: _booking, ...rest } = item;
+                return rest;
+            }),
+        };
+
         const response = await bookingService.createBookingLog({
             bookingId: booking.id,
             action: ActionAction.CREATED,
-            details: JSON.stringify(booking),
+            details: JSON.stringify(logPayload),
             serviceName: BookingServiceEnum.BOOKING_CREATED,
         });
         console.log("LOG: ~ BOOKING_LOGS response:", response);

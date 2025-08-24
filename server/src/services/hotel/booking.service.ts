@@ -293,9 +293,7 @@ export class BookingService {
         payload.details = details;
         payload.log_time = new Date();
 
-        const result = await this.bookingServiceFailuresRepository.save(
-            payload
-        );
+        const result = await this.bookingLogsRepository.save(payload);
         return result;
     }
 }
