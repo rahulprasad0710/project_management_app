@@ -7,7 +7,6 @@ import {
     HorizontaLDots,
     ListIcon,
     PieChartIcon,
-    PlugInIcon,
     UserCircleIcon,
 } from "../icons";
 import {

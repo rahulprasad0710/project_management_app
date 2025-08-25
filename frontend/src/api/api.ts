@@ -14,6 +14,7 @@ import { bookingEndpoints } from "./apiRoutes/hotel/bookingApi";
 import { commentEndpoints } from "./apiRoutes/commentApi";
 import { customerEndpoints } from "./apiRoutes/customerApi";
 import { employeeEndpoints } from "./apiRoutes/employeeApi";
+import { getAuthToken } from "@/utils/apiFn";
 import { labelEndpoints } from "./apiRoutes/labelApi";
 import { projectEndpoints } from "./apiRoutes/projectApi";
 import { roleEndpoints } from "./apiRoutes/rolesApi";
@@ -26,12 +27,6 @@ import { taskStatusEndpoints } from "./apiRoutes/taskStatusApi";
 import { uploadsEndpoints } from "./apiRoutes/uploadApi";
 
 // /* REDUX API */
-
-async function getAuthToken(): Promise<{ accessToken: string }> {
-    // Example: get token from localStorage or cookies
-    const accessToken = localStorage.getItem("accessToken") || "";
-    return { accessToken };
-}
 
 export const api = createApi({
     baseQuery: fetchBaseQuery({
