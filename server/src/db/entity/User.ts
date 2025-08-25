@@ -45,9 +45,6 @@ export class User {
     @Column({ type: "varchar", default: "0000-00-00" })
     mobileNumber: string;
 
-    @OneToMany(() => Notification, (notification) => notification.recipient)
-    notifications: Notification[];
-
     @Column({ default: false })
     emailVerified: boolean;
 

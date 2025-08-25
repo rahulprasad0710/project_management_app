@@ -46,7 +46,4 @@ export class UserView {
 
     @ViewColumn()
     profilePictureUrl: string;
-
-    @OneToMany(() => Notification, (notification) => notification.recipient)
-    notifications: Notification[];
 }

@@ -2,29 +2,29 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    ManyToOne,
     PrimaryGeneratedColumn,
 } from "typeorm";
 
-import { User } from "./User";
-
-@Entity()
+@Entity("notifications")
 export class Notification {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
+    type: string;
+
+    @Column()
+    link: string;
+
+    @Column()
     message: string;
 
-    @Column({ default: false })
-    isRead: boolean;
+    @Column({ type: "json" })
+    payload: string;
 
     @CreateDateColumn()
     createdAt: Date;
 
-    @ManyToOne(() => User, (user) => user.notifications, { nullable: false })
-    recipient: User;
-
     @Column({ nullable: true })
-    redirectUrl: string;
+    html_template: string;
 }

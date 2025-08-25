@@ -30,6 +30,7 @@ import { Task } from "./entity/task";
 import { TaskStatus } from "./entity/taskStatus";
 import { UploadFile } from "./entity/uploads";
 import { User } from "./entity/User";
+import { UserNotification } from "./entity/UserNotification";
 // View Entity
 import { UserView } from "./view/UserView";
 
@@ -43,6 +44,7 @@ export default [
     Comment,
     Activity,
     Notification,
+    UserNotification,
     Department,
     Role,
     PermissionGroup,

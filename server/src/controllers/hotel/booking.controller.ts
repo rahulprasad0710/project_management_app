@@ -1,4 +1,8 @@
-import { BOOKING_EMAIL, BOOKING_LOGS } from "../../events/bookingEvents";
+import {
+    BOOKING_EMAIL,
+    BOOKING_LOGS,
+    BOOKING_NOTIFICATION,
+} from "../../events/bookingEvents";
 import { Request, Response } from "express";
 
 import { BookingService } from "../../services/hotel/booking.service";
@@ -37,6 +41,7 @@ export class BookingController {
             // 3. Fire side-events independently
             eventBus.emit(BOOKING_EMAIL, result);
             eventBus.emit(BOOKING_LOGS, result);
+            eventBus.emit(BOOKING_NOTIFICATION, { ...result, addedBy: 48 });
         }
 
         res.status(200).json({

@@ -42,6 +42,10 @@ export interface ITask {
     sprint: Sprint;
 }
 
+export interface IBookingResponseDetails extends IBookingResponse {
+    addedByEmployee: boolean;
+    addedBy: number;
+}
 export interface IBookingResponse extends Booking {
     bookedRoomResult: BookingRoom[];
 }
