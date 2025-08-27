@@ -1,12 +1,17 @@
 import { Customer } from "../db/entity/Customer";
+import { User } from "../db/entity/User";
 
-type TPayload = {
+type TCustomerPayload = {
     customer: Customer;
+};
+
+type TEmployeePayload = {
+    employee: User;
 };
 
 export const sanitizeCustomerResult = ({
     customer,
-}: TPayload): Partial<Customer> => {
+}: TCustomerPayload): Partial<Customer> => {
     const newItem: Partial<Customer> = {
         id: customer.id,
         name: customer.name,
@@ -14,6 +19,22 @@ export const sanitizeCustomerResult = ({
         mobileNumber: customer.mobileNumber,
         associated_internal_company_id: customer.associated_internal_company_id,
         profilePictureUrl: customer.profilePictureUrl,
+    };
+
+    return newItem;
+};
+
+export const sanitizeEmployeeResult = ({
+    employee,
+}: TEmployeePayload): Partial<User> => {
+    const newItem: Partial<User> = {
+        id: employee.id,
+        firstName: employee.firstName,
+        lastName: employee.lastName,
+        employeeId: employee.employeeId,
+        email: employee.email,
+        mobileNumber: employee.mobileNumber,
+        profilePictureUrl: employee.profilePictureUrl,
     };
 
     return newItem;

@@ -469,3 +469,28 @@ export interface ITaskStatusPayload {
 export interface ITaskStatusUpdatePayload extends ITaskStatusPayload {
     id: number;
 }
+
+export interface IFeatureResponse {
+    id: number;
+    name: string;
+    slug: string;
+    description: string;
+    profilePicture: string;
+    active: boolean;
+}
+
+export interface IFeatureDetailsResponse extends IFeatureResponse {
+    featureTeamMember: IEmployeeResponse[];
+    admin: IEmployeeResponse;
+}
+
+export interface IFeaturePayload {
+    name: string;
+    slug: string;
+    description: string;
+    profilePicture: string;
+}
+
+export interface IFeatureUpdatePayload extends IFeaturePayload {
+    id: number;
+}

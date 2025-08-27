@@ -24,10 +24,26 @@ eventBus.on(BOOKING_EMAIL, async (booking: IBookingResponse) => {
         const response = await emailService.sendBookingConfirmationEmail(
             booking
         );
-        console.log("LOG: ~ BOOKING_EMAIL response:", response);
+
+        const { customer: _customer, hotel: _hotel, ...payload } = booking;
+
+        const logPayload = {
+            ...payload,
+            bookedRoomResult: payload?.bookedRoomResult?.map((item) => {
+                const { booking: _booking, ...rest } = item;
+                return rest;
+            }),
+        };
+
+        await bookingService.createBookingLog({
+            bookingId: booking.id,
+            action: ActionAction.EMAIL_SENT,
+            details: JSON.stringify(logPayload),
+            serviceName: BookingServiceEnum.BOOKING_EMAIL,
+        });
+
         return response;
     } catch (err) {
-        console.log("LOG: ~ BOOKING_EMAIL err:", err);
         await bookingService.createBookingServiceFailures({
             bookingId: booking.id,
             error: JSON.stringify(err),
@@ -104,6 +120,23 @@ eventBus.on(BOOKING_NOTIFICATION, async (booking: IBookingResponseDetails) => {
             booking.addedBy,
             createNotificationResponse
         );
+
+        const { customer: _customer, hotel: _hotel, ...payload } = booking;
+
+        const logPayload = {
+            ...payload,
+            bookedRoomResult: payload?.bookedRoomResult?.map((item) => {
+                const { booking: _booking, ...rest } = item;
+                return rest;
+            }),
+        };
+
+        await bookingService.createBookingLog({
+            bookingId: booking.id,
+            action: ActionAction.NOTIFICATION_SENT,
+            details: JSON.stringify(logPayload),
+            serviceName: BookingServiceEnum.BOOKING_NOTIFICATION,
+        });
 
         return createNotificationResponse;
     } catch (err) {

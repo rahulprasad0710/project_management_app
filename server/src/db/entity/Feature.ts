@@ -25,6 +25,9 @@ export class Feature {
     @Column()
     slug: string;
 
+    @Column()
+    active: boolean;
+
     @Column({ nullable: true, default: null })
     profilePicture: string;
 
@@ -41,7 +44,7 @@ export class Feature {
 
     @ManyToMany(() => User, (user) => user.id, {
         cascade: true,
-        eager: true,
+        eager: false,
     })
     @JoinTable({
         name: "feature_team_member",

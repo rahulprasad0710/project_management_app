@@ -99,6 +99,14 @@ export interface IBookingResponse {
     customer: Partial<ICustomerResponse>;
     hotelId: number;
     customerId: number;
+    bookingRooms: IBookingRoomResponse[];
+}
+
+export interface IBookingRoomResponse {
+    id: number;
+    userBookingRoomId: string;
+    room_status: string;
+    room: IRoomResponse;
 }
 
 export interface ICustomerResponse {

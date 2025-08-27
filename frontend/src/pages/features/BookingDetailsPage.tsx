@@ -1,3 +1,8 @@
+import type { IBookingRoomResponse } from "@/types/hotel.type";
+import ReactTable from "@/components/common/ReactTable";
+import { createColumnHelper } from "@tanstack/react-table";
+import { current } from "@reduxjs/toolkit";
+import { format } from "date-fns";
 import { useEffect } from "react";
 import { useLazyGetBookingByIdQuery } from "@apiHooks/hotel/useBooking";
 import { useParams } from "react-router-dom";
@@ -17,6 +22,48 @@ const BookingDetailsPage = () => {
         });
     }, [bookingId]);
 
+    const columnHelper = createColumnHelper<IBookingRoomResponse>();
+
+    const columns = [
+        columnHelper.accessor((row) => row.userBookingRoomId, {
+            id: "userBookingRoomId",
+            cell: (info) => (
+                <div className='font-semibold text-gray-700 dark:text-slate-100'>
+                    {info.renderValue()}
+                </div>
+            ),
+            header: () => <div>Room Booking ID</div>,
+        }),
+        columnHelper.accessor((row) => row.room.roomNumber, {
+            id: "roomNumber",
+            cell: (info) => (
+                <div className='font-semibold text-gray-700 dark:text-slate-100'>
+                    {info.renderValue()}
+                </div>
+            ),
+            header: () => <div>Room Number</div>,
+        }),
+
+        columnHelper.accessor((row) => row.room.roomType.name, {
+            id: "name",
+            cell: (info) => (
+                <div className='font-semibold text-gray-700 dark:text-slate-100'>
+                    {info.renderValue()}
+                </div>
+            ),
+            header: () => <div>Room Type</div>,
+        }),
+        columnHelper.accessor((row) => row.room.roomType.roomPrice, {
+            id: "roomPrice",
+            cell: (info) => (
+                <div className='font-semibold text-gray-700 dark:text-slate-100'>
+                    {info.renderValue()}
+                </div>
+            ),
+            header: () => <div>Room Price</div>,
+        }),
+    ];
+
     return (
         <div>
             <div className='flex flex-col justify-between gap-6 rounded-2xl border border-gray-200 bg-white px-6 py-5 sm:flex-row sm:items-center dark:border-gray-800 dark:bg-white/3 mb-6'>
@@ -25,21 +72,19 @@ const BookingDetailsPage = () => {
                         <span className='text-base font-medium text-gray-700 dark:text-gray-400'>
                             Booking ID : #34834
                         </span>
-                        <span className='bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500 inline-flex items-center justify-center gap-1 rounded-full px-2.5 py-0.5 text-sm font-medium'>
-                            Completed
-                        </span>
                     </div>
                     <p className='text-sm text-gray-500 sm:pl-3 dark:text-gray-400'>
-                        Booking date:&nbsp;25 August 2025
+                        Booking date:&nbsp;{" "}
+                        {format(
+                            data?.data?.bookingDate ?? new Date(),
+                            "dd-MM-yyyy hh:mm a"
+                        )}
                     </p>
                 </div>
                 <div className='flex gap-3'>
-                    <button className='bg-brand-500 shadow-theme-xs hover:bg-brand-600 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-white transition'>
-                        View Invoice
-                    </button>
-                    <button className='shadow-theme-xs inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-3 text-sm font-medium text-gray-700 ring-1 ring-gray-300 transition hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:ring-gray-700 dark:hover:bg-white/[0.03]'>
-                        Refund
-                    </button>
+                    <span className='bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500 inline-flex items-center justify-center gap-1 rounded-full px-2.5 py-1 text-sm font-medium'>
+                        Completed
+                    </span>
                 </div>
             </div>
             <div className='grid grid-cols-1 gap-6 lg:grid-cols-12'>
@@ -48,15 +93,29 @@ const BookingDetailsPage = () => {
                         <h2 className='mb-5 text-lg font-semibold text-gray-800 dark:text-white/90'>
                             Booking Details
                         </h2>
-                        <div className='overflow-hidden rounded-2xl border border-gray-100 dark:border-gray-800'>
-                            <div className='custom-scrollbar overflow-x-auto'>
+                        <div className=' rounded-md border border-gray-100 dark:border-gray-800'>
+                            <div className=' overflow-x-auto'>
                                 {/* Table  */}
+                                <ReactTable
+                                    columns={columns}
+                                    data={data?.data?.bookingRooms ?? []}
+                                    isFetching={isFetching}
+                                    showPagination={false}
+                                    pagination={{
+                                        currentPage: 1,
+                                        pageSize: 10,
+                                        totalCount: 10,
+                                        totalPages: 1,
+                                    }}
+                                    handleNext={() => {}}
+                                    handlePrevious={() => {}}
+                                />
                             </div>
                         </div>
                         <div className='flex flex-wrap justify-between sm:justify-end'>
                             <div className='mt-6 w-full space-y-1 text-right sm:w-[220px]'>
                                 <p className='mb-4 text-left text-sm font-medium text-gray-800 dark:text-white/90'>
-                                    Order summary
+                                    Booking summary
                                 </p>
                                 <ul className='space-y-2'>
                                     <li className='flex justify-between gap-5'>
@@ -118,19 +177,19 @@ const BookingDetailsPage = () => {
                                     {data?.data?.customer?.mobileNumber}
                                 </span>
                             </li>
-                            <li className='flex items-start gap-5 py-2.5'>
+                            {/* <li className='flex items-start gap-5 py-2.5'>
                                 <span className='w-1/2 text-sm text-gray-500 sm:w-1/3 dark:text-gray-400'>
                                     Added By:
                                 </span>
                                 <span className='w-1/2 text-sm text-gray-700 sm:w-2/3 dark:text-gray-400'>
                                     {data?.data?.customer?.CredentialType}
                                 </span>
-                            </li>
+                            </li> */}
                         </ul>
                     </div>
                     <div className='rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/3'>
                         <h2 className='mb-5 text-lg font-semibold text-gray-800 dark:text-white/90'>
-                            Order History
+                            Booking History
                         </h2>
                         {/* Timeline item */}
                         <div className='relative pb-7 pl-11'>
@@ -161,21 +220,23 @@ const BookingDetailsPage = () => {
                                     />
                                 </svg>
                             </div>
-                            <div className='ml-4 flex justify-between'>
+                            <div className='ml-6 flex justify-between'>
                                 <div>
                                     <h4 className='font-medium text-gray-800 dark:text-white/90'>
-                                        Checkout Started
+                                        Check-in | check-out
                                     </h4>
-                                    <p className='text-sm text-gray-500 dark:text-gray-400'>
-                                        via tailadmin.com
-                                    </p>
-                                </div>
-                                <div>
-                                    <span className='text-xs text-gray-500 dark:text-gray-400'>
-                                        12:54
-                                    </span>
                                     <p className='text-xs text-gray-500 dark:text-gray-400'>
-                                        12th Apr 28
+                                        {format(
+                                            data?.data?.checkInDate ??
+                                                new Date(),
+                                            "dd-MM-yyyy"
+                                        )}{" "}
+                                        |{" "}
+                                        {format(
+                                            data?.data?.checkOutDate ??
+                                                new Date(),
+                                            "dd-MM-yyyy"
+                                        )}
                                     </p>
                                 </div>
                             </div>
@@ -204,21 +265,13 @@ const BookingDetailsPage = () => {
                                     />
                                 </svg>
                             </div>
-                            <div className='ml-4 flex justify-between'>
+                            <div className='ml-6 flex justify-between'>
                                 <div>
                                     <h4 className='font-medium text-gray-800 dark:text-white/90'>
-                                        Purchased
+                                        Payment Status
                                     </h4>
-                                    <p className='text-sm text-gray-500 dark:text-gray-400'>
-                                        for US$4,235 via PayPal
-                                    </p>
-                                </div>
-                                <div>
-                                    <span className='text-xs text-gray-500 dark:text-gray-400'>
-                                        12:58
-                                    </span>
                                     <p className='text-xs text-gray-500 dark:text-gray-400'>
-                                        12th Apr 28
+                                        {data?.data?.payment_status}
                                     </p>
                                 </div>
                             </div>
@@ -247,27 +300,23 @@ const BookingDetailsPage = () => {
                                     />
                                 </svg>
                             </div>
-                            <div className='ml-4 flex justify-between'>
+                            <div className='ml-6 flex justify-between'>
                                 <div>
                                     <h4 className='font-medium text-gray-800 dark:text-white/90'>
-                                        Receipt Email Sent
+                                        Email Sent To Customer
                                     </h4>
-                                    <p className='text-sm text-gray-500 dark:text-gray-400'>
-                                        Receipt #1734535
-                                    </p>
-                                </div>
-                                <div>
-                                    <span className='text-xs text-gray-500 dark:text-gray-400'>
-                                        12:58
-                                    </span>
                                     <p className='text-xs text-gray-500 dark:text-gray-400'>
-                                        12th Apr 28
+                                        {format(
+                                            data?.data?.bookingDate ??
+                                                new Date(),
+                                            "dd-MM-yyyy"
+                                        )}
                                     </p>
                                 </div>
                             </div>
                         </div>
                         {/* Action buttons */}
-                        <div className='mt-5 flex items-center justify-center gap-2'>
+                        {/* <div className='mt-5 flex items-center justify-center gap-2'>
                             <button className='shadow-theme-xs rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800'>
                                 Resend
                             </button>
@@ -277,7 +326,7 @@ const BookingDetailsPage = () => {
                             <button className='shadow-theme-xs rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800'>
                                 Preview
                             </button>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>

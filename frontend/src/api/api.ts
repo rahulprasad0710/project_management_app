@@ -14,6 +14,7 @@ import { bookingEndpoints } from "./apiRoutes/hotel/bookingApi";
 import { commentEndpoints } from "./apiRoutes/commentApi";
 import { customerEndpoints } from "./apiRoutes/customerApi";
 import { employeeEndpoints } from "./apiRoutes/employeeApi";
+import { featuresEndpoints } from "./apiRoutes/featureApi";
 import { getAuthToken } from "@/utils/apiFn";
 import { labelEndpoints } from "./apiRoutes/labelApi";
 import { projectEndpoints } from "./apiRoutes/projectApi";
@@ -144,6 +145,7 @@ export const api = createApi({
         ...customerEndpoints(build),
         ...roomsAvailabilityEndpoints(build),
         ...projectEndpoints(build),
+        ...featuresEndpoints(build),
     }),
 });
 

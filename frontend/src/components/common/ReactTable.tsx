@@ -13,8 +13,8 @@ type IProps<T> = {
     columns: ColumnDef<T, any>[];
     data: T[];
     showPagination?: boolean;
-    handlePrevious: () => void;
-    handleNext: () => void;
+    handlePrevious?: () => void;
+    handleNext?: () => void;
     isFetching: boolean;
     pagination: {
         currentPage: number;
@@ -27,9 +27,9 @@ type IProps<T> = {
 const ReactTable = <T extends object>({
     columns,
     data,
-    showPagination,
-    handlePrevious,
-    handleNext,
+    showPagination = true,
+    handlePrevious = () => {},
+    handleNext = () => {},
     isFetching,
     pagination,
 }: IProps<T>) => {
@@ -184,7 +184,7 @@ const ReactTable = <T extends object>({
                                     ? `${btnClass} cursor-not-allowed bg-neutral-100 text-neutral-500 opacity-60`
                                     : `${btnClass} cursor-pointer`
                             }
-                            onClick={() => handleNext()}
+                            onClick={() => handleNext?.()}
                         >
                             <span>Next</span>
                             <ChevronRight className='h-5 w-5' />

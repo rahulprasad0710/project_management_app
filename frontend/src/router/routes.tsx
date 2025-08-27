@@ -3,7 +3,6 @@ import { Outlet, createBrowserRouter } from "react-router-dom";
 import AddBookingPage from "@/pages/companySettings/AddBookingPage";
 import AppLayout from "@/layout/AppLayout";
 import BookingDetailsPage from "@/pages/features/BookingDetailsPage";
-import BookingInvoicePage from "@/pages/features/BookingInvoicePage";
 import BookingPage from "@/pages/companySettings/BookingPage";
 import Calendar from "@/pages/Calendar";
 import CustomerListPage from "@/pages/CustomerListPage";
@@ -11,6 +10,7 @@ import Dashboard from "@/pages/Dashboard";
 import EmailVerify from "@/pages/AuthPages/ EmailVerify";
 import Employee from "@/pages/AdminSettings/Employee";
 import FeatureLayout from "@/layout/FeatureLayout";
+import FeaturePage from "@/pages/AdminSettings/FeaturePage";
 import HomePage from "@/pages/HomePage";
 import LabelPage from "@/pages/settings/LabelPage";
 import NotFound from "@/pages/NotFound";
@@ -139,6 +139,10 @@ const router = createBrowserRouter([
                     {
                         path: "roles",
                         element: <Roles />,
+                    },
+                    {
+                        path: "features",
+                        element: <FeaturePage />,
                     },
                 ],
             },

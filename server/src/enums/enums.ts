@@ -6,4 +6,6 @@ export enum ActionAction {
     COMMENTED = "COMMENTED",
     DELETED = "DELETED",
     EDITED = "EDITED",
+    EMAIL_SENT = "EMAIL_SENT",
+    NOTIFICATION_SENT = "NOTIFICATION_SENT",
 }
