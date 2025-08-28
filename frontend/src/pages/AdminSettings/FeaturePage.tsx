@@ -1,4 +1,8 @@
-import type { IEmployeeResponse, IFeatureResponse } from "@/types/config.types";
+import type {
+    IEmployeeResponse,
+    IFeatureDetailsResponse,
+    IFeatureResponse,
+} from "@/types/config.types";
 import { useEffect, useState } from "react";
 import {
     useGetFeaturesQuery,
@@ -7,7 +11,8 @@ import {
 
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/button/Button";
-import { PlusIcon } from "@/icons";
+import FeatureModal from "@/modal/FeatureModal";
+import { Modal } from "@/components/common/Modal";
 import ReactTable from "@/components/common/ReactTable";
 import { createColumnHelper } from "@tanstack/react-table";
 
@@ -17,7 +22,7 @@ interface IEmployeeResponseTable extends IEmployeeResponse {
 
 const FeaturePage = () => {
     const [tableData, setTableData] = useState<IEmployeeResponseTable[]>([]);
-
+    const [selectedData, setSelectedData] = useState<IFeatureDetailsResponse>();
     const { data: roleList } = useGetFeaturesQuery({
         isPaginationEnabled: true,
         page: 1,
@@ -25,6 +30,7 @@ const FeaturePage = () => {
         isActive: true,
     });
     const [itemIndex, setItemIndex] = useState<number>(1);
+    const [toggle, setToggle] = useState(false);
 
     useEffect(() => {
         if (roleList?.data?.result?.length && roleList?.data?.result[0]?.id) {
@@ -42,6 +48,11 @@ const FeaturePage = () => {
         fetchDetailsById({
             payloadId: item.id,
         });
+    };
+
+    const handleEdit = (item: IFeatureDetailsResponse) => {
+        setSelectedData(item);
+        setToggle(true);
     };
 
     useEffect(() => {
@@ -127,7 +138,10 @@ const FeaturePage = () => {
             header: () => <div>Status</div>,
         }),
     ];
-
+    const handleCloseModal = () => {
+        setSelectedData(undefined);
+        setToggle(false);
+    };
     const btnClassName = `bg-gray-100 p-2 px-4 w-full rounded-md hover:bg-gray-200`;
 
     return (
@@ -160,7 +174,11 @@ const FeaturePage = () => {
                                 <div className='flex w-full flex-col items-center gap-6 xl:flex-row'>
                                     <div className='h-20 w-20 overflow-hidden rounded-full border border-gray-200 dark:border-gray-800'>
                                         <img
-                                            src='src/images/user/owner.jpg'
+                                            src={
+                                                detailsData?.data
+                                                    ?.profilePictureResponse
+                                                    ?.url
+                                            }
                                             alt='user'
                                         />
                                     </div>
@@ -184,7 +202,16 @@ const FeaturePage = () => {
                                         </p>
                                     </div>
                                 </div>
-                                <Button variant='primary' size='xs'>
+                                <Button
+                                    variant='primary'
+                                    onClick={() => {
+                                        if (!detailsData?.data) {
+                                            return;
+                                        }
+                                        handleEdit(detailsData?.data);
+                                    }}
+                                    size='xs'
+                                >
                                     <svg
                                         className='fill-current'
                                         width={18}
@@ -231,6 +258,18 @@ const FeaturePage = () => {
                     </div>
                 </div>
             </div>
+            <Modal
+                isOpen={toggle}
+                onClose={() => handleCloseModal()}
+                className='max-w-[700px] mb-4  '
+                isFullscreen={false}
+            >
+                <FeatureModal
+                    setSelectedData={setSelectedData}
+                    selectedData={selectedData}
+                    handleCloseModal={handleCloseModal}
+                />
+            </Modal>
         </div>
     );
 };

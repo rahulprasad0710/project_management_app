@@ -61,9 +61,20 @@ async function getPreSignedUrl({ bucketKey }: { bucketKey: string }) {
         });
 
         const url = await getSignedUrl(client, command, { expiresIn: 3600 }); // 1 hour
-        return url;
+        return {
+            url,
+            success: true,
+            message: "OK",
+        };
     } catch (error) {
-        throw new Error(error instanceof Error ? error.message : String(error));
+        // throw new Error(error instanceof Error ? error.message : String(error));
+
+        // TODO  : add logging here.
+        return {
+            success: false,
+            message: "Error getting signed URL",
+            url: "",
+        };
     }
 }
 

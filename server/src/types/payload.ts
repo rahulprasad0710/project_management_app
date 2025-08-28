@@ -90,3 +90,12 @@ export interface IBookingPagination extends IPagination {
     dateStart: Date | undefined;
     dateEnd: Date | undefined;
 }
+
+export interface IFeaturePayload {
+    name: string;
+    description: string;
+    active: boolean;
+    profilePicture: string;
+    featureTeamMember: number[];
+    admin: number;
+}

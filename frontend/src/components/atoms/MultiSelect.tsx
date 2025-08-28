@@ -18,7 +18,9 @@ const MultiSelect = (props: Props) => {
     const [openSelect, setOpenSelect] = useState<boolean>(false);
     // const [showList, setShowList] = useState<IList[]>([]);
     const multiSelectRef = useRef(null);
-
+    console.log({
+        selectedList,
+    });
     const handleSelect = (valueSelected: number | string) => {
         const isItemAlreadyPresent = selectedList.find(
             (item) => item.value === valueSelected
@@ -58,31 +60,42 @@ const MultiSelect = (props: Props) => {
         <div ref={multiSelectRef} className='relative'>
             <button
                 onClick={() => setOpenSelect(!openSelect)}
-                className={`py-${
-                    size ?? 2
-                } block w-full rounded border border-gray-200 bg-white px-4 text-left text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none`}
                 type='button'
+                className='mb-2 w-full flex h-11 rounded-lg border border-gray-300 py-1.5 pl-3 pr-3 shadow-theme-xs outline-hidden transition focus:border-brand-300 focus:shadow-focus-ring dark:border-gray-700 dark:bg-gray-900 dark:focus:border-brand-300'
             >
                 {selectedList?.length === 0 && (
                     <span>{placeholder ? placeholder : "Please select"}</span>
                 )}
 
                 {selectedList?.length > 0 && (
-                    <div className='flex flex-wrap gap-1'>
+                    <div className='flex flex-wrap  gap-1'>
                         {selectedList?.map((item: IMultiList) => (
                             <div
-                                className='mr-1 flex items-center gap-1 rounded-sm bg-gray-100 px-2 font-semibold text-gray-700'
+                                className='mr-1 flex items-center gap-1 rounded-lg  bg-gray-100 px-2 font-semibold text-gray-700'
                                 key={item.value}
                             >
                                 <span>{item.label}</span>
-                                <span>
-                                    <X
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleSelect(item.value);
-                                        }}
-                                        className='ml-1 h-5 w-5 font-semibold text-gray-700 hover:bg-gray-200 hover:text-red-500'
-                                    />
+                                <span
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleSelect(item.value);
+                                    }}
+                                    className='ml-1'
+                                >
+                                    <svg
+                                        className='fill-current'
+                                        role='button'
+                                        width='14'
+                                        height='14'
+                                        viewBox='0 0 14 14'
+                                        xmlns='http://www.w3.org/2000/svg'
+                                    >
+                                        <path
+                                            fillRule='evenodd'
+                                            clipRule='evenodd'
+                                            d='M3.40717 4.46881C3.11428 4.17591 3.11428 3.70104 3.40717 3.40815C3.70006 3.11525 4.17494 3.11525 4.46783 3.40815L6.99943 5.93975L9.53095 3.40822C9.82385 3.11533 10.2987 3.11533 10.5916 3.40822C10.8845 3.70112 10.8845 4.17599 10.5916 4.46888L8.06009 7.00041L10.5916 9.53193C10.8845 9.82482 10.8845 10.2997 10.5916 10.5926C10.2987 10.8855 9.82385 10.8855 9.53095 10.5926L6.99943 8.06107L4.46783 10.5927C4.17494 10.8856 3.70006 10.8856 3.40717 10.5927C3.11428 10.2998 3.11428 9.8249 3.40717 9.53201L5.93877 7.00041L3.40717 4.46881Z'
+                                        />
+                                    </svg>
                                 </span>
                             </div>
                         ))}

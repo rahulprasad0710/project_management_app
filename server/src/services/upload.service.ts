@@ -11,6 +11,13 @@ interface IAwsUploadFile {
     size: number;
 }
 
+export interface IUploadSignedUrlResponse {
+    url: string;
+    message: string;
+    id: string;
+    success: boolean;
+}
+
 export interface IUploadFile {
     filename: string;
     originalname: string;
@@ -91,7 +98,7 @@ export class UploadService {
                 });
                 return {
                     ...file,
-                    backendUrl: result,
+                    backendUrl: result?.url,
                 };
             })
         );
@@ -107,16 +114,17 @@ export class UploadService {
         if (!uploadResult) {
             return {
                 url: "",
+                id: uploadId,
+                success: false,
+                message: "File Id not found",
             };
         } else {
             const getUrl = await this.getPresignedUrl({
                 bucketKey: uploadResult?.filename,
             });
-            console.log({
-                getUrl,
-            });
             return {
-                url: getUrl,
+                ...getUrl,
+                id: uploadId,
             };
         }
     }

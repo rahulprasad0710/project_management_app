@@ -479,16 +479,26 @@ export interface IFeatureResponse {
     active: boolean;
 }
 
+export interface ImageResponse {
+    id: string;
+    url: string;
+    success: boolean;
+    message: string;
+}
+
 export interface IFeatureDetailsResponse extends IFeatureResponse {
     featureTeamMember: IEmployeeResponse[];
     admin: IEmployeeResponse;
+    profilePictureResponse: ImageResponse;
 }
 
 export interface IFeaturePayload {
     name: string;
-    slug: string;
     description: string;
     profilePicture: string;
+    active: boolean;
+    featureTeamMember: number[];
+    admin: number;
 }
 
 export interface IFeatureUpdatePayload extends IFeaturePayload {

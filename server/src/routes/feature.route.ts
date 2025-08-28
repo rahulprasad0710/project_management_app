@@ -8,6 +8,7 @@ import featureController from "../controllers/feature.controller";
 const router = ExpressRouter();
 
 router.get("", applyPagination, featureController.getAll);
+router.put("/:id", featureController.update);
 router.get("/:id", featureController.getById);
 
 export default router;

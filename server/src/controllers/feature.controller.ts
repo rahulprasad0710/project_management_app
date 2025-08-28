@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 
 import FeatureService from "../services/feature.service";
+import { IFeaturePayload } from "../types/payload";
 import { IPagination } from "../types/express";
 import normalizeToString from "../utils/sanatizeQueryParams";
 
@@ -9,12 +10,12 @@ const featureService = new FeatureService();
 const getById = async (req: Request, res: Response) => {
     const featureId = Number(req.params.id);
 
-    const taskStatus = await featureService.getById(featureId);
+    const response = await featureService.getById(featureId);
 
     res.status(200).json({
         success: true,
-        data: taskStatus,
-        message: "Task status fetched successfully",
+        data: response,
+        message: "Feature fetched successfully",
     });
 };
 
@@ -38,7 +39,28 @@ const getAll = async (req: Request, res: Response) => {
     });
 };
 
+const update = async (req: Request, res: Response) => {
+    const featureId = Number(req.params.id);
+    const payload: IFeaturePayload = {
+        name: req.body.name,
+        description: req.body.description,
+        active: req.body.active,
+        profilePicture: req.body.profilePicture,
+        featureTeamMember: req.body.featureTeamMember,
+        admin: req.body.admin,
+    };
+
+    const response = await featureService.update(featureId, payload);
+
+    res.status(200).json({
+        success: true,
+        data: response,
+        message: "Feature updated successfully",
+    });
+};
+
 export default {
     getById,
     getAll,
+    update,
 };
