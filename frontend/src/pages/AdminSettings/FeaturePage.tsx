@@ -18,7 +18,7 @@ interface IEmployeeResponseTable extends IEmployeeResponse {
 const FeaturePage = () => {
     const [tableData, setTableData] = useState<IEmployeeResponseTable[]>([]);
 
-    const { data: roleList, isFetching } = useGetFeaturesQuery({
+    const { data: roleList } = useGetFeaturesQuery({
         isPaginationEnabled: true,
         page: 1,
         pageSize: 10,
@@ -27,17 +27,15 @@ const FeaturePage = () => {
     const [itemIndex, setItemIndex] = useState<number>(1);
 
     useEffect(() => {
-        if (roleList?.data?.result?.length) {
+        if (roleList?.data?.result?.length && roleList?.data?.result[0]?.id) {
             fetchDetailsById({
                 payloadId: roleList?.data?.result[0]?.id,
             });
         }
     }, [roleList]);
 
-    const [
-        fetchDetailsById,
-        { data: detailsData, isFetching: isFetchingById },
-    ] = useLazyGetFeaturesByIdQuery();
+    const [fetchDetailsById, { data: detailsData }] =
+        useLazyGetFeaturesByIdQuery();
 
     const handleClick = (index: number, item: IFeatureResponse) => {
         setItemIndex(index);
@@ -135,18 +133,12 @@ const FeaturePage = () => {
     return (
         <div>
             <div className='rounded-md border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]'>
-                <div className=' px-6 py-5 flex justify-between items-center'>
-                    <h2 className='text-xl font-semibold text-gray-800 dark:text-white/90'>
-                        Features
-                    </h2>
-                    <Button variant='primary' size='sm'>
-                        <PlusIcon />
-                        Add New Feature
-                    </Button>
-                </div>
                 <div className='grid grid-cols-12 gap-6 px-6 py-5'>
                     <div className='col-span-3 '>
                         <div className='w-full mb-6 rounded-2xl border border-gray-200 p-5 lg:p-6 dark:border-gray-800'>
+                            <h2 className='text-xl  text-center bg-amber-200 font-semibold text-gray-800 dark:text-white/90 mb-4 p-2 rounded shadow'>
+                                Features
+                            </h2>
                             {roleList?.data?.result?.map((item, index) => (
                                 <button
                                     key={index}
@@ -192,7 +184,7 @@ const FeaturePage = () => {
                                         </p>
                                     </div>
                                 </div>
-                                <Button variant='outline' size='xs'>
+                                <Button variant='primary' size='xs'>
                                     <svg
                                         className='fill-current'
                                         width={18}

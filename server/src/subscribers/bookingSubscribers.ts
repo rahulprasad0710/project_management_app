@@ -89,6 +89,7 @@ eventBus.on(BOOKING_LOGS, async (booking: IBookingResponse) => {
             serviceName: BookingServiceEnum.BOOKING_EMAIL,
             status: BookingStatusEnum.FAILED,
         });
+        return false;
     }
 });
 
