@@ -142,15 +142,15 @@ const FeaturePage = () => {
         setSelectedData(undefined);
         setToggle(false);
     };
-    const btnClassName = `bg-gray-100 p-2 px-4 w-full rounded-md hover:bg-gray-200`;
+    const btnClassName = `bg-gray-100 p-2 px-4 w-full rounded-md hover:bg-gray-200 dark:bg-slate-900 dark:text-gray-200`;
 
     return (
         <div>
-            <div className='rounded-md border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]'>
+            <div className='rounded-md border border-gray-200 bg-white dark:border-gray-800 dark:bg-slate-900'>
                 <div className='grid grid-cols-12 gap-6 px-6 py-5'>
-                    <div className='col-span-3 '>
+                    <div className='col-span-12 md:col-span-4 lg:col-span-3 dark:bg-slate-800'>
                         <div className='w-full mb-6 rounded-2xl border border-gray-200 p-5 lg:p-6 dark:border-gray-800'>
-                            <h2 className='text-xl  text-center bg-amber-200 font-semibold text-gray-800 dark:text-white/90 mb-4 p-2 rounded shadow'>
+                            <h2 className='text-xl  text-center bg-amber-200 font-semibold text-gray-800 dark:text-gray-200 dark:bg-slate-900 mb-4 p-2 rounded shadow'>
                                 Features
                             </h2>
                             {roleList?.data?.result?.map((item, index) => (
@@ -168,7 +168,7 @@ const FeaturePage = () => {
                             ))}
                         </div>
                     </div>
-                    <div className='col-span-9'>
+                    <div className='col-span-12 md:col-span-8 lg:col-span-9 dark:bg-slate-800'>
                         <div className='w-full mb-6 rounded-2xl border border-gray-200 p-5 lg:p-6 dark:border-gray-800'>
                             <div className='flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between mb-6'>
                                 <div className='flex w-full flex-col items-center gap-6 xl:flex-row'>

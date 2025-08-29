@@ -96,6 +96,7 @@ export class CustomerService {
                     "mobileNumber",
                     "emailVerified",
                     "isActive",
+                    "CredentialType",
                 ],
                 result,
             }),

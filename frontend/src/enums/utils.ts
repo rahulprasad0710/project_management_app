@@ -10,3 +10,9 @@ export const ActivityAction = {
 
 export type ActivityAction =
     (typeof ActivityAction)[keyof typeof ActivityAction];
+
+export enum CredentialType {
+    ADMIN = "ADMIN",
+    Google = "GOOGLE",
+    CUSTOMER_CREDENTIAL = "CUSTOMER_CREDENTIAL",
+}
