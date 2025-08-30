@@ -62,14 +62,6 @@ export class CustomerService {
     async getAll(query: IActivePagination) {
         const { skip, take, isPaginationEnabled, keyword, isActive } = query;
 
-        console.log({
-            skip,
-            take,
-            isPaginationEnabled,
-            keyword,
-            isActive,
-        });
-
         const whereCondition = keyword
             ? [
                   { name: ILike(`%${keyword}%`), isActive },

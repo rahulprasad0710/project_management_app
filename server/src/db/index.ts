@@ -12,6 +12,7 @@ import { BookingRoom } from "./entity/hotel/BookingRoom";
 import { Comment } from "./entity/comment";
 import { Customer } from "./entity/Customer";
 import { Department } from "./entity/department";
+import { EmailNotifications } from "./entity/Email.entity";
 import { Feature } from "./entity/Feature";
 import { FeatureTaskStatus } from "./entity/FeatureTaskStatus";
 import { FeatureUpload } from "./entity/FeatureUpload";
@@ -30,9 +31,10 @@ import { Task } from "./entity/task";
 import { TaskStatus } from "./entity/taskStatus";
 import { UploadFile } from "./entity/uploads";
 import { User } from "./entity/User";
+import { UserInternalCompany } from "./entity/UserInternalCompany";
 import { UserNotification } from "./entity/UserNotification";
+
 // View Entity
-import { UserView } from "./view/UserView";
 
 export default [
     User,
@@ -58,9 +60,6 @@ export default [
     AdminAudit,
     FeatureTaskStatus,
     Customer,
-    // Views
-    UserView,
-    // View_End
     // Hotel
     Booking,
     BookingRoom,
@@ -68,4 +67,6 @@ export default [
     RoomType,
     BookingServiceFailures,
     BookingLogs,
+    UserInternalCompany,
+    EmailNotifications,
 ];

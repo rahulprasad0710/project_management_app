@@ -25,3 +25,6 @@ export const inputFieldClass = ({
 
     return inputClasses;
 };
+
+export const classForSelect =
+    "block w-full appearance-none rounded-lg border border-gray-200 bg-white px-4 py-2.5 pr-8 leading-tight text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none";

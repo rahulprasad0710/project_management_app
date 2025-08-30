@@ -4,20 +4,25 @@ import type {
     IEmployeePayload,
     IEmployeeResponse,
     IEmployeeUpdatePayload,
+    IMultiList,
 } from "@/types/config.types";
+import { classForSelect, inputFieldClass } from "@/utils/style";
 import {
     useCreateEmployeeMutation,
     useUpdateEmployeeMutation,
 } from "@api/hooks/useEmployee";
+import { useEffect, useState } from "react";
 
+import Button from "@/components/ui/button/Button";
 import Label from "@/components/form/Label";
+import ModalHeader from "@/components/atoms/ModalHeader";
+import MultiSelect from "@/components/atoms/MultiSelect";
 import { Spinner } from "@/components/atoms/Spinner";
 import type { SubmitHandler } from "react-hook-form";
-import { inputFieldClass } from "@/utils/style";
 import { toast } from "react-toastify";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useGetAllRolesQuery } from "@api/hooks/useRoles";
+import { useGetInternalCompaniesQuery } from "@/api/hooks/useInternalCompany";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 type Props = {
@@ -36,9 +41,19 @@ interface IFormInput {
 
 const EmployeeModal = (props: Props) => {
     const { selectedData, handleCloseModal } = props;
-
+    const [selectedInternalCompany, setSelectedInternalCompany] = useState<
+        IMultiList[]
+    >([]);
     const [createMutation] = useCreateEmployeeMutation();
     const [updateMutation] = useUpdateEmployeeMutation();
+
+    const { data: internalCompanyList, isFetching } =
+        useGetInternalCompaniesQuery({
+            isPaginationEnabled: false,
+            isActive: true,
+            page: 1,
+            pageSize: 20,
+        });
 
     const schema = yup.object().shape({
         firstName: yup.string().required("First name is required"),
@@ -87,12 +102,15 @@ const EmployeeModal = (props: Props) => {
     const onSubmit: SubmitHandler<IFormInput> = async (data) => {
         console.log(data);
 
-        const payload: IEmployeePayload | IEmployeeUpdatePayload = {
+        const payload: IEmployeePayload = {
             firstName: data.firstName,
             lastName: data.lastName,
             email: data.email,
             mobileNumber: data.mobileNumber,
-            role: data.role,
+            role: Number(data.role),
+            internalCompany: selectedInternalCompany.map((item) =>
+                Number(item.value)
+            ),
         };
 
         try {
@@ -125,10 +143,11 @@ const EmployeeModal = (props: Props) => {
 
     return (
         <div className='relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900 lg:p-6'>
-            <div className='px-2 pr-14'>
-                <h4 className='mb-2 text-xl font-semibold text-gray-800 dark:text-white/90'>
-                    Add Employee
-                </h4>
+            <div className='p-4 '>
+                <ModalHeader
+                    isAdd={selectedData?.id ? false : true}
+                    title='Employee'
+                />
             </div>
             <form
                 className='bg-white px-4 py-4 dark:bg-slate-800'
@@ -233,11 +252,15 @@ const EmployeeModal = (props: Props) => {
                         </Label>
                         <div className='relative'>
                             <select
-                                className='block w-full appearance-none rounded-lg border border-gray-200 bg-white px-4 py-2.5 pr-8 leading-tight text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none'
+                                className={classForSelect}
                                 {...register("role", { required: true })}
                             >
-                                <option value='' disabled>
-                                    -- Select Role --
+                                <option
+                                    className='text-gray-500!'
+                                    value=''
+                                    disabled
+                                >
+                                    Select Role
                                 </option>
                                 {roleOptions?.data?.result.map((role) => (
                                     <option value={role.id} key={role.id}>
@@ -262,19 +285,50 @@ const EmployeeModal = (props: Props) => {
                         )}
                     </div>
                 </div>
+                <div className='w-full mb-8'>
+                    <Label>
+                        Internal Company
+                        <span className='text-error-500'>*</span>
+                    </Label>
+                    <MultiSelect
+                        isDisabled={isFetching}
+                        placeholder='Select Internal Company'
+                        selectedList={selectedInternalCompany}
+                        setSelectList={setSelectedInternalCompany}
+                        list={
+                            (internalCompanyList?.data &&
+                                internalCompanyList?.data?.result?.map(
+                                    (company) => {
+                                        const payload = {
+                                            label: company.name,
+                                            value: String(company.id),
+                                        };
+                                        return payload;
+                                    }
+                                )) ??
+                            []
+                        }
+                    />
+                    {errors.role && (
+                        <p className='text-xs italic text-red-500'>
+                            {errors.role?.message}
+                        </p>
+                    )}
+                </div>
 
-                <div className='mt-4 flex items-center justify-end gap-4'>
-                    <button
+                <div className=' flex items-center justify-end gap-4'>
+                    <Button
+                        variant='outline'
+                        size='sm'
                         onClick={handleCloseModal}
-                        className='focus:shadow-outline rounded bg-gray-100 px-4 py-2 font-bold text-gray-500 hover:text-gray-800'
                     >
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                        type='submit'
+                        className='px-6!'
+                        size='sm'
                         disabled={isSubmitting}
-                        className={` ${
-                            isSubmitting ? "opacity-50" : ""
-                        } focus:shadow-outline rounded bg-blue-500 px-8 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none`}
                     >
                         {isSubmitting ? (
                             <Spinner />
@@ -284,7 +338,7 @@ const EmployeeModal = (props: Props) => {
                                 {selectedData?.id ? "Update" : "Submit"}{" "}
                             </span>
                         )}
-                    </button>
+                    </Button>
                 </div>
             </form>
         </div>

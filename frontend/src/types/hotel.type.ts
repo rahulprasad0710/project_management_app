@@ -1,4 +1,4 @@
-import type { Pagination } from "./config.types";
+import type { ICustomerResponse, Pagination } from "./config.types";
 
 export interface IRoomTypePayload {
     name: string;
@@ -107,17 +107,4 @@ export interface IBookingRoomResponse {
     userBookingRoomId: string;
     room_status: string;
     room: IRoomResponse;
-}
-
-export interface ICustomerResponse {
-    createdAt: string; // ISO date string
-    isActive: boolean;
-    id: number;
-    name: string;
-    email: string;
-    mobileNumber: string;
-    CredentialType: "ADMIN" | "USER" | "SUPER_ADMIN"; // extend if needed
-    associated_internal_company_id: number;
-    profilePictureUrl: string | null;
-    emailVerified: boolean;
 }

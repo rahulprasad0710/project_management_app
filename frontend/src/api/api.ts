@@ -16,6 +16,7 @@ import { customerEndpoints } from "./apiRoutes/customerApi";
 import { employeeEndpoints } from "./apiRoutes/employeeApi";
 import { featuresEndpoints } from "./apiRoutes/featureApi";
 import { getAuthToken } from "@/utils/apiFn";
+import { internalCompanyEndpoints } from "./apiRoutes/internalCompanyApi";
 import { labelEndpoints } from "./apiRoutes/labelApi";
 import { projectEndpoints } from "./apiRoutes/projectApi";
 import { roleEndpoints } from "./apiRoutes/rolesApi";
@@ -130,6 +131,7 @@ export const api = createApi({
         }),
 
         // ! ROLES-STARTS
+        ...internalCompanyEndpoints(build),
         ...roleEndpoints(build),
         ...taskStatusEndpoints(build),
         ...taskEndpoints(build),

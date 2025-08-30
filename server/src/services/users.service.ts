@@ -1,12 +1,15 @@
 import APP_CONSTANT from "../constants/AppConfig";
+import AppError from "../utils/AppError";
 import { EmailService } from "./config/email.service";
+import { ErrorType } from "../enums/Eums";
 import { Feature } from "../db/entity/Feature";
 import { IEmployeePagination } from "../types/payload";
 import { ILike } from "typeorm";
 import { IPagination } from "../types/express";
+import { InternalCompany } from "../db/entity/InternalCompany";
 import { Role } from "../db/entity/role";
 import { User } from "../db/entity/User";
-import { UserView } from "../db/view/UserView";
+import { UserInternalCompany } from "../db/entity/UserInternalCompany";
 import createPagination from "../utils/createPagination";
 import crypto from "crypto";
 import dataSource from "../db/data-source";
@@ -17,21 +20,40 @@ const emailService = new EmailService();
 interface IUser {
     firstName: string;
     lastName: string;
-    role: Role;
+    role: number;
     email: string;
     mobileNumber: string;
+    internalCompany: number[];
 }
 
+interface IUserPayload extends IUser {
+    roleResponse: Role;
+}
 export class UserService {
-    constructor(
-        private readonly userRepository = dataSource.getRepository(User),
-        private readonly userViewRepository = dataSource.getRepository(
-            UserView
-        ),
-        private readonly featureRepository = dataSource.getRepository(Feature)
-    ) {}
+    private readonly userRepository = dataSource.getRepository(User);
+    private readonly userInternalCompanyRepository =
+        dataSource.getRepository(UserInternalCompany);
+
+    private readonly internalCompanyRepository =
+        dataSource.getRepository(InternalCompany);
+
+    private readonly featureRepository = dataSource.getRepository(Feature);
+
+    private readonly roleRepository = dataSource.getRepository(Role);
 
     async create(user: IUser) {
+        const roleResponse = await this.roleRepository.findOne({
+            where: { id: user.role },
+        });
+
+        if (!roleResponse) {
+            throw new AppError(
+                "Role not found",
+                404,
+                ErrorType.NOT_FOUND_ERROR
+            );
+        }
+
         const generateVerificationToken = () =>
             crypto.randomBytes(32).toString("hex");
 
@@ -39,7 +61,14 @@ export class UserService {
 
         const employeeId = await this.generateEmployeeId();
 
-        const response = await this.addUser(user, employeeId, token);
+        const response = await this.addUser(
+            {
+                ...user,
+                roleResponse,
+            },
+            employeeId,
+            token
+        );
 
         const verifyLink = `${APP_CONSTANT.FRONTEND_BASE_URL}auth/verify-email/${response.id}?token=${token}`;
 
@@ -50,60 +79,44 @@ export class UserService {
 
         return {
             ...response,
-            verifyLink: emailResponse,
+            emailResponse,
         };
     }
 
-    async addUser(user: IUser, employeeId: string, verifyEmailToken: string) {
-        const userObj = new User();
-        userObj.firstName = user.firstName;
-        userObj.lastName = user.lastName;
-        userObj.email = user.email;
-        userObj.emailVerified = false;
-        userObj.mobileNumber = user.mobileNumber;
-        userObj.role = user.role;
-        userObj.employeeId = employeeId;
-        userObj.verifyEmailToken = verifyEmailToken;
-        const response = await this.userRepository.save(userObj);
-        return response;
-    }
+    async addUser(
+        user: IUserPayload,
+        employeeId: string,
+        verifyEmailToken: string
+    ) {
+        try {
+            const userObj = new User();
+            userObj.firstName = user.firstName;
+            userObj.lastName = user.lastName;
+            userObj.email = user.email;
+            userObj.emailVerified = false;
+            userObj.mobileNumber = user.mobileNumber;
+            userObj.role = user.roleResponse;
+            userObj.roleId = user.roleResponse.id;
+            userObj.employeeId = employeeId;
+            userObj.verifyEmailToken = verifyEmailToken;
+            const response = await this.userRepository.save(userObj);
 
-    async getAll(query: IPagination) {
-        const { skip, take, isPaginationEnabled, keyword } = query;
-        console.log("getAll");
-        let whereClause = {};
-        if (keyword) {
-            whereClause = [
-                { ...whereClause, firstName: ILike(`%${keyword}%`) },
-                { ...whereClause, lastName: ILike(`%${keyword}%`) },
-                { ...whereClause, employeeId: ILike(`%${keyword}%`) },
-                { ...whereClause, mobileNumber: ILike(`%${keyword}%`) },
-            ];
+            const userInternalCompanyResult = this.addInternalCompany(
+                response.id,
+                user.internalCompany
+            );
+
+            return {
+                ...response,
+                userInternalCompanyResult,
+            };
+        } catch (error) {
+            console.error("Error adding user:", error);
+            throw new Error("Error adding user");
         }
-
-        const result = await this.userViewRepository.find({
-            skip: skip,
-            take: take,
-            order: {
-                id: "DESC",
-            },
-            where: whereClause,
-        });
-        const totalCount = await this.userRepository.count();
-        return {
-            result,
-            pagination: createPagination(
-                skip,
-                take,
-                totalCount,
-                isPaginationEnabled
-            ),
-        };
     }
 
     async getAllEmployee(query: IEmployeePagination) {
-        console.log("getAllEmployeefff");
-
         const {
             skip,
             take,
@@ -111,6 +124,7 @@ export class UserService {
             isActive,
             keyword,
             emailVerified,
+            requestFromUrl,
         } = query;
 
         console.log({
@@ -122,7 +136,17 @@ export class UserService {
             emailVerified,
         });
 
-        const result = await this.userRepository.find({
+        const FROM_URL = ["LIST_PAGE"];
+
+        const whereCondition = keyword
+            ? [
+                  { firstName: ILike(`%${keyword}%`), isActive },
+                  { employeeId: ILike(`%${keyword}%`), isActive },
+                  { email: ILike(`%${keyword}%`), isActive },
+              ]
+            : { isActive };
+
+        const [result, totalCount] = await this.userRepository.findAndCount({
             select: [
                 "id",
                 "email",
@@ -142,16 +166,11 @@ export class UserService {
             order: {
                 id: "DESC",
             },
-
-            where: {
-                ...(keyword ? { firstName: ILike(`%${keyword}%`) } : {}),
-                ...(keyword ? { lastName: ILike(`%${keyword}%`) } : {}),
-                ...(keyword ? { employeeId: ILike(`%${keyword}%`) } : {}),
-                ...(isActive ? { isActive: isActive } : {}),
-                ...(emailVerified ? { emailVerified: emailVerified } : {}),
-            },
+            ...(requestFromUrl && FROM_URL.includes(requestFromUrl)
+                ? { relations: ["role"] }
+                : {}),
+            where: whereCondition,
         });
-        const totalCount = await this.userRepository.count();
         return {
             result,
             pagination: createPagination(
@@ -171,10 +190,30 @@ export class UserService {
     }
 
     async getById(id: number) {
-        const response = await this.userRepository.findOne({
+        const result = await this.userRepository.findOne({
             where: { id: id },
         });
-        return response;
+
+        if (result) {
+            const internalCompanies = await this.getInternalCompanyByUserId(id);
+            return {
+                ...result,
+                internalCompanies,
+            };
+        } else {
+            return null;
+        }
+    }
+
+    async getInternalCompanyByUserId(id: number) {
+        const result = await this.userInternalCompanyRepository.find({
+            where: {
+                user_id: id,
+            },
+            relations: ["internal_company"],
+        });
+
+        return result;
     }
 
     async generateEmployeeId() {
@@ -255,6 +294,39 @@ export class UserService {
             refreshToken: refreshToken ? refreshToken : () => "NULL",
         });
         return response;
+    }
+
+    async addInternalCompany(userId: number, internalCompanyIds: number[]) {
+        const user = await this.userRepository.findOne({
+            where: { id: userId },
+        });
+
+        if (!user) return null;
+
+        const result = await Promise.all(
+            internalCompanyIds.map(async (companyId) => {
+                const newUserInternalPayLoad = new UserInternalCompany();
+                const internalCompany =
+                    await this.internalCompanyRepository.findOne({
+                        where: { id: companyId },
+                    });
+
+                if (internalCompany) {
+                    newUserInternalPayLoad.user = user;
+                    newUserInternalPayLoad.internal_company = internalCompany;
+
+                    const userInternalCompany =
+                        await this.userInternalCompanyRepository.save(
+                            newUserInternalPayLoad
+                        );
+
+                    return userInternalCompany;
+                } else {
+                    return null;
+                }
+            })
+        );
+        return result;
     }
 }
 

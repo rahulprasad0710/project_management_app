@@ -229,7 +229,8 @@ export interface IEmployeePayload {
     lastName: string;
     email: string;
     mobileNumber: string;
-    role: string;
+    role: number;
+    internalCompany: number[];
 }
 
 export interface IEmployeeUpdatePayload extends IEmployeePayload {
@@ -503,4 +504,17 @@ export interface IFeaturePayload {
 
 export interface IFeatureUpdatePayload extends IFeaturePayload {
     id: number;
+}
+
+export interface ICustomerResponse {
+    createdAt: string; // ISO date string
+    isActive: boolean;
+    id: number;
+    name: string;
+    email: string;
+    mobileNumber: string;
+    CredentialType: "ADMIN" | "USER" | "SUPER_ADMIN"; // extend if needed
+    associated_internal_company_id: number;
+    profilePictureUrl: string | null;
+    emailVerified: boolean;
 }

@@ -7,7 +7,6 @@ import {
     PrimaryGeneratedColumn,
 } from "typeorm";
 
-import { Notification } from "./Notification";
 import { Role } from "./role";
 
 @Entity()

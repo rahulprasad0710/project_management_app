@@ -158,7 +158,7 @@ const FeaturePage = () => {
                                     key={index}
                                     className={
                                         index === itemIndex
-                                            ? btnClassName
+                                            ? `${btnClassName} menu-dropdown-item-active`
                                             : btnClassName
                                     }
                                     onClick={() => handleClick(index, item)}

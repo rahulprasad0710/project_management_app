@@ -13,4 +13,5 @@ export interface IPagination {
     take?: number;
     keyword?: string;
     isPaginationEnabled: boolean;
+    requestFromUrl?: string;
 }

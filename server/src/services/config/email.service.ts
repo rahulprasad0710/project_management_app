@@ -1,10 +1,46 @@
+import { EmailSendType, EmailStatus, EmailType } from "../../enums/email.enum";
+
+import AppError from "../../utils/AppError";
+import { EmailNotifications } from "../../db/entity/Email.entity";
+import { ErrorType } from "../../enums/Eums";
 import { IBookingResponse } from "../../types/payload";
+import { Repository } from "typeorm";
 import { TEmail } from "../../types/types";
 import { User } from "../../db/entity/User";
 import { addEmailToQueue } from "../../jobs/emailQueue";
+import dataSource from "../../db/data-source";
+import { sendEmail } from "../../config/email.config";
+
+interface IEmailPayload {
+    to: string;
+    subject: string;
+    html_template: string;
+    text: string;
+    type: EmailType;
+    status: EmailStatus;
+    retries: number | undefined;
+    data_id: string;
+}
 
 export class EmailService {
-    constructor() {}
+    private readonly emailRepository =
+        dataSource.getRepository(EmailNotifications);
+
+    async createEmailNotification(emailData: IEmailPayload) {
+        const payload = new EmailNotifications();
+
+        payload.to = emailData.to;
+        payload.subject = emailData.subject;
+        payload.html_template = emailData.html_template;
+        payload.text = emailData.text;
+        payload.type = emailData.type;
+        payload.status = emailData.status;
+        payload.retries = emailData?.retries ?? 0;
+        payload.data_id = emailData.data_id;
+
+        const result = await this.emailRepository.save(payload);
+        return result;
+    }
 
     async sendVerificationEmail(user: User, verifyLink: string) {
         const emailObj: TEmail = {
@@ -21,14 +57,26 @@ export class EmailService {
                     Please login to the app
                     `,
         };
+
+        const createEmailNotification = await this.createEmailNotification({
+            to: user.email,
+            subject: emailObj.subject,
+            html_template: emailObj.html ?? "",
+            text: emailObj.text ?? "",
+            type: EmailType.USER_EMAIL_VERIFICATION,
+            status: EmailStatus.IN_PROGRESS,
+            retries: 0,
+            data_id: String(user.id),
+        });
+
         await addEmailToQueue(emailObj);
-        return verifyLink;
+        return {
+            createEmailNotification,
+            verifyLink,
+        };
     }
 
     async sendBookingConfirmationEmail(booking: IBookingResponse) {
-        console.log(
-            "LOG: ~ EmailService ~ sendBookingConfirmationEmail ~ sendBookingConfirmationEmail:"
-        );
         const customer = booking.customer;
 
         const roomsList = booking.bookedRoomResult
@@ -97,11 +145,70 @@ export class EmailService {
                 `,
         };
 
-        const addEmailToQueueResponse = await addEmailToQueue(emailObj);
-        console.log(
-            "LOG: ~ EmailService ~ sendBookingConfirmationEmail ~ addEmailToQueueResponse:",
-            addEmailToQueueResponse
-        );
-        return booking.id;
+        const createEmailNotification = await this.createEmailNotification({
+            to: booking.customer.email,
+            subject: emailObj.subject,
+            html_template: emailObj.html ?? "",
+            text: emailObj.text ?? "",
+            type: EmailType.BOOKING_CONFIRMATION,
+            status: EmailStatus.IN_PROGRESS,
+            retries: 0,
+            data_id: String(booking.id),
+        });
+
+        await addEmailToQueue(emailObj);
+
+        return {
+            createEmailNotification,
+            bookingId: booking.id,
+        };
+    }
+
+    async getEmailById(emailId: number) {
+        const result = this.emailRepository.findOne({
+            where: {
+                id: emailId,
+            },
+        });
+        return result;
+    }
+
+    async sendMailDirectly(
+        emailId: number,
+        sentType: EmailSendType | undefined
+    ) {
+        const emailResponse = await this.getEmailById(emailId);
+
+        if (!emailResponse) {
+            throw new AppError(
+                "Email Not Found",
+                400,
+                ErrorType.NOT_FOUND_ERROR
+            );
+        }
+
+        const emailObj: TEmail = {
+            to: [emailResponse.to],
+            subject: emailResponse.subject,
+            html: emailResponse.html_template,
+            text: emailResponse.text,
+        };
+
+        if (sentType === EmailSendType.DIRECT) {
+            const result = await sendEmail(emailObj);
+            return {
+                success: true,
+                ...result,
+                emailId: emailResponse.id,
+                sentType,
+            };
+        } else {
+            await addEmailToQueue(emailObj);
+            return {
+                success: true,
+                emailId: emailResponse.id,
+                sentType,
+            };
+        }
     }
 }

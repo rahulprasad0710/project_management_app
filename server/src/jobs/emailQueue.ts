@@ -19,11 +19,15 @@ export async function getEmailQueue(): Promise<QueueType<TEmail>> {
     return emailQueue;
 }
 
-export async function addEmailToQueue(data: TEmail) {
-    try {
-        const queue = await getEmailQueue();
-        await queue.add("email-queue", data);
-    } catch (error) {
-        console.log("addEmailToQueue", error);
-    }
+export async function addEmailToQueue(emailTemplate: TEmail) {
+    const emailQueue = await getEmailQueue();
+    await emailQueue.add("email-queue", emailTemplate, {
+        attempts: 5,
+        backoff: {
+            type: "exponential",
+            delay: 5000,
+        },
+        removeOnComplete: true,
+        removeOnFail: false,
+    });
 }

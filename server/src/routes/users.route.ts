@@ -13,8 +13,6 @@ router.get(
     asyncTryCatchFn(usersController.getAllEmployeeDetails)
 );
 
-router.get("/view", applyPagination, asyncTryCatchFn(usersController.getAll));
-
 router.get(
     "/feature/:featureId",
     applyPagination,

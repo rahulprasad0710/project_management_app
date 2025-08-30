@@ -9,8 +9,12 @@ const ModalHeader = (props: IProps) => {
     const { isAdd, title } = props;
     return (
         <div className='flex gap-2 items-center'>
-            {isAdd ? <PlusIcon /> : <Edit />}
-            <h4 className=' text-xl font-semibold '>
+            {isAdd ? (
+                <PlusIcon className='dark:text-gray-200' />
+            ) : (
+                <Edit className='dark:text-gray-200' />
+            )}
+            <h4 className=' text-xl font-semibold dark:text-gray-200 '>
                 {isAdd ? "Add New " : "Edit "} {title}
             </h4>
         </div>

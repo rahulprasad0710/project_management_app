@@ -1,7 +1,10 @@
 import AppError from "../utils/AppError";
 import { ErrorType } from "../enums/Eums";
 import { Feature } from "../db/entity/Feature";
+import { IActivePagination } from "../types/payload";
+import { ILike } from "typeorm";
 import { InternalCompany } from "../db/entity/InternalCompany";
+import createPagination from "../utils/createPagination";
 import dataSource from "../db/data-source";
 
 interface IInternalCompany {
@@ -35,10 +38,36 @@ export class InternalCompanyService {
         return await this.companyRepository.save(company);
     }
 
-    async getAll() {
-        return await this.companyRepository.find({
-            relations: ["projects"],
+    async getAll(query: IActivePagination) {
+        const {
+            skip,
+            take,
+            isPaginationEnabled,
+            keyword,
+            isActive,
+            requestFromUrl: _requestFromUrl,
+        } = query;
+
+        const whereCondition = keyword
+            ? [{ name: ILike(`%${keyword}%`), isActive }]
+            : { isActive };
+
+        const [result, totalCount] = await this.companyRepository.findAndCount({
+            skip,
+            take,
+            order: { id: "DESC" },
+            where: whereCondition,
         });
+
+        return {
+            result: result,
+            pagination: createPagination(
+                skip,
+                take,
+                totalCount,
+                isPaginationEnabled
+            ),
+        };
     }
 
     async getById(id: number) {
@@ -46,6 +75,7 @@ export class InternalCompanyService {
             where: { id },
             relations: ["projects"],
         });
+        return result;
     }
 
     async update(id: number, updateFields: Partial<IInternalCompany>) {

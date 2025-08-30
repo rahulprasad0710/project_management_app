@@ -16,7 +16,18 @@ const create = async (req: Request, res: Response) => {
 };
 
 const getAll = async (req: Request, res: Response) => {
-    const companies = await internalCompanyService.getAll();
+    const isActive = req.query.isActive;
+    const { isPaginationEnabled, keyword, requestFromUrl, skip, take } =
+        req.pagination;
+
+    const companies = await internalCompanyService.getAll({
+        isActive: isActive === "true" ? true : false,
+        isPaginationEnabled,
+        keyword,
+        requestFromUrl,
+        skip,
+        take,
+    });
 
     res.status(200).json({
         success: true,
