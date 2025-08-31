@@ -1,11 +1,12 @@
+import { Mail, MailCheck, MailX, PlusIcon, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import AlertModal from "@/modal/AlertModal";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/button/Button";
 import EmployeeModal from "@/modal/EmployeeModal";
 import type { IEmployeeResponse } from "@/types/config.types";
 import { Modal } from "@/components/common/Modal";
-import { PlusIcon } from "lucide-react";
 import ReactTable from "@/components/common/ReactTable";
 import SearchBar from "@/components/molecules/SearchBar";
 import { SquarePen } from "lucide-react";
@@ -21,13 +22,10 @@ const EmployeePage = () => {
     const [isActive, setIsActive] = useState<boolean>(true);
     const [keyword, setKeyword] = useState<string>("");
     const [toggle, setToggle] = useState(false);
+    const [toggleDeactivate, setToggleDeactivate] = useState(false);
 
     const [fetchAll, { isFetching, data: dataList }] =
         useLazyGetEmployeesQuery();
-
-    console.log({
-        dataList,
-    });
 
     useEffect(() => {
         fetchAll({
@@ -37,7 +35,7 @@ const EmployeePage = () => {
             isActive: isActive,
             keyword: keyword,
         });
-    }, [fetchAll]);
+    }, [isActive]);
 
     const handleSearch = () => {
         fetchAll({
@@ -158,9 +156,15 @@ const EmployeePage = () => {
             cell: (info) => (
                 <div className='font-semibold py-1 px-4'>
                     {info.renderValue() ? (
-                        <Badge badgeType='success' title='Verified' />
+                        <div className='flex gap-1 items-center'>
+                            <MailCheck className='text-green-500' />
+                            <Badge badgeType='success' title={"Verified"} />
+                        </div>
                     ) : (
-                        <Badge badgeType='error' title='Not Verified' />
+                        <div className='flex gap-1 items-center'>
+                            <MailX className='text-error-500' />
+                            <Badge badgeType='error' title='Not Verified' />
+                        </div>
                     )}
                 </div>
             ),
@@ -177,18 +181,39 @@ const EmployeePage = () => {
 
         columnHelper.accessor((row) => row.id, {
             id: "action",
-            cell: (info) => (
-                <div className='flex  gap-4 '>
-                    <Button
-                        size='sm'
-                        variant='outline'
-                        onClick={() => handleEdit(info.row.original)}
-                    >
-                        <SquarePen className='h-5 w-5 text-blue-400' />
-                        <span>Edit</span>
-                    </Button>
-                </div>
-            ),
+            cell: (info) => {
+                return (
+                    <div className='flex  gap-4 '>
+                        <Button
+                            size='sm'
+                            variant='secondary'
+                            onClick={() => handleEdit(info.row.original)}
+                        >
+                            <SquarePen className='h-5 w-5 text-brand-400' />
+                            <span>Edit</span>
+                        </Button>
+
+                        {info.row?.original?.isActive && (
+                            <Button
+                                size='sm'
+                                variant='primary'
+                                onClick={() => setToggleDeactivate(true)}
+                                className='bg-red-500! hover:bg-red-600!'
+                            >
+                                <Trash className='h-5 w-5 text-white' />
+                                <span>Deactivate Employee</span>
+                            </Button>
+                        )}
+
+                        {!info.row?.original?.emailVerified && (
+                            <Button size='sm' variant='primary'>
+                                <Mail className='h-5 w-5 text-white' />
+                                <span>Send Verification Email</span>
+                            </Button>
+                        )}
+                    </div>
+                );
+            },
             header: () => <span className='text-center'>Action</span>,
         }),
     ];
@@ -228,8 +253,8 @@ const EmployeePage = () => {
 
                         <SearchBar
                             setKeyword={setKeyword}
-                            onChange={() => handleClearFilter()}
                             keyword={keyword}
+                            onClose={() => handleClearFilter()}
                         />
 
                         <Button
@@ -272,6 +297,21 @@ const EmployeePage = () => {
                     setSelectedData={setSelectedData}
                     selectedData={selectedData}
                     handleCloseModal={handleCloseModal}
+                />
+            </Modal>
+            <Modal
+                blurEffect='8px'
+                isOpen={toggleDeactivate}
+                onClose={() => setToggleDeactivate(false)}
+                className='max-w-[700px] mb-4  '
+                isFullscreen={false}
+            >
+                <AlertModal
+                    heading='Deactivate Employee'
+                    description='Employee will be logout and removed from app until activated back.'
+                    btnText='Deactivate'
+                    alertType='DANGER'
+                    dataInfo={`EmployeeId : PMA-0001   Email ID: rahulstart@example.com `}
                 />
             </Modal>
         </div>

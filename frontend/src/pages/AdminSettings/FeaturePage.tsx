@@ -183,8 +183,8 @@ const FeaturePage = () => {
                                         />
                                     </div>
                                     <div className='order-3 xl:order-2'>
-                                        <h4 className='mb-2 text-center text-lg font-semibold text-gray-800 xl:text-left dark:text-white/90'>
-                                            {detailsData?.data?.name}{" "}
+                                        <h4 className=' text-center text-lg font-semibold text-gray-800 xl:text-left dark:text-white/90'>
+                                            {detailsData?.data?.name}
                                             {detailsData?.data?.active ? (
                                                 <Badge
                                                     title='Active'
@@ -198,7 +198,13 @@ const FeaturePage = () => {
                                             )}
                                         </h4>
                                         <p className='text-sm text-gray-500 dark:text-gray-400'>
-                                            {detailsData?.data?.description}
+                                            {detailsData?.data?.description}{" "}
+                                        </p>
+                                        <p className='text-md text-gray-800 dark:text-gray-400'>
+                                            {
+                                                detailsData?.data
+                                                    ?.internalCompany?.name
+                                            }
                                         </p>
                                     </div>
                                 </div>
@@ -230,6 +236,7 @@ const FeaturePage = () => {
                                     Edit
                                 </Button>
                             </div>
+
                             <div className='flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between'>
                                 <div className='w-full'>
                                     <h4 className='text-lg font-semibold text-gray-800 lg:mb-2 dark:text-white/90'>

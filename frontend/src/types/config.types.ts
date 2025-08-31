@@ -491,6 +491,7 @@ export interface IFeatureDetailsResponse extends IFeatureResponse {
     featureTeamMember: IEmployeeResponse[];
     admin: IEmployeeResponse;
     profilePictureResponse: ImageResponse;
+    internalCompany: IInternalCompanyResponse;
 }
 
 export interface IFeaturePayload {
