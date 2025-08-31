@@ -11,8 +11,8 @@ const create = async (req: Request, res: Response) => {
     const response = await userService.create(data);
     res.status(201).json({
         success: true,
-        data: response,
-        message: "User created successfully",
+        data: response.id,
+        message: `User created with Id : ${response.employeeId}. A verification has been sent to ${response.email}.`,
     });
 };
 

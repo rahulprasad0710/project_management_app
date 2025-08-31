@@ -5,7 +5,6 @@ import { ErrorType } from "../enums/Eums";
 import { Feature } from "../db/entity/Feature";
 import { IEmployeePagination } from "../types/payload";
 import { ILike } from "typeorm";
-import { IPagination } from "../types/express";
 import { InternalCompany } from "../db/entity/InternalCompany";
 import { Role } from "../db/entity/role";
 import { User } from "../db/entity/User";
@@ -14,6 +13,7 @@ import createPagination from "../utils/createPagination";
 import crypto from "crypto";
 import dataSource from "../db/data-source";
 import { sanitizeDBResult } from "../utils/sanitizeDbResult";
+import { sendEmail } from "../config/email.config";
 
 const emailService = new EmailService();
 
@@ -42,6 +42,19 @@ export class UserService {
     private readonly roleRepository = dataSource.getRepository(Role);
 
     async create(user: IUser) {
+        const isEmailAlreadyRegistered = await this.userRepository.findOne({
+            where: {
+                email: user.email,
+            },
+        });
+
+        if (isEmailAlreadyRegistered) {
+            throw new AppError(
+                "Email already registered.",
+                409,
+                ErrorType.BAD_REQUEST_ERROR
+            );
+        }
         const roleResponse = await this.roleRepository.findOne({
             where: { id: user.role },
         });
@@ -171,8 +184,15 @@ export class UserService {
                 : {}),
             where: whereCondition,
         });
+        const email = await sendEmail({
+            to: ["tt"],
+            subject: "EMAILSEND",
+            text: "TEST SENT",
+            html: `<p>heelo html</p>`,
+        });
         return {
             result,
+            email,
             pagination: createPagination(
                 skip,
                 take,

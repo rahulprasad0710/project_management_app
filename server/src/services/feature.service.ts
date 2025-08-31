@@ -18,7 +18,7 @@ class FeatureService {
     async getById(id: number) {
         const result = await this.featureRepository.findOne({
             where: { id },
-            relations: ["featureTeamMember", "admin"],
+            relations: ["featureTeamMember", "admin", "internalCompany"],
         });
 
         let profilePictureResponse: IUploadSignedUrlResponse | null = null;
@@ -33,11 +33,9 @@ class FeatureService {
 
         return {
             ...result,
-            // featureTeamMember: result?.featureTeamMember?.map((user) => {
-            //     return sanitizeEmployeeResult({ employee: user }) ?? [];
-            // }),
-
-            // featureTeamMember: result?.featureTeamMember,
+            featureTeamMember: result?.featureTeamMember?.map((user) => {
+                return sanitizeEmployeeResult({ employee: user }) ?? [];
+            }),
             admin: result?.admin
                 ? sanitizeEmployeeResult({ employee: result?.admin })
                 : {},

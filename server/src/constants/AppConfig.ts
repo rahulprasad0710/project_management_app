@@ -23,6 +23,7 @@ const APP_CONSTANT = {
     REDIS_HOST: process.env.REDIS_HOST,
     REDIS_PORT: process.env.REDIS_PORT,
     FRONTEND_BASE_URL: process.env.FRONTEND_BASE_URL,
+    START_APP_EMAIL: process.env.START_APP_EMAIL,
 };
 
 export default APP_CONSTANT;
