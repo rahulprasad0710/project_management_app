@@ -9,13 +9,15 @@ import {
     useCreateSprintMutation,
     useUpdateSprintMutation,
 } from "@apiHooks/useSprint";
+import { useEffect, useState } from "react";
 
+import CheckSwitch from "@/components/molecules/CheckSwitch";
 import Label from "@/components/form/Label";
+import ModalHeader from "@/components/atoms/ModalHeader";
 import { Spinner } from "@/components/atoms/Spinner";
 import type { SubmitHandler } from "react-hook-form";
 import { inputFieldClass } from "@/utils/style";
 import { toast } from "react-toastify";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -27,20 +29,20 @@ type Props = {
 
 interface IFormInput {
     name: string;
-    goal?: string;
+    goal: string;
     startDate: string;
     endDate: string;
 }
 
 const SprintModal = (props: Props) => {
     const { handleCloseModal, selectedData } = props;
-
+    const [isActive, setIsActive] = useState<boolean>(true);
     const [createSprintMutation] = useCreateSprintMutation();
     const [updateSprintMutation] = useUpdateSprintMutation();
 
     const schema = yup.object().shape({
         name: yup.string().required("Sprint name is required"),
-        goal: yup.string(),
+        goal: yup.string().default(""),
         startDate: yup.string().required("Start date is required"),
         endDate: yup.string().required("End date  is required"),
     });
@@ -67,9 +69,14 @@ const SprintModal = (props: Props) => {
             reset({
                 name: selectedData.name,
                 goal: selectedData.goal,
-                startDate: selectedData.startDate,
-                endDate: selectedData.endDate,
+                startDate: new Date(selectedData.startDate)
+                    .toISOString()
+                    .split("T")[0],
+                endDate: new Date(selectedData.endDate)
+                    .toISOString()
+                    .split("T")[0],
             });
+            setIsActive(selectedData?.isActive);
         }
     }, [selectedData]);
 
@@ -116,11 +123,12 @@ const SprintModal = (props: Props) => {
     };
 
     return (
-        <div className='relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900 lg:p-6'>
+        <div className='relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900 lg:p-6 z-9'>
             <div className='px-2 pr-14'>
-                <h4 className='mb-2 text-xl font-semibold text-gray-800 dark:text-white/90'>
-                    Add Employee
-                </h4>
+                <ModalHeader
+                    title='Sprint'
+                    isAdd={selectedData?.id ? false : true}
+                />
             </div>
             <form
                 className='bg-white px-4 py-4 dark:bg-slate-800'
@@ -168,7 +176,7 @@ const SprintModal = (props: Props) => {
                             className={inputFieldClass({
                                 error: errors.startDate ? true : false,
                             })}
-                            type='datetime-local'
+                            type='date'
                             {...register("startDate")}
                         />
                     </div>
@@ -180,26 +188,37 @@ const SprintModal = (props: Props) => {
                             className={inputFieldClass({
                                 error: errors.endDate ? true : false,
                             })}
-                            type='datetime-local'
+                            type='date'
+                            {...register("endDate")}
                         />
                     </div>
                 </div>
-                <div className='mt-4 flex items-center justify-end gap-4'>
-                    <button
-                        onClick={handleCloseModal}
-                        className='focus:shadow-outline rounded bg-gray-100 px-4 py-2 font-bold text-gray-500 hover:text-gray-800'
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        disabled={isSubmitting}
-                        className={` ${
-                            isSubmitting ? "opacity-50" : ""
-                        } focus:shadow-outline rounded bg-blue-500 px-8 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none`}
-                    >
-                        {!!isSubmitting && <Spinner />}
-                        <span> {selectedData?.id ? "Update" : "Submit"} </span>
-                    </button>
+                <div className='mt-4 flex items-center justify-between gap-4'>
+                    <CheckSwitch
+                        selectedChecked={isActive}
+                        setSelectedChecked={setIsActive}
+                        label='Active'
+                    />
+                    <div className='flex items-center justify-end gap-4'>
+                        <button
+                            onClick={handleCloseModal}
+                            className='focus:shadow-outline rounded bg-gray-100 px-4 py-2 font-bold text-gray-500 hover:text-gray-800'
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            disabled={isSubmitting}
+                            className={` ${
+                                isSubmitting ? "opacity-50" : ""
+                            } focus:shadow-outline rounded bg-blue-500 px-8 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none`}
+                        >
+                            {!!isSubmitting && <Spinner />}
+                            <span>
+                                {" "}
+                                {selectedData?.id ? "Update" : "Submit"}{" "}
+                            </span>
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>

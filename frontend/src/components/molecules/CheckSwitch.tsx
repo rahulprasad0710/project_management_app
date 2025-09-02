@@ -1,28 +1,28 @@
-import { useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
+
+import React from "react";
 
 interface SwitchProps {
     label: string;
-    defaultChecked?: boolean;
+    selectedChecked: boolean;
+    setSelectedChecked: Dispatch<SetStateAction<boolean>>;
     disabled?: boolean;
     onChange?: (checked: boolean) => void;
     color?: "blue" | "gray";
 }
 
-const Switch: React.FC<SwitchProps> = ({
+const CheckSwitch: React.FC<SwitchProps> = ({
     label,
-    defaultChecked = false,
+    selectedChecked,
     disabled = false,
+    setSelectedChecked,
     onChange,
     color = "blue",
 }) => {
-    const [isChecked, setIsChecked] = useState(defaultChecked);
-    console.log({
-        defaultChecked,
-    });
     const handleToggle = () => {
         if (disabled) return;
-        const newCheckedState = !isChecked;
-        setIsChecked(newCheckedState);
+        const newCheckedState = !selectedChecked;
+        setSelectedChecked(newCheckedState);
         if (onChange) {
             onChange(newCheckedState);
         }
@@ -31,18 +31,18 @@ const Switch: React.FC<SwitchProps> = ({
     const switchColors =
         color === "blue"
             ? {
-                  background: isChecked
+                  background: selectedChecked
                       ? "bg-teal-500 "
                       : "bg-gray-200 dark:bg-white/10", // Blue version
-                  knob: isChecked
+                  knob: selectedChecked
                       ? "translate-x-full bg-white"
                       : "translate-x-0 bg-white",
               }
             : {
-                  background: isChecked
+                  background: selectedChecked
                       ? "bg-gray-800 dark:bg-white/10"
                       : "bg-gray-200 dark:bg-white/10", // Gray version
-                  knob: isChecked
+                  knob: selectedChecked
                       ? "translate-x-full bg-white"
                       : "translate-x-0 bg-white",
               };
@@ -52,7 +52,7 @@ const Switch: React.FC<SwitchProps> = ({
             className={`flex cursor-pointer select-none items-center gap-3 text-sm font-medium ${
                 disabled ? "text-gray-400" : "text-gray-700 dark:text-gray-400"
             }`}
-            onClick={handleToggle} // Toggle when the label itself is clicked
+            onClick={handleToggle}
         >
             <div className='relative'>
                 <div
@@ -71,4 +71,4 @@ const Switch: React.FC<SwitchProps> = ({
     );
 };
 
-export default Switch;
+export default CheckSwitch;

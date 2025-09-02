@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/button/Button";
+import CheckSwitch from "@/components/molecules/CheckSwitch";
 import type { ISprintResponse } from "@/types/config.types";
 import { Modal } from "@/components/common/Modal";
 import { PlusIcon } from "lucide-react";
@@ -9,8 +10,8 @@ import ReactTable from "@/components/common/ReactTable";
 import SearchBar from "@/components/molecules/SearchBar";
 import SprintModal from "@/modal/SprintModal";
 import { SquarePen } from "lucide-react";
-import Switch from "@/components/form/switch/Switch";
 import { createColumnHelper } from "@tanstack/react-table";
+import { format } from "date-fns";
 import { useLazyGetSprintsQuery } from "@api/hooks/useSprint";
 
 const SprintPage = () => {
@@ -29,6 +30,9 @@ const SprintPage = () => {
     });
 
     useEffect(() => {
+        console.log({
+            isActive,
+        });
         fetchAll({
             isPaginationEnabled: true,
             page: 1,
@@ -128,7 +132,7 @@ const SprintPage = () => {
             id: "startDate",
             cell: (info) => (
                 <p className='font-semibold text-gray-700 dark:text-slate-100'>
-                    {info.renderValue()}
+                    {format(info.renderValue() ?? new Date(), "dd-MM-yyyy")}
                 </p>
             ),
             header: () => <span>Description</span>,
@@ -137,7 +141,7 @@ const SprintPage = () => {
             id: "endDate",
             cell: (info) => (
                 <p className='font-semibold text-gray-700 dark:text-slate-100'>
-                    {info.renderValue()}
+                    {format(info.renderValue() ?? new Date(), "dd-MM-yyyy")}
                 </p>
             ),
             header: () => <span>Description</span>,
@@ -204,19 +208,13 @@ const SprintPage = () => {
 
                 <div className='border-b border-gray-200 px-5 py-4 dark:border-gray-800'>
                     <div className='flex items-center  justify-end  gap-2 md:gap-4 flex-wrap'>
-                        <Switch
-                            onChange={() => {
-                                setIsActive(!isActive);
-                            }}
+                        <CheckSwitch
+                            selectedChecked={isActive}
+                            setSelectedChecked={setIsActive}
                             label='Active'
-                            defaultChecked={isActive}
                         />
 
-                        <SearchBar
-                            setKeyword={setKeyword}
-                            onChange={() => handleClearFilter()}
-                            keyword={keyword}
-                        />
+                        <SearchBar setKeyword={setKeyword} keyword={keyword} />
 
                         <Button
                             variant='outline'
@@ -237,14 +235,7 @@ const SprintPage = () => {
                         handleNext={handleNext}
                         handlePrevious={handlePrevious}
                         data={dataList?.data.result ?? []}
-                        pagination={
-                            dataList?.data?.pagination ?? {
-                                currentPage: 1,
-                                pageSize: 10,
-                                totalCount: 10,
-                                totalPages: 1,
-                            }
-                        }
+                        pagination={dataList?.data?.pagination}
                     />
                 </div>
             </div>

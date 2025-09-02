@@ -16,7 +16,7 @@ type IProps<T> = {
     handlePrevious?: () => void;
     handleNext?: () => void;
     isFetching: boolean;
-    pagination: {
+    pagination?: {
         currentPage: number;
         pageSize: number;
         totalCount: number;
@@ -31,7 +31,12 @@ const ReactTable = <T extends object>({
     handlePrevious = () => {},
     handleNext = () => {},
     isFetching,
-    pagination,
+    pagination = {
+        currentPage: 1,
+        pageSize: 10,
+        totalCount: data?.length ?? 0,
+        totalPages: 1,
+    },
 }: IProps<T>) => {
     console.log({
         pagination,
@@ -136,13 +141,20 @@ const ReactTable = <T extends object>({
                 </table>
             </div>
 
+            {!isFetching && pagination?.totalCount === 0 && (
+                <div className='flex items-center w-full  bg-white  px-6 py-4 dark:border-gray-800 dark:bg-slate-800'>
+                    <div className='text-center w-full text-gray-600'>
+                        No Data Found.
+                    </div>
+                </div>
+            )}
             {showPagination && (
-                <div className='flex items-center justify-between bg-white border-t border-gray-200 px-6 py-4 dark:border-gray-800 dark:bg-slate-800'>
+                <div className='flex items-center w-full justify-between bg-white border-t border-gray-200 px-6 py-4 dark:border-gray-800 dark:bg-slate-800'>
                     <div className='flex items-center justify-between '>
                         <p className='mr-4 text-sm text-gray-700 dark:text-slate-100'>
                             Total pages :
                             <span className='mx-1 px-1 font-medium'>
-                                {pagination?.totalPages}{" "}
+                                {pagination?.totalPages}
                             </span>
                         </p>
                         <p className='text-sm text-gray-700 dark:text-slate-100'>
@@ -158,12 +170,12 @@ const ReactTable = <T extends object>({
                             </span>
                             of
                             <span className='mx-1 px-1 font-medium'>
-                                {pagination?.totalCount}
+                                {String(pagination?.totalCount)}
                             </span>
                             results
                         </p>
                     </div>
-                    <nav className='flex items-center justify-between gap-6 px-4 py-2'>
+                    <nav className='flex items-center justify-between gap-6 '>
                         <button
                             disabled={pagination?.currentPage === 1}
                             onClick={() => handlePrevious()}

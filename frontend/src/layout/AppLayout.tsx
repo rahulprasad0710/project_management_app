@@ -40,7 +40,8 @@ const AppLayout: React.FC = () => {
             {authenticateEmployee?.id ? (
                 <LayoutContent />
             ) : (
-                <Navigate to={"/"} />
+                // <Navigate to={"/"} />
+                <LayoutContent />
             )}
         </SidebarProvider>
     );

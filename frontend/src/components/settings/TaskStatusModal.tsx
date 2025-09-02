@@ -4,16 +4,16 @@ import {
     useCreateTaskStatusMutation,
     useUpdateTaskStatusMutation,
 } from "@/api/hooks/useTaskStatus";
+import { useEffect, useState } from "react";
 
 import Button from "@/components/ui/button/Button";
-import { Edit } from "lucide-react";
+import CheckSwitch from "../molecules/CheckSwitch";
 import type { ITaskStatusResponse } from "@/types/config.types";
 import Label from "@/components/form/Label";
 import type { SubmitHandler } from "react-hook-form";
 import { getCustomerError } from "@/utils/customError";
 import { inputFieldClass } from "@/utils/style";
 import { toast } from "react-toastify";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -31,6 +31,7 @@ interface IFormInput {
 }
 
 const TaskStatusModal = (props: Props) => {
+    const [isActive, setIsActive] = useState<boolean>(true);
     const { handleCloseModal, selectedData } = props;
     const [createMutation] = useCreateTaskStatusMutation();
     const [updateMutation] = useUpdateTaskStatusMutation();
@@ -77,7 +78,6 @@ const TaskStatusModal = (props: Props) => {
 
                 if (response?.success) {
                     toast.success("Task status updated successfully");
-                    setToggle(false);
                 }
             } else {
                 const response = await createMutation({
@@ -88,7 +88,6 @@ const TaskStatusModal = (props: Props) => {
 
                 if (response?.success) {
                     toast.success("Task status added successfully");
-                    setToggle(false);
                 }
             }
         } catch (err) {
@@ -133,6 +132,9 @@ const TaskStatusModal = (props: Props) => {
                                         {errors.name.message}
                                     </span>
                                 )}
+                                <p className='text-sm text-blue-400 mt-1'>
+                                    eg. To Do , In Progress , Completed.
+                                </p>
                             </div>
                         </div>
                         <div className='col-span-1'>
@@ -159,23 +161,30 @@ const TaskStatusModal = (props: Props) => {
                         </div>
                     </div>
                 </div>
-                <div className='flex items-center gap-3 px-2 mt-6 lg:justify-end'>
-                    <Button
-                        size='sm'
-                        variant='outline'
-                        onClick={() => handleCloseModal()}
-                    >
-                        Close
-                    </Button>
+                <div className='flex items-center gap-3 px-2 mt-6 justify-between'>
+                    <CheckSwitch
+                        selectedChecked={isActive}
+                        setSelectedChecked={setIsActive}
+                        label='Active'
+                    />
+                    <div className='flex items-center gap-4 justify-end'>
+                        <Button
+                            size='sm'
+                            variant='outline'
+                            onClick={() => handleCloseModal()}
+                        >
+                            Close
+                        </Button>
 
-                    <Button
-                        onClick={handleSubmit(handleSubmitForm)}
-                        disabled={isSubmitting}
-                        type='button'
-                        size='sm'
-                    >
-                        {selectedData?.id ? "Update" : "Add"}
-                    </Button>
+                        <Button
+                            onClick={handleSubmit(handleSubmitForm)}
+                            disabled={isSubmitting}
+                            type='button'
+                            size='sm'
+                        >
+                            {selectedData?.id ? "Update" : "Add"}
+                        </Button>
+                    </div>
                 </div>
             </form>
         </div>

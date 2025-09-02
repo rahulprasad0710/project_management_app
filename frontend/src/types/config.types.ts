@@ -272,6 +272,7 @@ export interface ILabelPayload {
     name: string;
     description?: string;
     colorCode: string;
+    isActive: boolean;
 }
 
 export interface ILabelUpdatePayload extends Partial<ILabelPayload> {

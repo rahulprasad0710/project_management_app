@@ -9,13 +9,16 @@ import {
     useCreateLabelMutation,
     useUpdateLabelMutation,
 } from "@api/hooks/useLabel";
+import { useEffect, useState } from "react";
 
+import CheckSwitch from "@/components/molecules/CheckSwitch";
 import Label from "@/components/form/Label";
+import ModalHeader from "@/components/atoms/ModalHeader";
 import { Spinner } from "@/components/atoms/Spinner";
 import type { SubmitHandler } from "react-hook-form";
+import Switch from "@/components/form/switch/Switch";
 import { inputFieldClass } from "@/utils/style";
 import { toast } from "react-toastify";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -28,16 +31,17 @@ type Props = {
 interface IFormInput {
     colorCode: string;
     name: string;
-    description: string | undefined;
+    description: string;
 }
 
 const TaskLabelModal = (props: Props) => {
     const { selectedData, handleCloseModal } = props;
+    const [isActive, setIsActive] = useState<boolean>(true);
 
     const [createMutation] = useCreateLabelMutation();
     const [updateMutation] = useUpdateLabelMutation();
 
-    const defaultValues: IFormInput = {
+    const defaultValues = {
         colorCode: "",
         name: "",
         description: "",
@@ -46,7 +50,7 @@ const TaskLabelModal = (props: Props) => {
     const schema = yup.object().shape({
         name: yup.string().required("Task status name is required"),
         colorCode: yup.string().required("Color code is required"),
-        description: yup.string().optional(),
+        description: yup.string().default(""),
     });
 
     const {
@@ -61,11 +65,16 @@ const TaskLabelModal = (props: Props) => {
 
     useEffect(() => {
         if (selectedData?.id) {
+            console.log({
+                selectedDataActive: selectedData?.isActive,
+            });
             reset({
                 name: selectedData.name,
                 colorCode: selectedData.colorCode,
                 description: selectedData.description,
             });
+
+            setIsActive(selectedData?.isActive);
         }
     }, [selectedData]);
 
@@ -76,6 +85,7 @@ const TaskLabelModal = (props: Props) => {
             name: data.name,
             colorCode: data.colorCode,
             description: data.description,
+            isActive: isActive,
         };
 
         try {
@@ -108,11 +118,10 @@ const TaskLabelModal = (props: Props) => {
 
     return (
         <div className='relative w-full p-4 overflow-y-auto bg-white no-scrollbar rounded-3xl dark:bg-gray-900 lg:p-6'>
-            <div className='px-2 pr-14'>
-                <h4 className='mb-2 text-xl font-semibold text-gray-800 dark:text-white/90'>
-                    Add Employee
-                </h4>
+            <div className='p-2 pb-3'>
+                <ModalHeader isAdd={!selectedData?.id} title='Label' />
             </div>
+
             <form
                 className='bg-white px-4 py-4 dark:bg-slate-800'
                 onSubmit={handleSubmit(onSubmit)}
@@ -185,29 +194,38 @@ const TaskLabelModal = (props: Props) => {
                     </div>
                 </div>
 
-                <div className='mt-4 flex items-center justify-end gap-4'>
-                    <button
-                        onClick={handleCloseModal}
-                        className='focus:shadow-outline rounded bg-gray-100 px-4 py-2 font-bold text-gray-500 hover:text-gray-800'
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={handleSubmit(onSubmit)}
-                        disabled={isSubmitting}
-                        className={` ${
-                            isSubmitting ? "opacity-50" : ""
-                        } focus:shadow-outline rounded bg-blue-500 px-8 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none`}
-                    >
-                        {isSubmitting ? (
-                            <Spinner />
-                        ) : (
-                            <span>
-                                {" "}
-                                {selectedData?.id ? "Update" : "Submit"}{" "}
-                            </span>
-                        )}
-                    </button>
+                <div className='mt-4 flex items-center justify-between gap-4'>
+                    <CheckSwitch
+                        selectedChecked={isActive}
+                        setSelectedChecked={setIsActive}
+                        label='Active'
+                    />
+                    <div className='flex gap-4'>
+                        <button
+                            onClick={handleCloseModal}
+                            className='focus:shadow-outline rounded bg-gray-100 px-4 py-2 font-bold text-gray-500 hover:text-gray-800'
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleSubmit(onSubmit)}
+                            disabled={isSubmitting}
+                            className={` ${
+                                isSubmitting ? "opacity-50" : ""
+                            } focus:shadow-outline rounded bg-blue-500 px-8 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none`}
+                        >
+                            {isSubmitting ? (
+                                <Spinner />
+                            ) : (
+                                <span>
+                                    {" "}
+                                    {selectedData?.id
+                                        ? "Update"
+                                        : "Submit"}{" "}
+                                </span>
+                            )}
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>

@@ -79,7 +79,7 @@ export const taskStatusEndpoints = (
     }),
 
     updateTaskStatus: build.mutation<
-        Response<ITaskStatusResponse>,
+        Response<ITaskStatusUpdatePayload>,
         ITaskStatusUpdatePayload
     >({
         query: ({ id, ...payload }) => ({
