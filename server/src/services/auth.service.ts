@@ -3,6 +3,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import APP_CONSTANT from "../constants/AppConfig";
 import AppError from "../utils/AppError";
 import { ErrorType } from "../enums/Eums";
+import { RedisService } from "./config/redis.service";
 import UserService from "./users.service";
 // src/services/googleAuth.service.ts
 import bcrypt from "bcryptjs";
@@ -54,6 +55,19 @@ const loginWithCredentials = async (email: string, password: string) => {
         throw new AppError("User not found", 401, ErrorType.NOT_FOUND_ERROR);
     }
 
+    const userInternalCompany = await userService.getInternalCompanyByUserId(
+        userFromDB.id
+    );
+
+    const companyInfo = await userService.getUserFeatures(
+        userFromDB.id,
+        userInternalCompany
+    );
+
+    console.log({
+        userInternalCompany,
+    });
+
     // const isPasswordCorrect = await checkPassword(
     //     password,
     //     userFromDB.password
@@ -83,6 +97,14 @@ const loginWithCredentials = async (email: string, password: string) => {
         loginType: "credentials",
     });
 
+    RedisService.setValue(`user:${userFromDB?.id}`, {
+        id: userFromDB?.id,
+        email: userFromDB?.email,
+        type: "credentials",
+        accessToken,
+        companyInfo,
+    });
+
     const refreshToken = generateToken.refreshToken({
         userId: userFromDB?.id,
         userType: "credentials",
@@ -91,7 +113,13 @@ const loginWithCredentials = async (email: string, password: string) => {
 
     await userService.updateRefreshToken(userFromDB.id, refreshToken);
 
-    return { user: userFromDB, accessToken, refreshToken, authenticated: true };
+    return {
+        user: userFromDB,
+        accessToken,
+        refreshToken,
+        authenticated: true,
+        companyInfo,
+    };
 };
 
 const logout = async (userId: number) => {

@@ -39,15 +39,10 @@ export interface IUploadFileURL extends IUploadFile {
 }
 
 export class UploadService {
-    constructor(
-        private readonly uploadRepository = dataSource.getRepository(
-            UploadFile
-        ),
-        private readonly userRepository = dataSource.getRepository(User)
-    ) {}
+    private readonly uploadRepository = dataSource.getRepository(UploadFile);
+    private readonly userRepository = dataSource.getRepository(User);
 
     async create(uploadFile: IAwsUploadFile, userId: number) {
-        console.log("LOG: ~ UploadService ~ create ~ userId:", userId);
         const id = await generateUniqueId();
         const s3Key = `${id}_${uploadFile.originalname}`;
 

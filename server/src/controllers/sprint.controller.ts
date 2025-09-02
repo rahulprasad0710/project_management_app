@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 
+import { IPagination } from "../types/express";
 import SprintService from "../services/sprint.service";
 
 const sprintService = new SprintService();
@@ -11,7 +12,6 @@ const create = async (req: Request, res: Response): Promise<void> => {
             goal: req.body.goal,
             startDate: req.body.startDate,
             endDate: req.body.endDate,
-            addedBy: req.body.addedBy,
         });
 
         res.status(201).json({
@@ -28,23 +28,23 @@ const create = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-const getAll = async (_req: Request, res: Response): Promise<void> => {
-    const { isActive } = _req.query; // isActive is a string
+const getAll = async (req: Request, res: Response): Promise<void> => {
+    const { skip, take, keyword, isPaginationEnabled }: IPagination =
+        req.pagination;
+    const { isActive } = req.query;
+
     try {
-        const data = await sprintService.getAll(
-            isActive === "true" ? true : false
-        );
+        const response = await sprintService.getAll({
+            isActive: isActive === "true",
+            isPaginationEnabled,
+            keyword,
+            skip,
+            take,
+        });
 
         res.status(200).json({
             success: true,
-            data: {
-                result: data,
-                pagination: {
-                    currentPage: 1,
-                    pageSize: 10,
-                    totalPages: 1,
-                },
-            },
+            data: response,
             message: "Sprints fetched successfully",
         });
     } catch (error) {

@@ -18,12 +18,8 @@ interface IRoomType {
 }
 
 export class RoomTypeService {
-    constructor(
-        private readonly roomTypeRepository = dataSource.getRepository(
-            RoomType
-        ),
-        private readonly uploadRepository = dataSource.getRepository(UploadFile)
-    ) {}
+    private readonly roomTypeRepository = dataSource.getRepository(RoomType);
+    private readonly uploadRepository = dataSource.getRepository(UploadFile);
 
     async create(roomType: IRoomType) {
         const roomTypeObj = new RoomType();

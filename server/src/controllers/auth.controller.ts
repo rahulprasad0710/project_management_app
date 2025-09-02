@@ -8,13 +8,13 @@ const internalCompanyService = new InternalCompanyService();
 const login = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
 
-    const { user, accessToken, refreshToken } =
+    const { user, accessToken, refreshToken, companyInfo } =
         await authService.loginWithCredentials(email, password);
 
-    const companyInfo =
-        await internalCompanyService.getInternalCompanyDetailsForEmployee(
-            user.id
-        );
+    // const companyInfo =
+    //     await internalCompanyService.getInternalCompanyDetailsForEmployee(
+    //         user.id
+    //     );
 
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,

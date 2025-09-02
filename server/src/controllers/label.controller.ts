@@ -12,6 +12,7 @@ const create = async (req: Request, res: Response): Promise<void> => {
         description: req.body.description,
         addedBy: verifiedUser,
         colorCode: req.body.colorCode,
+        isActive: req.body.isActive,
     });
 
     res.status(201).json({

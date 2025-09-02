@@ -236,6 +236,64 @@ export class UserService {
         return result;
     }
 
+    async getUserFeatures(
+        employeeId: number,
+        internalCompanyList: UserInternalCompany[]
+    ) {
+        const resultAll = await Promise.all(
+            internalCompanyList.map(async (company) => {
+                const feature: Feature[] = await dataSource
+                    .getRepository(Feature)
+                    .createQueryBuilder("features")
+                    .select([
+                        "features.id",
+                        "features.name",
+                        "features.slug",
+                        "features.profilePicture",
+                    ])
+                    .leftJoin("features.featureTeamMember", "user")
+
+                    .addSelect("user.id", "features_user_id")
+                    .leftJoin("features.active_sprint", "sprint")
+                    .addSelect("sprint.id", "features_sprint_id")
+                    .addSelect("sprint.name", "features_sprint_name")
+                    .where("user.id = :userId", { userId: employeeId })
+                    .andWhere(
+                        "features.internalCompanyId = :internalCompanyId",
+                        {
+                            internalCompanyId: company.internal_company_id,
+                        }
+                    )
+                    .getRawMany();
+                return {
+                    internal_company_id: company.internal_company.id,
+                    internal_company_name: company.internal_company.name,
+                    internal_company_slug: company.internal_company.slug,
+                    internal_company_logoUrl: company.internal_company.logoUrl,
+                    internal_company_user_id: employeeId,
+                    feature,
+                };
+            })
+        );
+
+        console.log({
+            resultAll,
+        });
+
+        return resultAll;
+
+        //  feature: feature.map((item) => {
+        //                 return {
+        //                     features_id: item.id,
+        //                     features_name: item.name,
+        //                     features_slug: item.slug,
+        //                     features_profilePicture: item.profilePicture,
+        //                     features_user_id: employeeId,
+        //                     features_sprint_id: item.active_sprint,
+        //                 };
+        //             }),
+    }
+
     async generateEmployeeId() {
         const [response] = await this.userRepository.find({
             order: { id: "DESC" },

@@ -19,11 +19,12 @@ const getPresignedUrl = async (req: Request, res: Response): Promise<void> => {
 };
 
 const create = async (req: Request, res: Response): Promise<void> => {
+    const { verifiedUserId } = req;
     const { file } = req;
 
     if (!file) return;
 
-    const result = await uploadService.create(file, 48);
+    const result = await uploadService.create(file, verifiedUserId);
     res.status(201).json({
         success: true,
         data: result,

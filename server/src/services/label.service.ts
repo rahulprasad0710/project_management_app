@@ -9,27 +9,24 @@ interface ILabel {
     description?: string;
     addedBy: User;
     colorCode: string;
+    isActive: boolean;
 }
 
 export class LabelService {
-    constructor(
-        private readonly labelRepository = dataSource.getRepository(Label)
-    ) {}
+    private readonly labelRepository = dataSource.getRepository(Label);
 
     async create(label: ILabel) {
-        const labelObj = new Label();
-        console.log({
-            aa: label.addedBy,
-        });
-        labelObj.name = label.name;
-        labelObj.description = label.description || "";
-        labelObj.addedBy = label.addedBy;
-        labelObj.colorCode = label.colorCode;
-        labelObj.addedAt = new Date();
-        labelObj.isActive = true;
+        const labelPayload = new Label();
+
+        labelPayload.name = label.name;
+        labelPayload.description = label.description || "";
+        labelPayload.addedBy = label.addedBy;
+        labelPayload.colorCode = label.colorCode;
+        labelPayload.addedAt = new Date();
+        labelPayload.isActive = label.isActive;
 
         const { addedBy, ...result } = await this.labelRepository.save(
-            labelObj
+            labelPayload
         );
         return result;
     }

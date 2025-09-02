@@ -13,18 +13,12 @@ export class Sprint {
     @Column({ type: "text", nullable: true })
     goal: string;
 
-    @Column({ type: "date" })
+    @Column({ type: "timestamp" })
     startDate: Date;
 
-    @Column({ type: "date" })
+    @Column({ type: "timestamp" })
     endDate: Date;
 
     @Column({ default: true })
     isActive: boolean;
-
-    @Column()
-    addedAt: Date;
-
-    @ManyToOne(() => User, (user) => user.id)
-    addedBy: User;
 }

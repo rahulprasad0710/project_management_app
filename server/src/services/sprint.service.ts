@@ -1,5 +1,8 @@
+import { IActivePagination } from "../types/payload";
+import { ILike } from "typeorm";
 import { Sprint } from "../db/entity/sprint";
 import { User } from "../db/entity/User";
+import createPagination from "../utils/createPagination";
 import dataSource from "../db/data-source";
 
 interface ISprint {
@@ -7,13 +10,10 @@ interface ISprint {
     goal?: string;
     startDate: Date;
     endDate: Date;
-    addedBy: User;
 }
 
 export class SprintService {
-    constructor(
-        private readonly sprintRepository = dataSource.getRepository(Sprint)
-    ) {}
+    private readonly sprintRepository = dataSource.getRepository(Sprint);
 
     async create(sprint: ISprint) {
         const sprintObj = new Sprint();
@@ -21,18 +21,32 @@ export class SprintService {
         sprintObj.goal = sprint.goal || "";
         sprintObj.startDate = sprint.startDate;
         sprintObj.endDate = sprint.endDate;
-        sprintObj.addedBy = sprint.addedBy;
-        sprintObj.addedAt = new Date();
         sprintObj.isActive = true;
 
         return await this.sprintRepository.save(sprintObj);
     }
 
-    async getAll(isActive: boolean) {
-        const response = await this.sprintRepository.find({
-            where: { isActive: isActive },
+    async getAll(query: IActivePagination) {
+        const { skip, take, isPaginationEnabled, keyword, isActive } = query;
+
+        const [result, totalCount] = await this.sprintRepository.findAndCount({
+            skip,
+            take,
+            where: {
+                ...{ isActive: isActive },
+                ...(keyword ? { name: ILike(`%${keyword}%`) } : {}),
+            },
         });
-        return response;
+
+        return {
+            result: result,
+            pagination: createPagination(
+                skip,
+                take,
+                totalCount,
+                isPaginationEnabled
+            ),
+        };
     }
 
     async getById(id: number) {
