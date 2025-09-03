@@ -55,12 +55,12 @@ export const roomTypeEndpoints = (
             result
                 ? [
                       ...result.data.result.map((label) => ({
-                          type: "Labels" as const,
+                          type: "RoomTypes" as const,
                           id: label.id,
                       })),
-                      { type: "Labels" as const, id: "LIST" },
+                      { type: "RoomTypes" as const, id: "LIST" },
                   ]
-                : [{ type: "Labels" as const, id: "LIST" }],
+                : [{ type: "RoomTypes" as const, id: "LIST" }],
     }),
 
     getRoomTypesById: build.query<
@@ -90,7 +90,7 @@ export const roomTypeEndpoints = (
         IRoomTypeUpdatePayload
     >({
         query: ({ id, ...payload }) => ({
-            url: `roomTypeApiRoute/${id}`,
+            url: `${roomTypeApiRoute}/${id}`,
             method: "PUT",
             body: payload,
         }),

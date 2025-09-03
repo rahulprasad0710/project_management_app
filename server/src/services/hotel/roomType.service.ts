@@ -37,7 +37,9 @@ export class RoomTypeService {
             roomTypeObj.thumbnailUrl = uploadFile;
         }
 
-        return await this.roomTypeRepository.save(roomTypeObj);
+        const result = await this.roomTypeRepository.save(roomTypeObj);
+
+        return result;
     }
 
     async getAll(query: IActivePagination) {

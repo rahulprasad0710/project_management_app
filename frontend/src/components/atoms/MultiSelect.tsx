@@ -64,7 +64,7 @@ const MultiSelect = (props: Props) => {
                 onClick={() => setOpenSelect(!openSelect)}
                 type='button'
                 disabled={isDisabled}
-                className='mb-2 w-full flex h-11 rounded-lg border border-gray-300 py-1.5 pl-3 pr-3 shadow-theme-xs outline-hidden transition focus:border-brand-300 focus:shadow-focus-ring dark:border-gray-700 dark:bg-gray-900 dark:focus:border-brand-300'
+                className='mb-2 w-full flex min-h-11 rounded-lg border border-gray-300 py-1.5 pl-3 pr-3 shadow-theme-xs outline-hidden transition focus:border-brand-300 focus:shadow-focus-ring dark:border-gray-700 dark:bg-gray-900 dark:focus:border-brand-300'
             >
                 {selectedList?.length === 0 && (
                     <span className='text-gray-500 ml-2'>

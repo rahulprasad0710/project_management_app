@@ -15,6 +15,7 @@ import {
 } from "@/api/hooks/useUpload";
 import { useEffect, useState } from "react";
 
+import CheckSwitch from "@/components/molecules/CheckSwitch";
 import { CloseIcon } from "@/icons";
 import { FacilityOptions } from "@/constant/Hotel";
 import FileInput from "@/components/form/input/FileInput";
@@ -24,7 +25,6 @@ import MultiSelect from "@/components/atoms/MultiSelect";
 import { PlusIcon } from "lucide-react";
 import { Spinner } from "@/components/atoms/Spinner";
 import type { SubmitHandler } from "react-hook-form";
-import Switch from "@/components/form/switch/Switch";
 import { inputFieldClass } from "@/utils/style";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
@@ -94,8 +94,24 @@ const RoomTypeModal = (props: Props) => {
             reset({
                 name: selectedData.name,
                 description: selectedData.description,
+                roomPrice: String(selectedData.roomPrice),
+                total_number_of_rooms: String(
+                    selectedData.total_number_of_rooms
+                ),
             });
 
+            setSelectedFacilities(
+                selectedData?.facilities?.map((item) => {
+                    const temp = FacilityOptions.find(
+                        (fac) => fac.key === item
+                    );
+                    if (temp) {
+                        return { label: temp.label, value: temp.key };
+                    }
+                    return { label: item, value: item };
+                })
+            );
+            setIsRoomActive(selectedData.isActive);
             if (selectedData?.thumbnailUrlId) {
                 fetchUpload({
                     uploadId: selectedData.thumbnailUrlId,
@@ -114,9 +130,11 @@ const RoomTypeModal = (props: Props) => {
 
     const onSubmit: SubmitHandler<IFormInput> = async (data) => {
         try {
-            console.log(files);
-
-            if (files?.length === 0) {
+            console.log({
+                files,
+                thumbnailData,
+            });
+            if (files?.length === 0 && !thumbnailData) {
                 setImageError(true);
                 return;
             }
@@ -155,7 +173,7 @@ const RoomTypeModal = (props: Props) => {
 
                 const response = await updateMutation(updatePayload).unwrap();
                 if (response.success) {
-                    toast.success("Employee updated successfully");
+                    toast.success("Room Type updated successfully");
                     handleCloseModal();
                 }
             } else {
@@ -164,7 +182,7 @@ const RoomTypeModal = (props: Props) => {
                 };
                 const response = await createMutation(addPayload).unwrap();
                 if (response.success) {
-                    toast.success("New employee added successfully");
+                    toast.success("New Room Type added successfully");
                     handleCloseModal();
                 }
             }
@@ -188,7 +206,6 @@ const RoomTypeModal = (props: Props) => {
                             src={thumbnailData?.data?.url}
                             alt={"upload"}
                             style={{
-                                width: "120px",
                                 height: "120px",
                                 objectFit: "cover",
                                 borderRadius: "8px",
@@ -198,7 +215,7 @@ const RoomTypeModal = (props: Props) => {
                 )}
                 {files.map((file, index) => (
                     <div
-                        className='relative my-4 object-cover '
+                        className='relative '
                         key={index}
                         style={{ textAlign: "center" }}
                     >
@@ -219,7 +236,6 @@ const RoomTypeModal = (props: Props) => {
                             src={URL.createObjectURL(file)}
                             alt={`Preview ${index}`}
                             style={{
-                                width: "120px",
                                 height: "120px",
                                 objectFit: "cover",
                                 borderRadius: "8px",
@@ -365,10 +381,9 @@ const RoomTypeModal = (props: Props) => {
 
                 <div className='mt-4 flex items-center justify-between gap-4'>
                     <div className='relative'>
-                        <Switch
-                            onChange={() => {
-                                setIsRoomActive(!isRoomActive);
-                            }}
+                        <CheckSwitch
+                            selectedChecked={isRoomActive}
+                            setSelectedChecked={setIsRoomActive}
                             label='Activate Room'
                         />
                     </div>

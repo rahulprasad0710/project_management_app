@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/button/Button";
+import CheckSwitch from "@/components/molecules/CheckSwitch";
 import type { IRoomTypeResponse } from "@/types/hotel.type";
 import { Modal } from "@/components/common/Modal";
 import { PlusIcon } from "lucide-react";
@@ -9,7 +10,6 @@ import ReactTable from "@/components/common/ReactTable";
 import RoomTypeModal from "@/modal/RoomTypeModal";
 import SearchBar from "@/components/molecules/SearchBar";
 import { SquarePen } from "lucide-react";
-import Switch from "@/components/form/switch/Switch";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useLazyGetRoomTypesQuery } from "@api/hooks/hotel/useRoomType";
 
@@ -197,17 +197,15 @@ const RoomTypePage = () => {
 
                 <div className='border-b border-gray-200 px-5 py-4 dark:border-gray-800'>
                     <div className='flex items-center  justify-end  gap-2 md:gap-4 flex-wrap'>
-                        <Switch
-                            onChange={() => {
-                                setIsActive(!isActive);
-                            }}
+                        <CheckSwitch
                             label='Active'
-                            defaultChecked={isActive}
+                            selectedChecked={isActive}
+                            setSelectedChecked={setIsActive}
                         />
 
                         <SearchBar
                             setKeyword={setKeyword}
-                            onChange={() => handleClearFilter()}
+                            onClose={() => handleClearFilter()}
                             keyword={keyword}
                         />
 

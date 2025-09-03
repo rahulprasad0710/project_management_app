@@ -72,7 +72,10 @@ export class UploadService {
         uploadPayload.updatedAt = new Date();
 
         const result = await this.uploadRepository.save(uploadPayload);
-        return result;
+        return {
+            ...result,
+            createdBy: result.createdBy,
+        };
     }
 
     async getPresignedUrl({ bucketKey }: { bucketKey: string }) {

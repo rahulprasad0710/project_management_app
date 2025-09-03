@@ -1,6 +1,5 @@
-import { Grid3X3, Search, X } from "lucide-react";
-
 import React from "react";
+import { X } from "lucide-react";
 
 type IProps = {
     keyword: string;
