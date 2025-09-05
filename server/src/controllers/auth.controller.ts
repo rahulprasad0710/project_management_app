@@ -1,20 +1,14 @@
 import { Request, Response } from "express";
 
-import { InternalCompanyService } from "./../services/internalCompany.service";
 import authService from "../services/auth.service";
-
-const internalCompanyService = new InternalCompanyService();
 
 const login = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
 
-    const { user, accessToken, refreshToken, companyInfo } =
-        await authService.loginWithCredentials(email, password);
-
-    // const companyInfo =
-    //     await internalCompanyService.getInternalCompanyDetailsForEmployee(
-    //         user.id
-    //     );
+    const { refreshToken, ...rest } = await authService.loginWithCredentials(
+        email,
+        password
+    );
 
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
@@ -25,14 +19,7 @@ const login = async (req: Request, res: Response): Promise<void> => {
         .status(200)
         .json({
             success: true,
-            data: {
-                id: user?.id,
-                email: user?.email,
-                type: "credentials",
-                accessToken,
-                refreshToken,
-                companyInfo,
-            },
+            data: rest,
             message: "login successful",
         });
 };
@@ -41,10 +28,17 @@ const logout = async (req: Request, res: Response) => {
     const { verifiedUserId } = req;
     const response = await authService.logout(verifiedUserId);
 
-    res.status(200).json({
-        success: true,
-        data: response,
-    });
+    res.cookie("refreshToken", null, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+    })
+        .status(200)
+        .json({
+            success: true,
+            data: response,
+            message: "login successful",
+        });
 };
 
 const verifyEmailAndSetPassword = async (req: Request, res: Response) => {
@@ -73,8 +67,20 @@ const refreshUser = async (req: Request, res: Response) => {
     });
 };
 
+const authenticateMe = async (req: Request, res: Response) => {
+    const { verifiedUserId } = req;
+    const response = await authService.authenticateUser(verifiedUserId);
+
+    res.status(200).json({
+        success: true,
+        data: response,
+        message: "User authenticated successfully",
+    });
+};
+
 export default {
     login,
     verifyEmailAndSetPassword,
     logout,
+    authenticateMe,
 };

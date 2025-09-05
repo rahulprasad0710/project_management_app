@@ -1,7 +1,8 @@
+import Spinner2 from "@/components/atoms/Spinner2";
 import { setAuthenticateEmployeeDetailsData } from "@/store";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { useLazyAuthMeQuery } from "@/api/api";
+import { useLazyGetUserAuthenticatedQuery } from "@apiHooks/useAuthUser";
 
 export default function AppInitializer({
     children,
@@ -9,23 +10,35 @@ export default function AppInitializer({
     children: React.ReactNode;
 }) {
     const dispatch = useDispatch();
-    const [triggerAuthMe] = useLazyAuthMeQuery();
+    const [authenticateMe, { isFetching }] = useLazyGetUserAuthenticatedQuery();
+
+    const handleLogout = () => {
+        dispatch(setAuthenticateEmployeeDetailsData(null));
+    };
 
     useEffect(() => {
-        const refreshToken = localStorage.getItem("accessToken");
-        if (refreshToken) {
-            triggerAuthMe()
+        const accessToken = localStorage.getItem("accessToken");
+        if (accessToken) {
+            authenticateMe()
                 .unwrap()
                 .then((res) => {
-                    dispatch(setAuthenticateEmployeeDetailsData(res));
+                    if (res?.data && res?.success) {
+                        dispatch(
+                            setAuthenticateEmployeeDetailsData(
+                                res?.data || null
+                            )
+                        );
+                    } else {
+                        handleLogout();
+                    }
                 })
                 .catch(() => {
-                    localStorage.removeItem("accessToken");
-                    localStorage.removeItem("persist:root");
-                    dispatch(setAuthenticateEmployeeDetailsData(null));
+                    handleLogout();
                 });
+        } else {
+            handleLogout();
         }
-    }, [dispatch, triggerAuthMe]);
+    }, [dispatch, authenticateMe]);
 
-    return <>{children}</>;
+    return <>{isFetching ? <Spinner2 /> : children}</>;
 }

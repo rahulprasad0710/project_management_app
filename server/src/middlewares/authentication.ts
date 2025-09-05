@@ -66,7 +66,11 @@ const verifyToken = async (
         const authHeader = req.headers.authorization;
 
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            res.status(401).json({ success: false, message: "Unauthorized" });
+            res.status(401).json({
+                success: false,
+                message: "Unauthorized",
+                data: null,
+            });
             return;
         }
 
@@ -84,6 +88,7 @@ const verifyToken = async (
         const userId = await decodeToken(token);
 
         const user = await verifyFromCredentials(userId);
+        console.log("LOG: ~ verifyToken ~ user:", user);
 
         if (!user) {
             res.status(401).json({

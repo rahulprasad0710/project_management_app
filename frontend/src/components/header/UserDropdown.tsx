@@ -1,11 +1,14 @@
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { setAuthenticateEmployeeDetailsData } from "@/store";
+import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
+import { useLazyGetUserLogoutQuery } from "@apiHooks/useAuthUser";
 import { useNavigate } from "react-router";
 import { useState } from "react";
 
 export default function UserDropdown() {
+    const [logoutUser, { isLoading }] = useLazyGetUserLogoutQuery();
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const dispatch = useDispatch();
@@ -18,13 +21,18 @@ export default function UserDropdown() {
         setIsOpen(false);
     }
 
-    const handleLogout = () => {
-        // Clear user data from local storage or cookies
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("persist:root");
-        dispatch(setAuthenticateEmployeeDetailsData(null));
-
-        navigate("/");
+    const handleLogout = async () => {
+        try {
+            const response = await logoutUser().unwrap();
+            if (response.success) {
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("persist:root");
+                dispatch(setAuthenticateEmployeeDetailsData(null));
+                navigate("/");
+            }
+        } catch {
+            toast.error("Failed to logout. Please try again.");
+        }
     };
     return (
         <div className='relative'>
@@ -151,6 +159,7 @@ export default function UserDropdown() {
                     </li>
                 </ul>
                 <button
+                    disabled={isLoading}
                     onClick={handleLogout}
                     className='flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300'
                 >

@@ -1,15 +1,12 @@
 import type {
-    IAuthEmployeePayload,
-    IAuthEmployeeResponse,
-    IEmployeeResponse,
     IPaginationWithActive,
     IPermissionGroupResponse,
-    IVerifyPayload,
     Response,
     ResponseWithPagination,
 } from "../types/config.types";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+import { authEndpoints } from "./apiRoutes/authApi";
 import { bookingEndpoints } from "./apiRoutes/hotel/bookingApi";
 import { commentEndpoints } from "./apiRoutes/commentApi";
 import { customerEndpoints } from "./apiRoutes/customerApi";
@@ -61,31 +58,9 @@ export const api = createApi({
         "Room",
         "Booking",
         "RoomAvailability",
+        "AuthUser",
     ],
     endpoints: (build) => ({
-        createLoginEmployee: build.mutation<
-            Response<IAuthEmployeeResponse>,
-            IAuthEmployeePayload
-        >({
-            query: (payload) => ({
-                url: "auth/login",
-                method: "POST",
-                body: payload,
-            }),
-            invalidatesTags: ["Users"],
-        }),
-
-        createVerifyEmail: build.mutation<
-            Response<IEmployeeResponse>,
-            IVerifyPayload
-        >({
-            query: (payload) => ({
-                url: "auth/verify-email",
-                method: "POST",
-                body: payload,
-            }),
-        }),
-
         // ! PERMISSION-GROUP-STARTS
         getAllPermissionGroups: build.query<
             ResponseWithPagination<IPermissionGroupResponse[]>,
@@ -131,6 +106,8 @@ export const api = createApi({
         }),
 
         // ! ROLES-STARTS
+
+        ...authEndpoints(build),
         ...internalCompanyEndpoints(build),
         ...roleEndpoints(build),
         ...taskStatusEndpoints(build),
@@ -152,11 +129,6 @@ export const api = createApi({
 });
 
 export const {
-    useCreateLoginEmployeeMutation,
-
-    useCreateEmployeeMutation,
-    //AUTH
-    useCreateVerifyEmailMutation,
     // PERMISSIONS
     useGetAllPermissionGroupsQuery,
     useLazyGetPermissionGroupsDetailsByIdQuery,

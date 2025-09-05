@@ -1,51 +1,17 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
+import { IFeatureInfo, IUserInfo, TInternalCompany } from "../types/types";
 
 import APP_CONSTANT from "../constants/AppConfig";
 import AppError from "../utils/AppError";
 import { ErrorType } from "../enums/Eums";
 import { RedisService } from "./config/redis.service";
+import RoleService from "./role.service";
 import UserService from "./users.service";
-// src/services/googleAuth.service.ts
 import bcrypt from "bcryptjs";
 import generateToken from "../utils/generateToken";
+import jwt from "jsonwebtoken";
 
 const userService = new UserService();
-
-export interface GoogleUserInfo {
-    sub: string; // Google user ID
-    name: string;
-    given_name: string;
-    family_name: string;
-    picture: string;
-    email: string;
-    email_verified: boolean;
-}
-
-export const getGoogleUserInfo = async (
-    accessToken: string
-): Promise<GoogleUserInfo | null | undefined> => {
-    try {
-        const res = await fetch(
-            "https://www.googleapis.com/oauth2/v3/userinfo",
-            {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
-        );
-
-        const data = await res.json();
-
-        if (!data.email) {
-            return null;
-        }
-
-        return data;
-    } catch (error) {
-        console.log("LOG: ~ error:", error);
-        return null;
-    }
-};
+const roleService = new RoleService();
 
 // ! # USER LOGGING IN WITH CREDENTIALS
 const loginWithCredentials = async (email: string, password: string) => {
@@ -54,19 +20,6 @@ const loginWithCredentials = async (email: string, password: string) => {
     if (!userFromDB) {
         throw new AppError("User not found", 401, ErrorType.NOT_FOUND_ERROR);
     }
-
-    const userInternalCompany = await userService.getInternalCompanyByUserId(
-        userFromDB.id
-    );
-
-    const companyInfo = await userService.getUserFeatures(
-        userFromDB.id,
-        userInternalCompany
-    );
-
-    console.log({
-        userInternalCompany,
-    });
 
     // const isPasswordCorrect = await checkPassword(
     //     password,
@@ -97,12 +50,15 @@ const loginWithCredentials = async (email: string, password: string) => {
         loginType: "credentials",
     });
 
+    const userInfo = await getUserInfo(userFromDB?.id);
+
     RedisService.setValue(`user:${userFromDB?.id}`, {
         id: userFromDB?.id,
         email: userFromDB?.email,
         type: "credentials",
-        accessToken,
-        companyInfo,
+        internalCompanies: userInfo?.internalCompanies,
+        role: userInfo?.role,
+        authenticated: true,
     });
 
     const refreshToken = generateToken.refreshToken({
@@ -114,23 +70,29 @@ const loginWithCredentials = async (email: string, password: string) => {
     await userService.updateRefreshToken(userFromDB.id, refreshToken);
 
     return {
-        user: userFromDB,
+        id: userFromDB?.id,
+        email: userFromDB?.email,
+        type: "credentials",
+        internalCompanies: userInfo?.internalCompanies,
+        role: {
+            ...userInfo?.role,
+            permissions: userInfo?.role?.permissions?.map((item) => {
+                return item.enumName;
+            }),
+        },
+
         accessToken,
         refreshToken,
         authenticated: true,
-        companyInfo,
     };
 };
 
 const logout = async (userId: number) => {
-    const user = await userService.getById(userId);
-    if (!user) {
-        throw new AppError("User not found", 401, ErrorType.NOT_FOUND_ERROR);
-    }
+    RedisService.deleteKey(`user:${userId}`);
 
     await userService.updateRefreshToken(userId, undefined);
 
-    return { user, accessToken: null, refreshToken: null };
+    return { id: userId, accessToken: null, refreshToken: null };
 };
 
 const checkPassword = async (enteredPassword: string, realPassword: string) => {
@@ -221,9 +183,85 @@ const refreshUser = async (refreshToken: string) => {
     }
 };
 
+const getUserInfo = async (userId: number) => {
+    const user = await userService.getById(userId);
+
+    if (!user) {
+        return null;
+    } else {
+        const role = await roleService.getById(user.roleId);
+        const internalCompanyList =
+            await userService.getInternalCompanyByUserId({
+                userId: user.id,
+                populateInternalCompany: true,
+            });
+
+        const internalCompaniesWithFeatures: TInternalCompany[] =
+            await Promise.all(
+                internalCompanyList.map(async (item) => {
+                    const features: IFeatureInfo[] =
+                        await userService.getUserFeatures(
+                            user.id,
+                            item.internal_company_id
+                        );
+
+                    return {
+                        internal_company_id: item.internal_company_id,
+                        name: item?.internal_company?.name,
+                        slug: item?.internal_company?.slug,
+                        logoUrl: item?.internal_company?.logoUrl,
+                        isActive: item?.internal_company?.isActive,
+                        features,
+                    };
+                })
+            );
+
+        return {
+            id: user.id,
+            email: user.email,
+            role: role,
+            type: "credentials",
+            internalCompanies: internalCompaniesWithFeatures,
+            authenticated: true,
+        };
+    }
+};
+
+const authenticateUser = async (userId: number) => {
+    const result = await RedisService.getValue<IUserInfo>(`user:${userId}`);
+    if (!result) {
+        const userFromDB = await getUserInfo(userId);
+        if (!userFromDB) {
+            return null;
+        } else {
+            const redisPayload = {
+                id: userFromDB?.id,
+                email: userFromDB?.email,
+                type: "credentials",
+                internalCompanies: userFromDB?.internalCompanies,
+                role: {
+                    ...userFromDB?.role,
+                    permissions: userFromDB?.role?.permissions?.map((item) => {
+                        return item.enumName;
+                    }),
+                },
+                authenticated: true,
+            };
+            RedisService.setValue<IUserInfo>(
+                `user:${userFromDB?.id}`,
+                redisPayload
+            );
+            return redisPayload;
+        }
+    } else {
+        return result;
+    }
+};
+
 export default {
     loginWithCredentials,
     verifyEmailAndSetPassword,
     logout,
     refreshUser,
+    authenticateUser,
 };

@@ -1,6 +1,7 @@
 import "./index.css";
 import "react-toastify/dist/ReactToastify.css";
 
+import AppInitializer from "./layout/AppInitalizer.tsx";
 import { RouterProvider } from "react-router-dom";
 import SocketProvider from "./layout/SocketProvider.tsx";
 import StoreProvider from "./store/StoreProvider.tsx";
@@ -14,7 +15,9 @@ createRoot(document.getElementById("root")!).render(
     <ThemeProvider>
         <StoreProvider>
             <SocketProvider>
-                <RouterProvider router={routes} />
+                <AppInitializer>
+                    <RouterProvider router={routes} />
+                </AppInitializer>
             </SocketProvider>
         </StoreProvider>
         <ToastContainer
@@ -24,4 +27,3 @@ createRoot(document.getElementById("root")!).render(
         />
     </ThemeProvider>
 );
-

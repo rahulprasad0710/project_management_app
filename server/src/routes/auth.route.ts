@@ -5,14 +5,14 @@ import verifyToken from "../middlewares/authentication";
 
 const router = ExpressRouter();
 
+router.get("/me", verifyToken, asyncTryCatchFn(authController.authenticateMe));
+router.get("/logout", verifyToken, asyncTryCatchFn(authController.logout));
 router.post("/login", asyncTryCatchFn(authController.login));
-router.post("/logout", verifyToken, asyncTryCatchFn(authController.logout));
 router.post(
     "/refreshUser",
     verifyToken,
     asyncTryCatchFn(authController.logout)
 );
-
 router.post(
     "/verify-email",
     asyncTryCatchFn(authController.verifyEmailAndSetPassword)

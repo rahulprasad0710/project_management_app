@@ -4,11 +4,15 @@ import AppError from "../utils/AppError";
 import { ErrorType } from "../enums/Eums";
 import { PERMISSION_ENUM } from "../enums/Permission";
 
-type AuthorizePermission = (permissionName: PERMISSION_ENUM) => RequestHandler;
+type TAuthorizePayload = {
+    permissionName: PERMISSION_ENUM;
+};
 
-const authorizePermission: AuthorizePermission = (
-    permissionName: PERMISSION_ENUM
-) => {
+type AuthorizePermission = (payload: TAuthorizePayload) => RequestHandler;
+
+const authorizePermission: AuthorizePermission = ({
+    permissionName,
+}: TAuthorizePayload) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
             const user = req.verifiedUser;

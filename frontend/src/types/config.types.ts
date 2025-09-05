@@ -379,22 +379,28 @@ export interface IAuthEmployeePayload {
     password: string;
 }
 
+export interface IRoleInfo {
+    id: number;
+    name: string;
+    isActive: boolean;
+    permissions: string[];
+}
 export interface IAuthEmployeeResponse {
     id: number;
     email: string;
-    type: "credentials" | string;
-    accessToken: string;
-    refreshToken: string;
+    type: string;
+    internalCompanies: InternalCompanyInfo[];
+    role: IRoleInfo;
+    accessToken?: string | undefined;
     authenticated: boolean;
-    companyInfo: InternalCompanyInfo[];
 }
 
 export interface InternalCompanyInfo {
     internal_company_id: number;
-    internal_company_name: string;
-    internal_company_slug: string;
-    internal_company_logoUrl: string;
-    internal_company_user_id: number;
+    name: string;
+    slug: string;
+    logoUrl: string;
+    isActive: boolean;
 
     feature: FeatureInfo[];
 }
@@ -403,10 +409,10 @@ export interface FeatureInfo {
     features_id: number;
     features_name: string;
     features_slug: string;
-    features_profilePicture: string;
+    features_profilePicture: string | null;
     features_user_id: number;
-    features_sprint_id: number;
-    features_sprint_name: string;
+    features_sprint_id: number | null;
+    features_sprint_name: string | null;
 }
 
 export interface ICompanyDetails {
