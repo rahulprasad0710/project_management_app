@@ -123,7 +123,7 @@ const AddBookingPage = () => {
                 </h4>
                 <form className='bg-white px-4 py-4 dark:bg-slate-800'>
                     <div className='grid grid-cols-3 gap-8 mb-4'>
-                        <div>
+                        <div className='col-span-3 md:col-span-1'>
                             <Label>
                                 Customer's Name
                                 <span className='text-error-500'>*</span>
@@ -153,7 +153,7 @@ const AddBookingPage = () => {
                                 </div>
                             )}
                         </div>
-                        <div>
+                        <div className='col-span-3 md:col-span-1'>
                             <Label>
                                 Mobile Number
                                 <span className='text-error-500'>*</span>
@@ -185,7 +185,7 @@ const AddBookingPage = () => {
                                 </div>
                             )}
                         </div>
-                        <div>
+                        <div className='col-span-3 md:col-span-1'>
                             <Label>
                                 Email
                                 <span className='text-error-500'>*</span>

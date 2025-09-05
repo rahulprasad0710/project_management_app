@@ -12,7 +12,7 @@ export default function AppInitializer({
     const [triggerAuthMe] = useLazyAuthMeQuery();
 
     useEffect(() => {
-        const refreshToken = localStorage.getItem("refreshToken");
+        const refreshToken = localStorage.getItem("accessToken");
         if (refreshToken) {
             triggerAuthMe()
                 .unwrap()
@@ -20,8 +20,8 @@ export default function AppInitializer({
                     dispatch(setAuthenticateEmployeeDetailsData(res));
                 })
                 .catch(() => {
-                    // invalid refresh token -> clear localStorage + state
-                    localStorage.removeItem("refreshToken");
+                    localStorage.removeItem("accessToken");
+                    localStorage.removeItem("persist:root");
                     dispatch(setAuthenticateEmployeeDetailsData(null));
                 });
         }

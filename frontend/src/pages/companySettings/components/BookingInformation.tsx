@@ -6,7 +6,9 @@ import type {
 } from "@/types/hotel.type";
 import { useEffect, useMemo, useState } from "react";
 
+import BookingModal from "@/modal/BookingModal";
 import Button from "@/components/ui/button/Button";
+import { Modal } from "@/components/common/Modal";
 import ReactTable from "@/components/common/ReactTable";
 import { createColumnHelper } from "@tanstack/react-table";
 import { getCustomerError } from "@/utils/customError";
@@ -46,7 +48,7 @@ const BookingInformation = (props: IProps) => {
     } = props;
     const [allowBookingBtn, setAllowBookingBtn] = useState<boolean>(false);
     const [createBooking] = useCreateBookingMutation();
-
+    const [toggle, setToggle] = useState(false);
     console.log({
         checkInDateState,
         checkOutDateState,
@@ -194,6 +196,10 @@ const BookingInformation = (props: IProps) => {
         }
     };
 
+    const handleOpenToggle = () => {
+        setToggle(true);
+    };
+
     return (
         <div className='flex flex-col justify-between h-full'>
             <div className='mb-6'>
@@ -319,21 +325,38 @@ const BookingInformation = (props: IProps) => {
                         </ul>
                     </div>
                 </div>
-                <div className='mt-6'>
+                <div className='mt-6 flex w-full justify-end'>
                     <Button
                         variant='primary'
                         size='md'
                         title={!allowBookingBtn ? "Select Dates" : ""}
                         disabled={!allowBookingBtn}
                         onClick={() => {
-                            handleSubmitToBackend();
+                            handleOpenToggle();
                         }}
-                        className='bg-teal-500 hover:bg-teal-400!   w-full'
                     >
                         Confirm Booking
                     </Button>
                 </div>
             </div>
+            <Modal
+                isOpen={toggle}
+                onClose={() => setToggle(false)}
+                blurEffect='32px'
+                className='max-w-7xl mb-4  '
+                isFullscreen={false}
+            >
+                <BookingModal
+                    bookingInformation={bookingInformation}
+                    checkInDateState={checkInDateState}
+                    checkOutDateState={checkOutDateState}
+                    selectedCustomer={selectedCustomer}
+                    newCustomerMobileNumber={newCustomerMobileNumber}
+                    newCustomerName={newCustomerName}
+                    // handleSubmitToBackend={handleSubmitToBackend}
+                    // handleCloseModal={() => setToggle(false)}
+                />
+            </Modal>
         </div>
     );
 };

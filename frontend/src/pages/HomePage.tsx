@@ -5,7 +5,7 @@ import Testimonial from "@components/home/Testimonial";
 
 function HomePage() {
     return (
-        <div className='bg-white-50 text-gray-800'>
+        <div className='bg-white-50 text-gray-800 overflow-x-hidden! dark:bg-gray-900 dark:text-gray-100'>
             <HomeNavbar />
             {/* Hero Section */}
             <header className='flex min-h-fit flex-col items-center justify-center bg-white py-16'>

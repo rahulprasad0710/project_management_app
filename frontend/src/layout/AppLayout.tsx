@@ -34,14 +34,16 @@ const AppLayout: React.FC = () => {
     const authenticateEmployee = useAppSelector(
         (state) => state.global.authenticateEmployee
     );
+    console.log({
+        authenticateEmployee,
+    });
 
     return (
         <SidebarProvider>
             {authenticateEmployee?.id ? (
                 <LayoutContent />
             ) : (
-                // <Navigate to={"/"} />
-                <LayoutContent />
+                <Navigate to={"/"} />
             )}
         </SidebarProvider>
     );
