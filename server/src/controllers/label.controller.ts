@@ -37,8 +37,6 @@ const getAll = async (req: Request, res: Response): Promise<void> => {
         take,
     });
 
-    throw new AppError("Token has expired", 401, ErrorType.EXPIRED_TOKEN_ERROR);
-
     res.status(200).json({
         success: true,
         data: data,

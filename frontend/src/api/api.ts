@@ -4,15 +4,15 @@ import type {
     Response,
     ResponseWithPagination,
 } from "../types/config.types";
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 import { authEndpoints } from "./apiRoutes/authApi";
+import { baseQueryWithReauth } from "./baseQuery";
 import { bookingEndpoints } from "./apiRoutes/hotel/bookingApi";
 import { commentEndpoints } from "./apiRoutes/commentApi";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import { customerEndpoints } from "./apiRoutes/customerApi";
 import { employeeEndpoints } from "./apiRoutes/employeeApi";
 import { featuresEndpoints } from "./apiRoutes/featureApi";
-import { getAuthToken } from "@/utils/apiFn";
 import { internalCompanyEndpoints } from "./apiRoutes/internalCompanyApi";
 import { labelEndpoints } from "./apiRoutes/labelApi";
 import { projectEndpoints } from "./apiRoutes/projectApi";
@@ -28,16 +28,7 @@ import { uploadsEndpoints } from "./apiRoutes/uploadApi";
 // /* REDUX API */
 
 export const api = createApi({
-    baseQuery: fetchBaseQuery({
-        baseUrl: "http://localhost:8000/api/",
-        credentials: "include",
-        prepareHeaders: async (headers) => {
-            const { accessToken } = await getAuthToken();
-            console.log("LOG: ~ prepareHeaders: ~ accessToken:", accessToken);
-            headers.set("Authorization", `Bearer ${accessToken}`);
-            return headers;
-        },
-    }),
+    baseQuery: baseQueryWithReauth,
     reducerPath: "api",
     tagTypes: [
         "Users",
