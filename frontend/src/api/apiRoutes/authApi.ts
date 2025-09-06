@@ -63,6 +63,14 @@ export const authEndpoints = (
             method: "GET",
         }),
     }),
+    createRefreshToken: build.mutation<Response<IAuthEmployeeResponse>, void>({
+        query: () => ({
+            url: `${apiConstant.route}/refresh-token`,
+            method: "POST",
+            credentials: "include",
+        }),
+    }),
+
     getUserLogout: build.query<
         Response<{ id: number; accessToken: null; refreshToken: null }>,
         void

@@ -9,9 +9,9 @@ router.get("/me", verifyToken, asyncTryCatchFn(authController.authenticateMe));
 router.get("/logout", verifyToken, asyncTryCatchFn(authController.logout));
 router.post("/login", asyncTryCatchFn(authController.login));
 router.post(
-    "/refreshUser",
+    "/refresh-token",
     verifyToken,
-    asyncTryCatchFn(authController.logout)
+    asyncTryCatchFn(authController.refreshUser)
 );
 router.post(
     "/verify-email",

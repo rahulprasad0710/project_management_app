@@ -56,13 +56,16 @@ const verifyEmailAndSetPassword = async (req: Request, res: Response) => {
 };
 
 const refreshUser = async (req: Request, res: Response) => {
-    const incomingRefreshToken =
-        req.cookies.refreshToken || req.body.refreshToken;
+    const incomingRefreshToken = req.cookies.refreshToken;
+    console.log(
+        "LOG: ~ refreshUser ~ incomingRefreshToken:",
+        incomingRefreshToken
+    );
 
-    const response = await authService.refreshUser(incomingRefreshToken);
+    // const response = await authService.refreshUser(incomingRefreshToken);
     res.status(200).json({
         success: true,
-        data: response,
+        data: incomingRefreshToken,
         message: "User refreshed successfully",
     });
 };
@@ -83,4 +86,5 @@ export default {
     verifyEmailAndSetPassword,
     logout,
     authenticateMe,
+    refreshUser,
 };
