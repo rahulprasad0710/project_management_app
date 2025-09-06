@@ -2,6 +2,7 @@ import "./subscribers";
 
 import { Server } from "socket.io";
 import { connectToDatabase } from "./db/data-source";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import { createServer } from "http";
 import dotenv from "dotenv";
@@ -52,6 +53,8 @@ app.use(
         policy: "cross-origin",
     })
 );
+
+app.use(cookieParser());
 
 // socket connect
 socketConnect(httpServer);

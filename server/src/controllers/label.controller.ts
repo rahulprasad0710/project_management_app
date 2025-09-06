@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 
+import AppError from "../utils/AppError";
+import { ErrorType } from "../enums/Eums";
 import { IPagination } from "../types/express";
 import LabelService from "../services/label.service";
 
@@ -34,6 +36,8 @@ const getAll = async (req: Request, res: Response): Promise<void> => {
         skip,
         take,
     });
+
+    throw new AppError("Token has expired", 401, ErrorType.EXPIRED_TOKEN_ERROR);
 
     res.status(200).json({
         success: true,

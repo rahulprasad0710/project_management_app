@@ -56,23 +56,38 @@ const verifyEmailAndSetPassword = async (req: Request, res: Response) => {
 };
 
 const refreshUser = async (req: Request, res: Response) => {
-    const incomingRefreshToken = req.cookies.refreshToken;
-    console.log(
-        "LOG: ~ refreshUser ~ incomingRefreshToken:",
+    const incomingRefreshToken = req?.cookies?.refreshToken;
+
+    if (!incomingRefreshToken) {
+        res.status(401).json({
+            success: false,
+            data: null,
+            message: "No refresh token provided",
+        });
+        return;
+    }
+
+    const { refreshToken, ...rest } = await authService.refreshUser(
         incomingRefreshToken
     );
 
-    // const response = await authService.refreshUser(incomingRefreshToken);
-    res.status(200).json({
-        success: true,
-        data: incomingRefreshToken,
-        message: "User refreshed successfully",
-    });
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    })
+        .status(200)
+        .json({
+            success: true,
+            data: rest,
+            message: "refresh token successful",
+        });
 };
 
 const authenticateMe = async (req: Request, res: Response) => {
     const { verifiedUserId } = req;
-    const response = await authService.authenticateUser(verifiedUserId);
+    const response = await authService.authenticateUser(verifiedUserId, true);
 
     res.status(200).json({
         success: true,

@@ -153,8 +153,8 @@ const refreshUser = async (refreshToken: string) => {
     }
 
     if (typeof decoded === "object" && "id" in decoded) {
-        const userFromDB = await userService.getById(Number(decoded.id));
-
+        // const userFromDB = await userService.getById(Number(decoded.id));
+        const userFromDB = await authenticateUser(Number(decoded.id), false);
         if (!userFromDB) {
             throw new AppError(
                 "User not found",
@@ -177,7 +177,22 @@ const refreshUser = async (refreshToken: string) => {
 
         await userService.updateRefreshToken(userFromDB.id, refreshToken);
 
-        return { user: userFromDB, accessToken, refreshToken };
+        return {
+            id: userFromDB?.id,
+            email: userFromDB?.email,
+            type: "credentials",
+            internalCompanies: userFromDB?.internalCompanies,
+            role: {
+                ...userFromDB?.role,
+                permissions: userFromDB?.role?.permissions?.map((item) => {
+                    return item;
+                }),
+            },
+
+            accessToken,
+            refreshToken,
+            authenticated: true,
+        };
     } else {
         throw new AppError("Invalid token", 401, ErrorType.INVALID_TOKEN_ERROR);
     }
@@ -227,8 +242,16 @@ const getUserInfo = async (userId: number) => {
     }
 };
 
-const authenticateUser = async (userId: number) => {
-    const result = await RedisService.getValue<IUserInfo>(`user:${userId}`);
+const authenticateUser = async (userId: number, fromCache: boolean) => {
+    let result = null;
+    if (fromCache) {
+        result = await RedisService.getValue<IUserInfo>(`user:${userId}`);
+    }
+
+    if (result) {
+        return result;
+    }
+
     if (!result) {
         const userFromDB = await getUserInfo(userId);
         if (!userFromDB) {
