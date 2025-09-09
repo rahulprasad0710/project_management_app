@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
+import { PERMISSION_TYPE } from "../../enums/Permission";
 import { Permission } from "./Permission";
 
 @Entity()
@@ -13,7 +14,14 @@ export class PermissionGroup {
     @Column({ default: true })
     isActive: boolean;
 
-    @Column({ unique: true })
+    @Column({
+        type: "enum",
+        enum: PERMISSION_TYPE,
+        default: PERMISSION_TYPE.NORMAL,
+    })
+    permission_type: string;
+
+    @Column({ type: "text", nullable: true, default: null })
     description: string;
 
     @OneToMany(() => Permission, (permission) => permission.permissionGroup)

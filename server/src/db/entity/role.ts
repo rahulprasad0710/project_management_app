@@ -21,6 +21,11 @@ export class Role {
     @Column({ unique: true })
     name: string;
 
+    @Column({ default: true })
+    role_type: string;
+
+    description: string;
+
     @OneToMany(() => User, (user) => user.role, {
         eager: false,
     })

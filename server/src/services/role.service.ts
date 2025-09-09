@@ -17,14 +17,14 @@ export class RoleService {
     private readonly roleRepository = dataSource.getRepository(Role);
 
     async create(role: IRole) {
-        const roleObj = new Role();
-        roleObj.name = role.name;
-        roleObj.isActive = role.isActive ?? true;
+        const rolePayload = new Role();
+        rolePayload.name = role.name;
+        rolePayload.isActive = role.isActive ?? true;
         if (role.permissions) {
-            roleObj.permissions = role.permissions;
+            rolePayload.permissions = role.permissions;
         }
 
-        return await this.roleRepository.save(roleObj);
+        return await this.roleRepository.save(rolePayload);
     }
 
     async getAll(isActive: boolean) {
