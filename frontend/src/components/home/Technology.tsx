@@ -1,7 +1,5 @@
 import Image from "@molecules/Image";
 
-type Props = {};
-
 const Technology = (props: Props) => {
     return (
         <div className='bg-white'>

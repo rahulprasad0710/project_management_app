@@ -4,6 +4,15 @@ import APP_CONSTANT from "../constants/AppConfig";
 import { DataSource } from "typeorm";
 import entities from "./index";
 
+console.log({
+    node_env: APP_CONSTANT.NODE_ENV,
+    host: APP_CONSTANT.DB_HOST,
+    port: APP_CONSTANT.DB_PORT,
+    username: APP_CONSTANT.DB_USER,
+    password: APP_CONSTANT.DB_PASSWORD,
+    database: APP_CONSTANT.DB_NAME,
+});
+
 const dataSource = new DataSource({
     type: "postgres",
     host: APP_CONSTANT.DB_HOST,
@@ -16,9 +25,7 @@ const dataSource = new DataSource({
     entities: entities,
     migrations: [],
     subscribers: [],
-    ssl: {
-        rejectUnauthorized: false,
-    },
+    ssl: false,
 });
 
 export async function connectToDatabase() {

@@ -1,0 +1,56 @@
+services:
+    databaseserver:
+        image: postgres
+        container_name: postgres-server-container
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=Rahul99pg
+            - POSTGRES_DB=pma
+        volumes:
+            - ~/postgresql_folder/mount:/var/lib/postgresql/data
+        networks:
+            - pma-network
+    redisserver:
+        image: redis:alpine
+        container_name: redis-server-container
+        restart: always
+        volumes:
+            - redis_volume_data:/data
+        ports:
+            - 6379:6379
+    redis_insight:
+        image: redislabs/redisinsight:1.14.0
+        container_name: redis_insight-container
+        restart: always
+        ports:
+            - 8001:8001
+        volumes:
+            - redis_insight_volume_data:/db        -
+
+    backendserver:
+        image: rahulshah10/pma_backend_2025:latest
+        container_name: backend-server
+        ports:
+            - "8000:8000"
+        networks:
+            - pma-network
+        env_file: .env
+        depends_on:
+            - databaseserver
+            - redisserver
+            - redis_insight
+    frontendserver:
+        image: rahulshah10/pma-frontend:latest
+        container_name: frontend-server
+        ports:
+            - "3000:80"
+        networks:
+            - pma-network
+        depends_on:
+            - backendserver
+networks:
+    pma-network:
+        driver: bridge
+volumes:
+    redis_volume_data:
+    redis_insight_volume_data:

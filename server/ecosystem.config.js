@@ -1,22 +1,16 @@
 module.exports = {
     apps: [
         {
-            name: "project-management-app",
-            script: "npm",
-            args: "run dev",
+            name: "project-management-app-backend",
+            script: "./dist/index.js",
+            instances: "max",
+            exec_mode: "cluster",
             env: {
                 NODE_ENV: "development",
             },
-            // watch: true,
-        },
-        {
-            name: "project-management-app",
-            script: "npm",
-            args: "run server",
-            env: {
-                NODE_ENV: "development",
+            env_production: {
+                NODE_ENV: "production",
             },
-            // watch: true,
         },
     ],
 };
